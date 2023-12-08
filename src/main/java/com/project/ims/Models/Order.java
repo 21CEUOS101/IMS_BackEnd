@@ -24,7 +24,7 @@ public class Order {
 
     private String destination_id;
 
-    private Integer total_amount;
+    private String total_amount;
 
     private String status;
 

@@ -26,7 +26,7 @@ public class Product {
 
     private String expiry_date;
 
-    private Integer price;
+    private String price;
 
     private String quantity;
 
@@ -36,6 +36,6 @@ public class Product {
 
     private String company_name;
 
-    private Integer mrp;
+    private String mrp;
     
 }
