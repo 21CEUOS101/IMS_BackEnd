@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ImsApplication<ims>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.project.ims.ImsApplication",
+            "projectName": "ims",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
