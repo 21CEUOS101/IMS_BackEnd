@@ -49,14 +49,26 @@ public class AdminService implements IAdminService {
 
     @Override
     public Admin addAdmin(Admin admin) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addAdmin'");
+
+        if(admin.getId() == null || admin.getId().isEmpty())
+        {
+            throw new RuntimeException("Admin ID cannot be empty");
+        }
+        else if(adminRepo.existsById(admin.getId()))
+        {
+            throw new RuntimeException("Admin ID already exists");
+        }
+        else if (admin.getId().charAt(0) != 'a')
+        {
+            throw new RuntimeException("Admin ID must start with 'a'");
+        }
+
+        return adminRepo.save(admin);
     }
 
     @Override
     public Admin updateAdmin(Admin admin) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateAdmin'");
+        return adminRepo.save(admin);
     }
 
     @Override

@@ -40,29 +40,43 @@ public class WManagerService implements IWManagerService {
 
     @Autowired
     private WManagerRepo wManagerRepo;
+    
+    @Override
+    public WareHouse_Manager getWManagerById(String id) {
+        return wManagerRepo.findById(id).orElse(null);
+    }
 
     @Override
     public WareHouse_Manager addWManager(WareHouse_Manager wManager) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addWManager'");
+
+        if (wManager.getId() == null || wManager.getId().isEmpty())
+        {
+            throw new RuntimeException("WareHouse Manager ID cannot be empty");
+        }
+        else if (wManagerRepo.existsById(wManager.getId()))
+        {
+            throw new RuntimeException("WareHouse Manager ID already exists");
+        }
+        else if (wManager.getId().charAt(0) != 'm')
+        {
+            throw new RuntimeException("WareHouse Manager ID must start with 'm'");
+        }
+
+        return wManagerRepo.save(wManager);
     }
 
     @Override
     public WareHouse_Manager updateWManager(WareHouse_Manager wManager) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateWManager'");
-    }
-
-    @Override
-    public WareHouse_Manager getWManagerById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getWManagerById'");
+        return wManagerRepo.save(wManager);
     }
 
     @Override
     public void deleteWManager(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteWManager'");
+        if (!wManagerRepo.existsById(id))
+        {
+            throw new RuntimeException("WareHouse Manager ID does not exist");
+        }
+        wManagerRepo.deleteById(id);
     }
     
 }

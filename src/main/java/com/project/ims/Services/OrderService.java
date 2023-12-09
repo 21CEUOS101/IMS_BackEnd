@@ -43,26 +43,42 @@ public class OrderService implements IOrderService {
 
     @Override
     public Order getOrderById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getOrderById'");
+        return orderRepo.findById(id).orElse(null);
     }
 
     @Override
     public Order addOrder(Order order) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addOrder'");
+
+        if(order.getId() == null || order.getId().isEmpty())
+        {
+            throw new RuntimeException("Order ID cannot be empty");
+        }
+        else if(orderRepo.existsById(order.getId()))
+        {
+            throw new RuntimeException("Order ID already exists");
+        }
+        else if (order.getId().charAt(0) != 'o')
+        {
+            throw new RuntimeException("Order ID must start with 'o'");
+        }
+
+        return orderRepo.save(order);
     }
 
     @Override
     public Order updateOrder(Order order) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateOrder'");
+        return orderRepo.save(order);
     }
 
     @Override
     public void deleteOrder(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteOrder'");
+
+        if(!orderRepo.existsById(id))
+        {
+            throw new RuntimeException("Order with id " + id + " does not exist");
+        }
+
+        orderRepo.deleteById(id);
     }
     
 }

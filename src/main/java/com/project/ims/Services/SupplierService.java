@@ -42,27 +42,43 @@ public class SupplierService implements ISupplierService {
     private WManagerRepo wManagerRepo;
 
     @Override
+    public Supplier getSupplierById(String id) {
+        return supplierRepo.findById(id).orElse(null);
+    }
+
+    @Override
     public Supplier addSupplier(Supplier supplier) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addSupplier'");
+
+        if(supplier.getId() == null || supplier.getId().isEmpty())
+        {
+            throw new RuntimeException("Supplier ID cannot be empty");
+        }
+        else if(supplierRepo.existsById(supplier.getId()))
+        {
+            throw new RuntimeException("Supplier ID already exists");
+        }
+        else if (supplier.getId().charAt(0) != 's')
+        {
+            throw new RuntimeException("Supplier ID must start with 's'");
+        }
+
+        return supplierRepo.save(supplier);
     }
 
     @Override
     public Supplier updateSupplier(Supplier supplier) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateSupplier'");
-    }
-
-    @Override
-    public Supplier getSupplierById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSupplierById'");
+        return supplierRepo.save(supplier);
     }
 
     @Override
     public void deleteSupplier(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteSupplier'");
+        
+        if (!supplierRepo.existsById(id))
+        {
+            throw new RuntimeException("Supplier with id " + id + " does not exist");
+        }
+        
+        supplierRepo.deleteById(id);
     }
     
 }

@@ -43,26 +43,41 @@ public class ProductService implements IProductService {
 
     @Override
     public Product getProductById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getProductById'");
+        return productRepo.findById(id).orElse(null);
     }
 
     @Override
     public Product addProduct(Product product) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addProduct'");
+
+        if (product.getId() == null || product.getId().isEmpty())
+        {
+            throw new RuntimeException("Product ID cannot be empty");
+        }
+        else if (productRepo.existsById(product.getId()))
+        {
+            throw new RuntimeException("Product ID already exists");
+        }
+        else if (product.getId().charAt(0) != 'p')
+        {
+            throw new RuntimeException("Product ID must start with 'p'");
+        }
+
+        return productRepo.save(product);
     }
 
     @Override
     public Product updateProduct(Product product) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateProduct'");
+        return productRepo.save(product);
     }
 
     @Override
     public void deleteProduct(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteProduct'");
+        if (!productRepo.existsById(id))
+        {
+            throw new RuntimeException("Product with id " + id + " does not exist");
+        }
+
+        productRepo.deleteById(id);
     }
     
 }

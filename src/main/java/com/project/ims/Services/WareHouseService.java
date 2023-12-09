@@ -37,32 +37,46 @@ public class WareHouseService implements IWareHouseService {
 
     @Autowired
     private WareHouseRepo wareHouseRepo;
-
+    
     @Autowired
     private WManagerRepo wManagerRepo;
 
     @Override
+    public WareHouse getWareHouseById(String id) {
+        return wareHouseRepo.findById(id).orElse(null);
+    }
+
+    @Override
     public WareHouse addWareHouse(WareHouse wareHouse) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addWareHouse'");
+
+        if (wareHouse.getId() == null || wareHouse.getId().isEmpty())
+        {
+            throw new RuntimeException("WareHouse ID cannot be empty");
+        }
+        else if (wareHouseRepo.existsById(wareHouse.getId()))
+        {
+            throw new RuntimeException("WareHouse ID already exists");
+        }
+        else if (wareHouse.getId().charAt(0) != 'w')
+        {
+            throw new RuntimeException("WareHouse ID must start with 'w'");
+        }
+
+        return wareHouseRepo.save(wareHouse);
     }
 
     @Override
     public WareHouse updateWareHouse(WareHouse wareHouse) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateWareHouse'");
-    }
-
-    @Override
-    public WareHouse getWareHouseById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getWareHouseById'");
+        return wareHouseRepo.save(wareHouse);
     }
 
     @Override
     public void deleteWareHouse(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteWareHouse'");
+        if (!wareHouseRepo.existsById(id))
+        {
+            throw new RuntimeException("WareHouse ID does not exist");
+        }
+        wareHouseRepo.deleteById(id);
     }
     
 }

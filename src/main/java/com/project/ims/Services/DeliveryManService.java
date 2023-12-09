@@ -37,32 +37,40 @@ public class DeliveryManService implements IDeliveryManService {
 
     @Autowired
     private WareHouseRepo wareHouseRepo;
-
+    
     @Autowired
     private WManagerRepo wManagerRepo;
 
     @Override
+    public DeliveryMan getDeliveryManById(String id) {
+        return deliveryManRepo.findById(id).orElse(null);
+    }
+
+    @Override
     public DeliveryMan addDeliveryMan(DeliveryMan deliveryMan) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addDeliveryMan'");
+        
+        if(deliveryManRepo.existsById(deliveryMan.getId()))
+            throw new RuntimeException("DeliveryMan with id " + deliveryMan.getId() + " already exists");
+        else if (deliveryMan.getId() == null || deliveryMan.getId().isEmpty())
+            throw new RuntimeException("DeliveryMan ID cannot be empty");
+        else if (deliveryMan.getId().charAt(0) != 'd')
+            throw new RuntimeException("DeliveryMan ID must start with 'd'");
+        
+        return deliveryManRepo.save(deliveryMan);
     }
 
     @Override
     public DeliveryMan updateDeliveryMan(DeliveryMan deliveryMan) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateDeliveryMan'");
-    }
-
-    @Override
-    public DeliveryMan getDeliveryManById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDeliveryManById'");
+        return deliveryManRepo.save(deliveryMan);
     }
 
     @Override
     public void deleteDeliveryMan(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteDeliveryMan'");
+        
+        if(!deliveryManRepo.existsById(id))
+            throw new RuntimeException("DeliveryMan with id " + id + " does not exist");
+        
+        deliveryManRepo.deleteById(id);
     }
     
 }

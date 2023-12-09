@@ -42,27 +42,43 @@ public class CustomerService implements ICustomerService {
     private WManagerRepo wManagerRepo;
 
     @Override
+    public Customer getCustomerById(String id) {
+        return customerRepo.findById(id).orElse(null);
+    }
+
+    @Override
     public Customer addCustomer(Customer customer) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addCustomer'");
+        
+        if(customerRepo.existsById(customer.getId()))
+        {
+            throw new RuntimeException("Customer with id " + customer.getId() + " already exists");
+        }
+        else if (customer.getId() == null || customer.getId().isEmpty())
+        {
+            throw new RuntimeException("Customer ID cannot be empty");
+        }
+        else if (customer.getId().charAt(0) != 'c')
+        {
+            throw new RuntimeException("Customer ID must start with 'c'");
+        }
+        
+        return customerRepo.save(customer);
     }
 
     @Override
     public Customer updateCustomer(Customer customer) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateCustomer'");
-    }
-
-    @Override
-    public Customer getCustomerById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCustomerById'");
+        return customerRepo.save(customer);
     }
 
     @Override
     public void deleteCustomer(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteCustomer'");
+
+        if (customerRepo.existsById(id))
+        {
+            throw new RuntimeException("Customer with id " + id + " does not exist");
+        }
+
+        customerRepo.deleteById(id);
     }
     
 }
