@@ -10,8 +10,8 @@ public interface IWareHouseService {
 
     public WareHouse updateWareHouse(WareHouse wareHouse);
 
-    public WareHouse getWareHouseById(int id);
+    public WareHouse getWareHouseById(String id);
 
-    public void deleteWareHouse(int id);
+    public void deleteWareHouse(String id);
     
 }

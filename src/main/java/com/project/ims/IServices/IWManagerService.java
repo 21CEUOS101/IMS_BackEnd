@@ -10,7 +10,7 @@ public interface IWManagerService {
 
     public WareHouse_Manager updateWManager(WareHouse_Manager wManager);
 
-    public WareHouse_Manager getWManagerById(int id);
+    public WareHouse_Manager getWManagerById(String id);
 
-    public void deleteWManager(int id);
+    public void deleteWManager(String id);
 }

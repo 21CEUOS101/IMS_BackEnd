@@ -11,7 +11,7 @@ public interface IDeliveryManService {
 
     public DeliveryMan updateDeliveryMan(DeliveryMan deliveryMan);
 
-    public DeliveryMan getDeliveryManById(int id);
+    public DeliveryMan getDeliveryManById(String id);
 
-    public void deleteDeliveryMan(int id);
+    public void deleteDeliveryMan(String id);
 }

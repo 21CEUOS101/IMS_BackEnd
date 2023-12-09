@@ -7,11 +7,11 @@ import com.project.ims.Models.Product;
 @Service
 public interface IProductService {
         
-        public Product getProductById(int id);
+        public Product getProductById(String id);
         
         public Product addProduct(Product product);
         
         public Product updateProduct(Product product);
     
-        public void deleteProduct(int id);
+        public void deleteProduct(String id);
 }

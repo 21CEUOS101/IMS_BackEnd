@@ -11,7 +11,7 @@ public interface ISupplierService {
 
     public Supplier updateSupplier(Supplier supplier);
 
-    public Supplier getSupplierById(int id);
+    public Supplier getSupplierById(String id);
 
-    public void deleteSupplier(int id);
+    public void deleteSupplier(String id);
 }

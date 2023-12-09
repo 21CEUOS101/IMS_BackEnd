@@ -7,12 +7,12 @@ import com.project.ims.Models.Admin;
 @Service
 public interface IAdminService {
     
-    public Admin getAdminById(int id);
+    public Admin getAdminById(String id);
     
     public Admin addAdmin(Admin admin);
     
     public Admin updateAdmin(Admin admin);
 
-    public void deleteAdmin(int id);
+    public void deleteAdmin(String id);
 
 }
