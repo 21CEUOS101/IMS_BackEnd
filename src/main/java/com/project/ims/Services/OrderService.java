@@ -48,7 +48,8 @@ public class OrderService implements IOrderService {
 
     @Override
     public Order addOrder(Order order) {
-
+        
+        // Checking if the order ID is valid
         if(order.getId() == null || order.getId().isEmpty())
         {
             throw new RuntimeException("Order ID cannot be empty");
@@ -60,6 +61,19 @@ public class OrderService implements IOrderService {
         else if (order.getId().charAt(0) != 'o')
         {
             throw new RuntimeException("Order ID must start with 'o'");
+        }
+
+        // Checking if total price is valid
+        Integer totalPrice = 0;
+
+        for(int i=0;i<order.getProduct_ids().size();i++)
+        {
+            totalPrice += Integer.parseInt(productRepo.findById(order.getProduct_ids().get(i)).get().getPrice());
+        }
+
+        if(totalPrice != Integer.parseInt(order.getTotal_amount()))
+        {
+            throw new RuntimeException("Total price is not valid");
         }
 
         return orderRepo.save(order);
