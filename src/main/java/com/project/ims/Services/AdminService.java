@@ -1,5 +1,7 @@
 package com.project.ims.Services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -78,6 +80,11 @@ public class AdminService implements IAdminService {
         {
             adminRepo.deleteById(id);
         }
+    }
+
+    @Override
+    public List<Admin> getAllAdmin() {
+        return adminRepo.findAll();
     }
     
 }

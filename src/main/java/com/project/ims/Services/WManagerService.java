@@ -1,5 +1,7 @@
 package com.project.ims.Services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -77,6 +79,11 @@ public class WManagerService implements IWManagerService {
             throw new RuntimeException("WareHouse Manager ID does not exist");
         }
         wManagerRepo.deleteById(id);
+    }
+
+    @Override
+    public List<WareHouse_Manager> getAllWManager() {
+        return wManagerRepo.findAll();
     }
     
 }

@@ -1,5 +1,7 @@
 package com.project.ims.Services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -77,6 +79,11 @@ public class WareHouseService implements IWareHouseService {
             throw new RuntimeException("WareHouse ID does not exist");
         }
         wareHouseRepo.deleteById(id);
+    }
+
+    @Override
+    public List<WareHouse> getAllWareHouse() {
+        return wareHouseRepo.findAll();
     }
     
 }

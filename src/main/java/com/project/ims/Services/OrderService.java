@@ -94,5 +94,9 @@ public class OrderService implements IOrderService {
 
         orderRepo.deleteById(id);
     }
+
+    public List<Order> getAllOrder() {
+        return orderRepo.findAll();
+    }
     
 }
