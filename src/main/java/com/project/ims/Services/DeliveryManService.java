@@ -79,5 +79,14 @@ public class DeliveryManService implements IDeliveryManService {
     public List<DeliveryMan> getAllDeliveryMan() {
         return deliveryManRepo.findAll();
     }
+
+    @Override
+    public List<DeliveryMan> getAllDeliveryManByWarehouse(String wareHouseId) {
+        
+        if(!wareHouseRepo.existsById(wareHouseId))
+            throw new RuntimeException("WareHouse with id " + wareHouseId + " does not exist");
+        
+        return deliveryManRepo.findByWarehouseId(wareHouseId);
+    }
     
 }

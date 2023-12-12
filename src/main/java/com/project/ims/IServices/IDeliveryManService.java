@@ -10,6 +10,8 @@ import com.project.ims.Models.DeliveryMan;
 public interface IDeliveryManService {
 
     public List<DeliveryMan> getAllDeliveryMan();
+
+    public List<DeliveryMan> getAllDeliveryManByWarehouse(String wareHouseId);
     
     public DeliveryMan addDeliveryMan(DeliveryMan deliveryMan);
 
