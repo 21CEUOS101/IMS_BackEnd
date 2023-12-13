@@ -68,9 +68,9 @@ public class OrderService implements IOrderService {
         // Checking if total price is valid
         Integer totalPrice = 0;
 
-        for(int i=0;i<order.getProduct_ids().size();i++)
+        for(int i=0;i<order.getProducts().size();i++)
         {
-            totalPrice += Integer.parseInt(productRepo.findById(order.getProduct_ids().get(i)).get().getPrice());
+            totalPrice += Integer.parseInt(productRepo.findById(order.getProducts().get(i).getId()).get().getPrice());
         }
 
         if(totalPrice != Integer.parseInt(order.getTotal_amount()))

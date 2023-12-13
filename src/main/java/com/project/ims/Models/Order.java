@@ -18,7 +18,7 @@ public class Order {
     @Id
     private String id;
 
-    private List<String> product_ids;
+    private List<Product> products;
 
     private String source_id;
 

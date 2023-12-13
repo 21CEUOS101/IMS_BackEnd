@@ -1,10 +1,6 @@
 package com.project.ims.Controllers;
-
 import java.util.List;
 import java.util.Random;
-
-import javax.management.RuntimeErrorException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import java.time.format.DateTimeFormatter;
@@ -18,17 +14,20 @@ import com.project.ims.IServices.IWManagerService;
 import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
+import com.project.ims.Models.Product;
 import com.project.ims.Requests.OrderAddRequest;
 import java.time.LocalDateTime;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
 
-@Controller
+@RestController
 public class OrderController {
     
     @Autowired
@@ -71,8 +70,7 @@ public class OrderController {
         Random rand = new Random();
         String id = 'o' + String.valueOf(rand.nextInt(1000000));
         order.setId(id);
-
-        order.setProduct_ids(data.getProduct_ids());
+        order.setProducts(data.getProducts());
         order.setSource_id(data.getSource_id());
         order.setDestination_id(data.getDestination_id());
         order.setTotal_amount(data.getTotal_amount());
@@ -92,7 +90,8 @@ public class OrderController {
     }
     
     @PostMapping("/order/{id}/status")
-    public Order updateOrderStatus(@PathVariable("id") String id, @RequestParam("status") String status , @RequestParam("deliveryman_id") String deliveryman_id) {
+    public Order updateOrderStatus(@PathVariable("id") String id, @RequestParam("status") String status,
+            @RequestParam("deliveryman_id") String deliveryman_id) {
 
         Order order = orderService.getOrderById(id);
 
@@ -113,9 +112,7 @@ public class OrderController {
             deliveryMan.setStatus("available");
 
             deliveryManService.updateDeliveryMan(deliveryMan);
-        }
-        else if (status.equals("shipped") && order.getSource_id().startsWith("w"))
-        {
+        } else if (status.equals("shipped") && order.getSource_id().startsWith("w")) {
             List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getSource_id());
 
             for (DeliveryMan d : deliveryMen) {
@@ -130,19 +127,38 @@ public class OrderController {
             if (order.getDelivery_man_id() == null || order.getDelivery_man_id().startsWith("d")) {
                 throw new RuntimeException("No DeliveryMan available at the moment");
             }
-        }
-        else if (status.equals("cancel"))
-        {
+        } else if (status.equals("cancel")) {
             DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(deliveryman_id);
 
             deliveryMan.setStatus("available");
 
             deliveryManService.updateDeliveryMan(deliveryMan);
 
-            
+            for (Product p : order.getProducts()) {
+                Product database_p = productService.getProductById(p.getId());
+
+                database_p.setQuantity(p.getQuantity() + database_p.getQuantity());
+            }
         }
 
         return order;
+    }
+    
+    @DeleteMapping("/order/{id}/delete")
+    public void deleteOrder(@PathVariable String id)
+    {
+
+        if (orderService.getOrderById(id) == null)
+        {
+            throw new RuntimeException("Order Not Exists");
+        }
+
+        orderService.deleteOrder(id);
+
+        if(orderService.getOrderById(id) != null)
+        {
+            throw new RuntimeException("Order Not deleted");
+        }
     }
     
     
