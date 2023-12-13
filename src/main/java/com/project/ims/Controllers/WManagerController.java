@@ -1,6 +1,7 @@
 package com.project.ims.Controllers;
 
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,6 +64,9 @@ public class WManagerController {
     @PostMapping("/wmanager")
     public WareHouse_Manager createWManager(@RequestBody WManagerAddRequest data) {
         WareHouse_Manager wManager = new WareHouse_Manager();
+        Random rand = new Random();
+        String id = "wm" + String.valueOf(rand.nextInt(1000000));
+        wManager.setId(id);
         wManager.setName(data.getName());
         wManager.setEmail(data.getEmail());
         wManager.setPassword(data.getPassword());
