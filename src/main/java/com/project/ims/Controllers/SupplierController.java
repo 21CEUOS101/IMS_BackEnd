@@ -1,6 +1,7 @@
 package com.project.ims.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.ims.IServices.IAdminService;
@@ -13,6 +14,7 @@ import com.project.ims.IServices.IWManagerService;
 import com.project.ims.IServices.IWareHouseService;
 
 @RestController
+@RequestMapping("/api")
 public class SupplierController {
     @Autowired
     private IAdminService adminService;
