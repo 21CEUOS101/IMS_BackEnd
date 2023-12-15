@@ -28,8 +28,6 @@ public class Product {
 
     private String price;
 
-    private String quantity;
-
     private String image;
 
     private String status;

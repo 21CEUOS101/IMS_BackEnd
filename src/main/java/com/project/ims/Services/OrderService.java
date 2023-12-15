@@ -68,9 +68,20 @@ public class OrderService implements IOrderService {
         // Checking if total price is valid
         Integer totalPrice = 0;
 
-        for(int i=0;i<order.getProducts().size();i++)
+        for(int i = 0; i < order.getProduct_ids().size(); i++)
         {
-            totalPrice += Integer.parseInt(productRepo.findById(order.getProducts().get(i).getId()).get().getPrice());
+            String product_id = order.getProduct_ids().get(i);
+            String quantity = order.getQuantities().get(i);
+
+            if(!productRepo.existsById(product_id))
+            {
+                throw new RuntimeException("Product with id " + product_id + " does not exist");
+            }
+
+            Integer price = Integer.parseInt(productRepo.findById(product_id).get().getPrice());
+            Integer quantityInt = Integer.parseInt(quantity);
+
+            totalPrice += price * quantityInt;
         }
 
         if(totalPrice != Integer.parseInt(order.getTotal_amount()))

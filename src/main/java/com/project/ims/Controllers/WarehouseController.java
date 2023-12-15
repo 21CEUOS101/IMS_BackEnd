@@ -77,7 +77,8 @@ public class WarehouseController {
         wareHouse.setPincode(data.getPincode());
         wareHouse.setManager_id(data.getManager_id());
         wareHouse.setStatus(data.getStatus());
-        wareHouse.setProducts(data.getProducts());
+        wareHouse.setProduct_ids(data.getProduct_ids());
+        wareHouse.setQuantities(data.getQuantities());
         return wareHouseService.addWareHouse(wareHouse);
 
     }
@@ -91,7 +92,8 @@ public class WarehouseController {
         wareHouse.setPincode(data.getPincode());
         wareHouse.setManager_id(data.getManager_id());
         wareHouse.setStatus(data.getStatus());
-        wareHouse.setProducts(data.getProducts());
+        wareHouse.setProduct_ids(data.getProduct_ids());
+        wareHouse.setQuantities(data.getQuantities());
         return wareHouseService.addWareHouse(wareHouse);
     }
     

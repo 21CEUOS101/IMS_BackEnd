@@ -13,7 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderAddRequest {
 
-    private List<Product> products;
+    private List<String> product_ids;
+
+    private List<String> quantities;
 
     private String source_id;
 

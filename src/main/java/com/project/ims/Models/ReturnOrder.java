@@ -18,7 +18,9 @@ public class ReturnOrder {
     @Id
     private String id;
 
-    private List<Product> products;
+    private List<String> product_ids;
+
+    private List<String> quantities;
 
     private String source_id;
 

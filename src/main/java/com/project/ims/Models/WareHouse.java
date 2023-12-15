@@ -24,7 +24,9 @@ public class WareHouse {
 
     private String pincode;
 
-    private List<Product> products;
+    private List<String> product_ids;
+
+    private List<String> quantities;
 
     private String manager_id;
 
