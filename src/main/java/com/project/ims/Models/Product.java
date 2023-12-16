@@ -30,8 +30,6 @@ public class Product {
 
     private String image;
 
-    private String status;
-
     private String company_name;
 
     private String mrp;

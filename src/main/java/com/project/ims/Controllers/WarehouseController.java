@@ -56,7 +56,7 @@ public class WarehouseController {
     private IWManagerService wManagerService;
 
     @GetMapping("/warehouse/{id}")
-    public WareHouse getMethodName(@PathVariable String id) {
+    public WareHouse getWareHouseById(@PathVariable String id) {
         return wareHouseService.getWareHouseById(id);
     }
 
