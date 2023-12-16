@@ -18,13 +18,13 @@ public class Order {
     @Id
     private String id;
 
-    private List<String> product_ids;
+    private String product_id;
 
-    private List<String> quantities;
+    private String quantity;
 
-    private String source_id;
+    private String warehouse_id;
 
-    private String destination_id;
+    private String customer_id;
 
     private String total_amount;
 

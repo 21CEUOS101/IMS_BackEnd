@@ -17,13 +17,9 @@ public class OrderAddRequest {
 
     private List<String> quantities;
 
-    private String source_id;
+    private List<String> warehouse_ids;
 
-    private String destination_id;
-
-    private String total_amount;
-
-    private String date_time;
+    private String customer_id;
 
     private String payment_method;
 
