@@ -33,5 +33,7 @@ public class Product {
     private String company_name;
 
     private String mrp;
+
+    private String supplier_id;
     
 }

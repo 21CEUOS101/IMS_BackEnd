@@ -24,4 +24,6 @@ public class ProductAddRequest {
     private String company_name;
 
     private String mrp;
+
+    private String supplier_id;
 }

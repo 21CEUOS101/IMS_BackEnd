@@ -75,7 +75,7 @@ public class ProductController {
         product.setImage(data.getImage());
         product.setMrp(data.getMrp());
         product.setManufactured_date(data.getManufactured_date());
-
+        product.setSupplier_id(data.getSupplier_id());
         return productService.addProduct(product);
     }
 
@@ -91,7 +91,7 @@ public class ProductController {
         product.setImage(data.getImage());
         product.setMrp(data.getMrp());
         product.setManufactured_date(data.getManufactured_date());
-
+        product.setSupplier_id(data.getSupplier_id());
         return productService.updateProduct(product);
     }
 
