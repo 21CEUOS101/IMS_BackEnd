@@ -10,6 +10,8 @@ import com.project.ims.Models.ReturnOrder;
 public interface IReturnOrderService {
 
     public List<ReturnOrder> getAllReturnOrder();
+
+    public List<ReturnOrder> getAllReturnOrderByCustomerId(String id);
     
     public ReturnOrder getReturnOrderById(String id);
     

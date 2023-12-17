@@ -89,5 +89,10 @@ public class ReturnOrderService implements IReturnOrderService {
         }
         returnOrderRepo.deleteById(id);
     }
+
+    @Override
+    public List<ReturnOrder> getAllReturnOrderByCustomerId(String id) {
+        return returnOrderRepo.findAllByCustomerId(id);
+    }
     
 }

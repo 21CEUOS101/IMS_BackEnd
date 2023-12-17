@@ -18,6 +18,8 @@ import com.project.ims.Models.Order;
 import com.project.ims.Models.Product;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.OrderAddRequest;
+import com.project.ims.Requests.OrderUpdateRequest;
+
 import java.time.LocalDateTime;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -195,12 +197,10 @@ public class OrderController {
             deliveryMan.setStatus("available");
 
             deliveryManService.updateDeliveryMan(deliveryMan);
-        } 
-        else if (status.equals("shipped")) 
-        {
-            
+        } else if (status.equals("shipped")) {
+
             // assigning delivery man to order
-            
+
             List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
 
             for (DeliveryMan d : deliveryMen) {
@@ -217,15 +217,14 @@ public class OrderController {
             }
 
             // removing products from warehouse
-            
+
             String product_id = order.getProduct_id();
             String quantity = order.getQuantity();
             String warehouse_id = order.getWarehouse_id();
 
             WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
 
-            for(int j = 0; j < warehouse.getProduct_ids().size(); j++)
-            {
+            for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
                 if (warehouse.getProduct_ids().get(j).equals(product_id)) {
                     String q = warehouse.getQuantities().get(j);
                     int p_quantity = Integer.parseInt(q);
@@ -233,13 +232,13 @@ public class OrderController {
                     warehouse.getQuantities().set(j, String.valueOf(p_quantity));
                 }
             }
-            
+
             wareHouseService.updateWareHouse(warehouse);
 
         } else if (status.equals("cancel")) {
-            
+
             // making delivery man available again
-            
+
             DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(deliveryman_id);
 
             deliveryMan.setStatus("available");
@@ -254,8 +253,7 @@ public class OrderController {
 
             WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
 
-            for(int j = 0; j < warehouse.getProduct_ids().size(); j++)
-            {
+            for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
                 if (warehouse.getProduct_ids().get(j).equals(product_id)) {
                     String q = warehouse.getQuantities().get(j);
                     int p_quantity = Integer.parseInt(q);
@@ -263,11 +261,37 @@ public class OrderController {
                     warehouse.getQuantities().set(j, String.valueOf(p_quantity));
                 }
             }
-            
+
             wareHouseService.updateWareHouse(warehouse);
         }
         orderService.updateOrder(order);
         return order;
+    }
+    
+    // update order
+    @PostMapping("/order/{id}")
+    public Order updateOrder(@PathVariable("id") String id, @RequestBody OrderUpdateRequest data) {
+
+        Order order = orderService.getOrderById(id);
+        order.setCustomer_id(data.getCustomer_id());
+        order.setProduct_id(data.getProduct_id());
+        order.setQuantity(data.getQuantity());
+        order.setWarehouse_id(data.getWarehouse_id());
+        order.setTotal_amount(data.getTotal_amount());
+        order.setDate_time(data.getDate_time());
+        order.setPayment_method(data.getPayment_method());
+        order.setStatus(data.getStatus());
+        order.setDelivery_address(data.getDelivery_address());
+        order.setDelivery_man_id(data.getDelivery_man_id());
+        order.setDelivered_date_time(data.getDelivered_date_time());
+        
+        if(order.getPayment_method() == "online")
+        {
+            order.setTransaction_id(data.getTransaction_id());
+        }
+
+        return orderService.updateOrder(order);
+        
     }
     
     @DeleteMapping("/order/{id}/delete")
