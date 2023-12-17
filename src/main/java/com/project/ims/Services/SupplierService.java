@@ -43,6 +43,8 @@ public class SupplierService implements ISupplierService {
     @Autowired
     private WManagerRepo wManagerRepo;
 
+    
+
     @Override
     public Supplier getSupplierById(String id) {
         return supplierRepo.findById(id).orElse(null);
