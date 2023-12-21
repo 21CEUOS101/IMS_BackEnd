@@ -184,25 +184,24 @@ public class OrderController {
             throw new RuntimeException("Order not found");
         }
 
-        order.setStatus(status);
-
+        
         if (status.equals("delivered")) {
             LocalDateTime currentDateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = currentDateTime.format(formatter);
             order.setDelivered_date_time(formattedDateTime);
-
+            
             DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(deliveryman_id);
-
+            
             deliveryMan.setStatus("available");
-
+            
             deliveryManService.updateDeliveryMan(deliveryMan);
         } else if (status.equals("shipped")) {
-
+            
             // assigning delivery man to order
-
+            
             List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
-
+            
             for (DeliveryMan d : deliveryMen) {
                 if (d.getStatus() == "available") {
                     d.setStatus("unavailable");
@@ -211,19 +210,19 @@ public class OrderController {
                     break;
                 }
             }
-
+            
             if (order.getDelivery_man_id() == null || order.getDelivery_man_id().startsWith("d")) {
                 throw new RuntimeException("No DeliveryMan available at the moment");
             }
-
+            
             // removing products from warehouse
-
+            
             String product_id = order.getProduct_id();
             String quantity = order.getQuantity();
             String warehouse_id = order.getWarehouse_id();
-
+            
             WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
-
+            
             for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
                 if (warehouse.getProduct_ids().get(j).equals(product_id)) {
                     String q = warehouse.getQuantities().get(j);
@@ -232,38 +231,51 @@ public class OrderController {
                     warehouse.getQuantities().set(j, String.valueOf(p_quantity));
                 }
             }
-
             wareHouseService.updateWareHouse(warehouse);
 
+            
         } else if (status.equals("cancel")) {
-
+            
             // making delivery man available again
-
+            
             DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(deliveryman_id);
-
+            
             deliveryMan.setStatus("available");
-
+            
             deliveryManService.updateDeliveryMan(deliveryMan);
+            
+            if(order.getStatus() == "shipped")
+            {
+                // re-adding products to warehouse
 
-            // re-adding products to warehouse
+                String product_id = order.getProduct_id();
+                String quantity = order.getQuantity();
+                String warehouse_id = order.getWarehouse_id();
 
-            String product_id = order.getProduct_id();
-            String quantity = order.getQuantity();
-            String warehouse_id = order.getWarehouse_id();
+                WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
 
-            WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
-
-            for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
-                if (warehouse.getProduct_ids().get(j).equals(product_id)) {
-                    String q = warehouse.getQuantities().get(j);
-                    int p_quantity = Integer.parseInt(q);
-                    p_quantity += Integer.parseInt(quantity);
-                    warehouse.getQuantities().set(j, String.valueOf(p_quantity));
+                for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
+                    if (warehouse.getProduct_ids().get(j).equals(product_id)) {
+                        String q = warehouse.getQuantities().get(j);
+                        int p_quantity = Integer.parseInt(q);
+                        p_quantity += Integer.parseInt(quantity);
+                        warehouse.getQuantities().set(j, String.valueOf(p_quantity));
+                    }
                 }
-            }
 
-            wareHouseService.updateWareHouse(warehouse);
+                wareHouseService.updateWareHouse(warehouse);
+            }
+            else if(order.getStatus() == "pending")
+            {
+                // do nothing
+            }
+            else if(order.getStatus() == "delivered")
+            {
+                throw new RuntimeException("Order already delivered");
+            }
         }
+
+        order.setStatus(status);
         orderService.updateOrder(order);
         return order;
     }

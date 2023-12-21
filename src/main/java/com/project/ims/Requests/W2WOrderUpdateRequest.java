@@ -1,8 +1,4 @@
-package com.project.ims.Models;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+package com.project.ims.Requests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,12 +6,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "w2wOrders")
-public class W2WOrder {
-
-    @Id 
-    private String id;
-
+public class W2WOrderUpdateRequest {
     private String product_id;
 
     private String quantity;
@@ -33,5 +24,4 @@ public class W2WOrder {
     private String delivery_man_id;
 
     private String delivered_date_time;
-    
 }

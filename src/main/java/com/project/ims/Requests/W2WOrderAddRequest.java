@@ -17,9 +17,5 @@ public class W2WOrderAddRequest {
 
     private String r_warehouse_id;
 
-    private String payment_method;
-
-    private String transaction_id;
-
     private String delivery_address;
 }
