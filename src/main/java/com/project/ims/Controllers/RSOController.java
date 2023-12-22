@@ -107,8 +107,19 @@ public class RSOController {
         returnSupplyOrder.setReturn_reason(data.getReturn_reason());
         returnSupplyOrder.setStatus("pending");
         returnSupplyOrder.setSupplier_id(data.getSupplier_id());
+        
+        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
+        
+        for (DeliveryMan d : deliveryMen) {
+            if (d.getStatus() == "available") {
+                d.setStatus("unavailable");
+                returnSupplyOrder.setDelivery_man_id(d.getId());
+                deliveryManService.updateDeliveryMan(d);
+                break;
+            }
+        }
+        
         returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
-
         return returnSupplyOrder;
     }
 
@@ -125,7 +136,9 @@ public class RSOController {
 
             DeliveryMan m = deliveryManService.getDeliveryManById(returnSupplyOrder.getDelivery_man_id());
 
-            // remaining from here
+            m.setStatus("available");
+
+            deliveryManService.updateDeliveryMan(m);
         }
 
         returnSupplyOrder.setStatus(status);

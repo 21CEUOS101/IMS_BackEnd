@@ -115,6 +115,17 @@ public class SupplyOrderController {
         String formattedDateTime = currentDateTime.format(formatter);
         supplyOrder.setDate_time(formattedDateTime);
 
+        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(supplyOrder.getWarehouse_id());
+            
+        for (DeliveryMan d : deliveryMen) {
+            if (d.getStatus() == "available") {
+                d.setStatus("unavailable");
+                supplyOrder.setDelivery_man_id(d.getId());
+                deliveryManService.updateDeliveryMan(d);
+                break;
+            }
+        }
+
         return supplyOrderService.addSupplyOrder(supplyOrder);
     }
     

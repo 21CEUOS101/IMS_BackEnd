@@ -24,6 +24,7 @@ import com.project.ims.IServices.ISupplyOrderService;
 import com.project.ims.IServices.IW2WOrderService;
 import com.project.ims.IServices.IWManagerService;
 import com.project.ims.IServices.IWareHouseService;
+import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.Product;
 import com.project.ims.Models.ReturnOrder;
@@ -136,10 +137,35 @@ public class ReturnOrderController {
             Order order = orderService.getOrderById(returnOrder.getOrder_id());
             order.setStatus("returned");
             orderService.updateOrder(order);
+
+            List<DeliveryMan> deliveryMans = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
+
+            for(DeliveryMan i : deliveryMans)
+            {
+                if (i.getStatus() == "available") {
+                    i.setStatus("unavailable");
+                    deliveryManService.updateDeliveryMan(i);
+                    returnOrder.setDelivery_man_id(i.getId());
+                }
+            }
+            
+            if(returnOrder.getDelivery_man_id() == null)
+            {
+                throw new RuntimeException("Deliveryman not currently available");
+            }
+
         } else if (status.equals("rejected")) {
+
             Order order = orderService.getOrderById(returnOrder.getOrder_id());
             order.setStatus("delivered");
             orderService.updateOrder(order);
+
+            DeliveryMan m = deliveryManService.getDeliveryManById(returnOrder.getDelivery_man_id());
+
+            m.setStatus("available");
+
+            deliveryManService.updateDeliveryMan(m);
+
         } else if (status.equals("arrived")) {
             ReturnSupplyOrder returnSupplyOrder = new ReturnSupplyOrder();
             Random rand = new Random();
@@ -168,6 +194,17 @@ public class ReturnOrderController {
             returnSupplyOrder.setDelivery_address(supplier.getAddress());
 
             returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
+
+            List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
+            
+            for (DeliveryMan d : deliveryMen) {
+                if (d.getStatus() == "available") {
+                    d.setStatus("unavailable");
+                    returnSupplyOrder.setDelivery_man_id(d.getId());
+                    deliveryManService.updateDeliveryMan(d);
+                    break;
+                }
+            }
 
         }
 

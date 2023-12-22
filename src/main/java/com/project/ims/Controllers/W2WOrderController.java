@@ -169,6 +169,8 @@ public class W2WOrderController {
 
             for (DeliveryMan m : deliveryMans) {
                 if (m.getStatus() == "available") {
+                    m.setStatus("unavailable");
+                    deliveryManService.updateDeliveryMan(m);
                     w2wOrder.setDelivery_man_id(m.getId());
                 }
             }
