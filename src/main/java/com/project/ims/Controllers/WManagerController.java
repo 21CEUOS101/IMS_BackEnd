@@ -13,6 +13,8 @@ import com.project.ims.IServices.IWManagerService;
 import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Requests.WManagerAddRequest;
+import com.project.ims.Services.WManagerService;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,28 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class WManagerController {
 
     @Autowired
-    private IAdminService adminService;
-
-    @Autowired
-    private ICustomerService customerService;
-
-    @Autowired
-    private IDeliveryManService deliveryManService;
-
-    @Autowired
-    private IOrderService orderService;
-
-    @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IWareHouseService wareHouseService;
-
-    @Autowired
-    private IWManagerService wManagerService;
+    private WManagerService wManagerService;
 
     @GetMapping("/wmanager")
     public List<WareHouse_Manager> getAllWManagers() {

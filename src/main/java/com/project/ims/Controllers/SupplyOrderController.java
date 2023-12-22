@@ -31,47 +31,26 @@ import com.project.ims.Models.SupplyOrder;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.SupplyOrderAddRequest;
 import com.project.ims.Requests.SupplyOrderUpdateRequest;
+import com.project.ims.Services.DeliveryManService;
+import com.project.ims.Services.ProductService;
+import com.project.ims.Services.SupplyOrderService;
+import com.project.ims.Services.WareHouseService;
 
 @RestController
 @RequestMapping("/api")
 public class SupplyOrderController {
-    // Autowiring all the services
-    
-    @Autowired
-    private IAdminService adminService;
 
     @Autowired
-    private ICustomerService customerService;
+    private DeliveryManService deliveryManService;
 
     @Autowired
-    private IDeliveryManService deliveryManService;
+    private ProductService productService;
 
     @Autowired
-    private IOrderService orderService;
+    private WareHouseService wareHouseService;
 
     @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IWareHouseService wareHouseService;
-
-    @Autowired
-    private IWManagerService wManagerService;
-
-    @Autowired
-    private IReturnOrderService returnOrderService;
-
-    @Autowired
-    private ISupplyOrderService supplyOrderService;
-
-    @Autowired
-    private IW2WOrderService w2wOrderService;
-
-    @Autowired
-    private IRSOService returnSupplyOrderService;
+    private SupplyOrderService supplyOrderService;
     
     @GetMapping("/supplyorders")
     public List<SupplyOrder> getAllSupplyOrders() {

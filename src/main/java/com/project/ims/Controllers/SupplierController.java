@@ -20,33 +20,15 @@ import com.project.ims.IServices.IWManagerService;
 import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.Supplier;
 import com.project.ims.Requests.SupplierAddRequest;
+import com.project.ims.Services.SupplierService;
+import com.project.ims.Services.WareHouseService;
 
 @RestController
 @RequestMapping("/api")
 public class SupplierController {
-    @Autowired
-    private IAdminService adminService;
 
     @Autowired
-    private ICustomerService customerService;
-
-    @Autowired
-    private IDeliveryManService deliveryManService;
-
-    @Autowired
-    private IOrderService orderService;
-
-    @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IWareHouseService wareHouseService;
-
-    @Autowired
-    private IWManagerService wManagerService;
+    private SupplierService supplierService;
 
     // Suppliers API
 

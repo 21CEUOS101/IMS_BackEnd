@@ -32,47 +32,34 @@ import com.project.ims.Models.ReturnSupplyOrder;
 import com.project.ims.Models.Supplier;
 import com.project.ims.Requests.ReturnOrderAddRequest;
 import com.project.ims.Requests.ReturnOrderUpdateRequest;
+import com.project.ims.Services.DeliveryManService;
+import com.project.ims.Services.OrderService;
+import com.project.ims.Services.ProductService;
+import com.project.ims.Services.RSOService;
+import com.project.ims.Services.ReturnOrderService;
+import com.project.ims.Services.SupplierService;
 
 @RestController
 @RequestMapping("/api")
 public class ReturnOrderController {
-    // Autowiring all the services
 
     @Autowired
-    private IAdminService adminService;
+    private DeliveryManService deliveryManService;
 
     @Autowired
-    private ICustomerService customerService;
+    private OrderService orderService;
 
     @Autowired
-    private IDeliveryManService deliveryManService;
+    private ProductService productService;
 
     @Autowired
-    private IOrderService orderService;
+    private SupplierService supplierService;
 
     @Autowired
-    private IProductService productService;
+    private ReturnOrderService returnOrderService;
 
     @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IWareHouseService wareHouseService;
-
-    @Autowired
-    private IWManagerService wManagerService;
-
-    @Autowired
-    private IReturnOrderService returnOrderService;
-
-    @Autowired
-    private ISupplyOrderService supplyOrderService;
-
-    @Autowired
-    private IW2WOrderService w2wOrderService;
-
-    @Autowired
-    private IRSOService returnSupplyOrderService;
+    private RSOService returnSupplyOrderService;
 
     // Return Order APIs
 
@@ -102,7 +89,7 @@ public class ReturnOrderController {
         Random rand = new Random();
         String id = "r" + rand.nextInt(1000000);
         returnOrder.setId(id);
-        returnOrder.setCustomer_id(data.getCustomer_id());
+        returnOrder.setCustomerId(data.getCustomer_id());
         returnOrder.setPickup_address(data.getPickup_address());
         returnOrder.setReturn_reason(data.getReturn_reason());
         returnOrder.setStatus("pending");
@@ -229,7 +216,7 @@ public class ReturnOrderController {
         returnOrder.setWarehouse_id(order.getWarehouse_id());
         returnOrder.setRefund_amount(order.getTotal_amount());
         returnOrder.setOrder_id(order.getId());
-        returnOrder.setCustomer_id(order.getCustomer_id());
+        returnOrder.setCustomerId(order.getCustomerId());
 
         returnOrder.setDate_time(data.getDate_time());
         returnOrder.setDelivered_date_time(data.getDelivered_date_time());

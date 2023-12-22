@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.project.ims.IServices.IW2WOrderService;
 import com.project.ims.Models.W2WOrder;
@@ -20,6 +21,7 @@ import com.project.ims.Repo.WManagerRepo;
 import com.project.ims.Repo.WareHouseRepo;
 
 @Component
+@Service
 public class W2WOrderService implements IW2WOrderService {
     
     @Autowired

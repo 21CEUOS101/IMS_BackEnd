@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.project.ims.IServices.IRSOService;
 import com.project.ims.Models.ReturnSupplyOrder;
@@ -21,6 +22,7 @@ import com.project.ims.Repo.WManagerRepo;
 import com.project.ims.Repo.WareHouseRepo;
 
 @Component
+@Service
 public class RSOService implements IRSOService {
     
     @Autowired

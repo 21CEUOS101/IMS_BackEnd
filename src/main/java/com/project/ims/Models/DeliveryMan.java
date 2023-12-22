@@ -24,7 +24,7 @@ public class DeliveryMan {
 
     private String phone;
     
-    private String warehouse_id;
+    private String warehouseId;
 
     private String status;
 

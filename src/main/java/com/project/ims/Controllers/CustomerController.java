@@ -22,34 +22,14 @@ import com.project.ims.IServices.IWManagerService;
 import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.Customer;
 import com.project.ims.Requests.CustomerAddRequest;
+import com.project.ims.Services.CustomerService;
 
 @RestController
 @RequestMapping("/api")
 public class CustomerController {
-    
-    @Autowired
-    private IAdminService adminService;
 
     @Autowired
-    private ICustomerService customerService;
-
-    @Autowired
-    private IDeliveryManService deliveryManService;
-
-    @Autowired
-    private IOrderService orderService;
-
-    @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IWareHouseService wareHouseService;
-
-    @Autowired
-    private IWManagerService wManagerService;
+    private CustomerService customerService;
 
     @GetMapping("/customer")
     public List<Customer> getAllCustomers() {

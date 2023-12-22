@@ -22,34 +22,14 @@ import com.project.ims.IServices.IWManagerService;
 import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Requests.DeliveryManAddRequest;
+import com.project.ims.Services.DeliveryManService;
 
 @RestController
 @RequestMapping("/api")
 public class DeliveryManController {
-    
-    @Autowired
-    private IAdminService adminService;
 
     @Autowired
-    private ICustomerService customerService;
-
-    @Autowired
-    private IDeliveryManService deliveryManService;
-
-    @Autowired
-    private IOrderService orderService;
-
-    @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IWareHouseService wareHouseService;
-
-    @Autowired
-    private IWManagerService wManagerService;
+    private DeliveryManService deliveryManService;
 
     @GetMapping("/deliveryman")
     public List<DeliveryMan> getAllDeliveryMans() {
@@ -74,7 +54,7 @@ public class DeliveryManController {
         deliveryMan.setEmail(data.getEmail());
         deliveryMan.setPassword(data.getPassword());
         deliveryMan.setPhone(data.getPhone());
-        deliveryMan.setWarehouse_id(data.getWarehouse_id());
+        deliveryMan.setWarehouseId(data.getWarehouse_id());
         deliveryMan.setStatus(data.getStatus());
         deliveryManService.addDeliveryMan(deliveryMan);
         return deliveryMan;
@@ -87,7 +67,7 @@ public class DeliveryManController {
         deliveryMan.setEmail(data.getEmail());
         deliveryMan.setPassword(data.getPassword());
         deliveryMan.setPhone(data.getPhone());
-        deliveryMan.setWarehouse_id(data.getWarehouse_id());
+        deliveryMan.setWarehouseId(data.getWarehouse_id());
         deliveryMan.setStatus(data.getStatus());
         deliveryManService.updateDeliveryMan(deliveryMan);
         return deliveryMan;

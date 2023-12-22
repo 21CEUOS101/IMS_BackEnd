@@ -32,47 +32,21 @@ import com.project.ims.Models.W2WOrder;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.W2WOrderAddRequest;
 import com.project.ims.Requests.W2WOrderUpdateRequest;
+import com.project.ims.Services.DeliveryManService;
+import com.project.ims.Services.W2WOrderService;
+import com.project.ims.Services.WareHouseService;
 
 @RestController
 @RequestMapping("/api")
 public class W2WOrderController {
-    // Autowiring all the services
-    
     @Autowired
-    private IAdminService adminService;
+    private DeliveryManService deliveryManService;
 
     @Autowired
-    private ICustomerService customerService;
+    private WareHouseService wareHouseService;
 
     @Autowired
-    private IDeliveryManService deliveryManService;
-
-    @Autowired
-    private IOrderService orderService;
-
-    @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IWareHouseService wareHouseService;
-
-    @Autowired
-    private IWManagerService wManagerService;
-
-    @Autowired
-    private IReturnOrderService returnOrderService;
-
-    @Autowired
-    private ISupplyOrderService supplyOrderService;
-
-    @Autowired
-    private IW2WOrderService w2wOrderService;
-
-    @Autowired
-    private IRSOService returnSupplyOrderService;
+    private W2WOrderService w2wOrderService;
 
     @GetMapping("/w2worders")
     public List<W2WOrder> getAllW2WOrders() {

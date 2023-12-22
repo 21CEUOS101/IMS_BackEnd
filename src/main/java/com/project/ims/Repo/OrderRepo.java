@@ -9,6 +9,5 @@ import com.project.ims.Models.Order;
 
 @Repository
 public interface OrderRepo extends MongoRepository<Order, String>{
-    
-    public List<Order> findByCustomerId(String id);
+    public List<Order> findByCustomerId(String customerId);
 }

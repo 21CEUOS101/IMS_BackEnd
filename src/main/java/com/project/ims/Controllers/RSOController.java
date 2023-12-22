@@ -30,47 +30,22 @@ import com.project.ims.Models.Order;
 import com.project.ims.Models.ReturnSupplyOrder;
 import com.project.ims.Requests.RSOAddRequest;
 import com.project.ims.Requests.RSOUpdateRequest;
+import com.project.ims.Services.DeliveryManService;
+import com.project.ims.Services.OrderService;
+import com.project.ims.Services.RSOService;
 
 @RestController
 @RequestMapping("/api")
 public class RSOController {
-    // Autowiring all the services
-    
-    @Autowired
-    private IAdminService adminService;
 
     @Autowired
-    private ICustomerService customerService;
+    private DeliveryManService deliveryManService;
 
     @Autowired
-    private IDeliveryManService deliveryManService;
+    private OrderService orderService;
 
     @Autowired
-    private IOrderService orderService;
-
-    @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IWareHouseService wareHouseService;
-
-    @Autowired
-    private IWManagerService wManagerService;
-
-    @Autowired
-    private IReturnOrderService returnOrderService;
-
-    @Autowired
-    private ISupplyOrderService supplyOrderService;
-
-    @Autowired
-    private IW2WOrderService w2wOrderService;
-
-    @Autowired
-    private IRSOService returnSupplyOrderService;
+    private RSOService returnSupplyOrderService;
 
     @GetMapping("/returnSupplyOrders")
     public List<ReturnSupplyOrder> getReturnSupplyOrders() {

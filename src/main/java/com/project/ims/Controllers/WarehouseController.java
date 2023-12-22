@@ -12,6 +12,7 @@ import com.project.ims.IServices.IWManagerService;
 import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.WareHouseAddRequest;
+import com.project.ims.Services.WareHouseService;
 
 import java.util.List;
 import java.util.Random;
@@ -32,28 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class WarehouseController {
 
     @Autowired
-    private IAdminService adminService;
-
-    @Autowired
-    private ICustomerService customerService;
-
-    @Autowired
-    private IDeliveryManService deliveryManService;
-
-    @Autowired
-    private IOrderService orderService;
-
-    @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IWareHouseService wareHouseService;
-
-    @Autowired
-    private IWManagerService wManagerService;
+    private WareHouseService wareHouseService;
 
     @GetMapping("/warehouse/{id}")
     public WareHouse getWareHouseById(@PathVariable String id) {

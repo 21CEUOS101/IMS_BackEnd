@@ -8,5 +8,5 @@ import com.project.ims.Models.ReturnOrder;
 
 @Repository
 public interface ReturnOrderRepo extends MongoRepository<ReturnOrder, String>{
-    public List<ReturnOrder> findAllByCustomerId(String id);
+    public List<ReturnOrder> findAllByCustomerId(String customerId);
 }

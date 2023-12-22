@@ -19,6 +19,10 @@ import com.project.ims.Models.Product;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.OrderAddRequest;
 import com.project.ims.Requests.OrderUpdateRequest;
+import com.project.ims.Services.DeliveryManService;
+import com.project.ims.Services.OrderService;
+import com.project.ims.Services.ProductService;
+import com.project.ims.Services.WareHouseService;
 
 import java.time.LocalDateTime;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,31 +40,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api")
 public class OrderController {
 
-    // Autowiring all the services
-    
     @Autowired
-    private IAdminService adminService;
+    private DeliveryManService deliveryManService;
 
     @Autowired
-    private ICustomerService customerService;
+    private OrderService orderService;
 
     @Autowired
-    private IDeliveryManService deliveryManService;
+    private ProductService productService;
 
     @Autowired
-    private IOrderService orderService;
-
-    @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private ISupplierService supplierService;
-
-    @Autowired
-    private IWareHouseService wareHouseService;
-
-    @Autowired
-    private IWManagerService wManagerService;
+    private WareHouseService wareHouseService;
 
 
     // Order APIs
@@ -127,7 +117,7 @@ public class OrderController {
             order.setId(id);
             order.setProduct_id(product_ids.get(i));
             order.setQuantity(quantities.get(i));
-            order.setCustomer_id(data.getCustomer_id());
+            order.setCustomerId(data.getCustomer_id());
 
             // set total amount
 
@@ -285,7 +275,7 @@ public class OrderController {
     public Order updateOrder(@PathVariable("id") String id, @RequestBody OrderUpdateRequest data) {
 
         Order order = orderService.getOrderById(id);
-        order.setCustomer_id(data.getCustomer_id());
+        order.setCustomerId(data.getCustomer_id());
         order.setProduct_id(data.getProduct_id());
         order.setQuantity(data.getQuantity());
         order.setWarehouse_id(data.getWarehouse_id());
