@@ -1,65 +1,49 @@
 package com.project.ims.Services;
 
+// imports
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.project.ims.IServices.ICustomerService;
 import com.project.ims.Models.Customer;
-import com.project.ims.Repo.AdminRepo;
 import com.project.ims.Repo.CustomerRepo;
-import com.project.ims.Repo.DeliveryManRepo;
-import com.project.ims.Repo.OrderRepo;
-import com.project.ims.Repo.ProductRepo;
-import com.project.ims.Repo.SupplierRepo;
-import com.project.ims.Repo.WManagerRepo;
-import com.project.ims.Repo.WareHouseRepo;
 
 @Component
 @Service
 public class CustomerService implements ICustomerService {
-    
-    @Autowired
-    private AdminRepo adminRepo;
 
+    // necessary dependency Injections
     @Autowired
     private CustomerRepo customerRepo;
 
-    @Autowired
-    private OrderRepo orderRepo;
-
-    @Autowired
-    private DeliveryManRepo deliveryManRepo;
-
-    @Autowired
-    private ProductRepo productRepo;
-
-    @Autowired
-    private SupplierRepo supplierRepo;
-
-    @Autowired
-    private WareHouseRepo wareHouseRepo;
-
-    @Autowired
-    private WManagerRepo wManagerRepo;
-
     @Override
     public Customer getCustomerById(String id) {
+
+        // checking if id is null or not
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+
         return customerRepo.findById(id).orElse(null);
     }
 
     @Override
     public Customer addCustomer(Customer customer) {
         
-        if(customerRepo.existsById(customer.getId()))
+        // checking if customer data is null or not
+        if (customer == null)
         {
-            throw new RuntimeException("Customer with id " + customer.getId() + " already exists");
+            throw new RuntimeException("Customer data shouldn't be null");
         }
         else if (customer.getId() == null || customer.getId().isEmpty())
         {
             throw new RuntimeException("Customer ID cannot be empty");
+        }
+        else if(customerRepo.existsById(customer.getId()))
+        {
+            throw new RuntimeException("Customer with id " + customer.getId() + " already exists");
         }
         else if (customer.getId().charAt(0) != 'c')
         {
@@ -71,20 +55,29 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public Customer updateCustomer(Customer customer) {
+
+        // checking if customer data is null or not
+        if (customer == null)
+        {
+            throw new RuntimeException("Customer data shouldn't be null");
+        }
+
         return customerRepo.save(customer);
     }
 
     @Override
     public void deleteCustomer(String id) {
 
-        if (customerRepo.existsById(id))
+        // checking if id is null or not
+        if (id == null)
         {
-            throw new RuntimeException("Customer with id " + id + " does not exist");
+            throw new RuntimeException("Id shouldn't be null");
         }
 
         customerRepo.deleteById(id);
     }
 
+    // get all customers
     @Override
     public List<Customer> getAllCustomer() {
         return customerRepo.findAll();

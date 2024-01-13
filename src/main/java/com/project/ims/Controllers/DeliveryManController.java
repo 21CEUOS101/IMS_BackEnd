@@ -1,8 +1,8 @@
 package com.project.ims.Controllers;
 
+// imports
 import java.util.List;
 import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,15 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.project.ims.IServices.IAdminService;
-import com.project.ims.IServices.ICustomerService;
-import com.project.ims.IServices.IDeliveryManService;
-import com.project.ims.IServices.IOrderService;
-import com.project.ims.IServices.IProductService;
-import com.project.ims.IServices.ISupplierService;
-import com.project.ims.IServices.IWManagerService;
-import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Requests.DeliveryManAddRequest;
 import com.project.ims.Services.DeliveryManService;
@@ -28,53 +19,104 @@ import com.project.ims.Services.DeliveryManService;
 @RequestMapping("/api")
 public class DeliveryManController {
 
+    // necessary dependencies are injected here
     @Autowired
     private DeliveryManService deliveryManService;
 
+
+    // controllers
+
+    // get all deliverymans
     @GetMapping("/deliveryman")
     public List<DeliveryMan> getAllDeliveryMans() {
-        List<DeliveryMan> deliveryMans = deliveryManService.getAllDeliveryMan();
-        return deliveryMans;
+
+        try{
+            List<DeliveryMan> deliveryMans = deliveryManService.getAllDeliveryMan();
+            return deliveryMans;
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+        
     }
 
+    // get deliveryman by id
     @GetMapping("/deliveryman/{id}")
     public DeliveryMan getDeliveryManById(@PathVariable("id") String id) {
-        DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
-        return deliveryMan;
+        
+        try{
+            DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
+            return deliveryMan;
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+
     }
 
     @PostMapping("/deliveryman")
     public DeliveryMan addDeliveryMan(@RequestBody DeliveryManAddRequest data) {
 
+        String id = generateId();
+
         DeliveryMan deliveryMan = new DeliveryMan();
-        Random rand = new Random();
-        String id = 'd' + String.valueOf(rand.nextInt(1000000));
         deliveryMan.setId(id);
         deliveryMan.setName(data.getName());
         deliveryMan.setEmail(data.getEmail());
         deliveryMan.setPassword(data.getPassword());
         deliveryMan.setPhone(data.getPhone());
-        deliveryMan.setWarehouseId(data.getWarehouse_id());
+        deliveryMan.setWarehouseId(data.getWarehouseId());
         deliveryMan.setStatus(data.getStatus());
-        deliveryManService.addDeliveryMan(deliveryMan);
+
+
+        try{
+            deliveryManService.addDeliveryMan(deliveryMan);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+
         return deliveryMan;
     }
 
     @PostMapping("/deliveryman/{id}")
     public DeliveryMan updateDeliveryMan(@PathVariable("id") String id, @RequestBody DeliveryManAddRequest data) {
+
         DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
         deliveryMan.setName(data.getName());
         deliveryMan.setEmail(data.getEmail());
         deliveryMan.setPassword(data.getPassword());
         deliveryMan.setPhone(data.getPhone());
-        deliveryMan.setWarehouseId(data.getWarehouse_id());
+        deliveryMan.setWarehouseId(data.getWarehouseId());
         deliveryMan.setStatus(data.getStatus());
-        deliveryManService.updateDeliveryMan(deliveryMan);
+
+        try {
+            deliveryManService.updateDeliveryMan(deliveryMan);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+
         return deliveryMan;
     }
     
     @DeleteMapping("/deliveryman/{id}")
     public void deleteDeliveryMan(@PathVariable("id") String id) {
-        deliveryManService.deleteDeliveryMan(id);
+        try{
+            deliveryManService.deleteDeliveryMan(id);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public String generateId() {
+        // id generation
+        Random rand = new Random();
+        String id = 'd' + String.valueOf(rand.nextInt(1000000));
+
+        return id;
     }
 }

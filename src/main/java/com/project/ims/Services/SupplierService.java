@@ -1,54 +1,30 @@
 package com.project.ims.Services;
 
+// imports
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.project.ims.IServices.ISupplierService;
 import com.project.ims.Models.Supplier;
-import com.project.ims.Repo.AdminRepo;
-import com.project.ims.Repo.CustomerRepo;
-import com.project.ims.Repo.DeliveryManRepo;
-import com.project.ims.Repo.OrderRepo;
-import com.project.ims.Repo.ProductRepo;
 import com.project.ims.Repo.SupplierRepo;
-import com.project.ims.Repo.WManagerRepo;
-import com.project.ims.Repo.WareHouseRepo;
 
 @Component
 @Service
 public class SupplierService implements ISupplierService {
-    
-    @Autowired
-    private AdminRepo adminRepo;
 
-    @Autowired
-    private CustomerRepo customerRepo;
-
-    @Autowired
-    private OrderRepo orderRepo;
-
-    @Autowired
-    private DeliveryManRepo deliveryManRepo;
-
-    @Autowired
-    private ProductRepo productRepo;
-
+    // necessary dependency Injections
     @Autowired
     private SupplierRepo supplierRepo;
 
-    @Autowired
-    private WareHouseRepo wareHouseRepo;
-
-    @Autowired
-    private WManagerRepo wManagerRepo;
-
-    
-
     @Override
     public Supplier getSupplierById(String id) {
+
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+
         return supplierRepo.findById(id).orElse(null);
     }
 
@@ -73,13 +49,23 @@ public class SupplierService implements ISupplierService {
 
     @Override
     public Supplier updateSupplier(Supplier supplier) {
+
+        if(supplier == null)
+        {
+            throw new RuntimeException("Supplier data shouldn't be null");
+        }
+
         return supplierRepo.save(supplier);
     }
 
     @Override
     public void deleteSupplier(String id) {
-        
-        if (!supplierRepo.existsById(id))
+
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+        else if (!supplierRepo.existsById(id))
         {
             throw new RuntimeException("Supplier with id " + id + " does not exist");
         }

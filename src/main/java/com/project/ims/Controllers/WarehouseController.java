@@ -1,27 +1,16 @@
 package com.project.ims.Controllers;
 
+// imports
 import org.springframework.web.bind.annotation.RestController;
-
-import com.project.ims.IServices.IAdminService;
-import com.project.ims.IServices.ICustomerService;
-import com.project.ims.IServices.IDeliveryManService;
-import com.project.ims.IServices.IOrderService;
-import com.project.ims.IServices.IProductService;
-import com.project.ims.IServices.ISupplierService;
-import com.project.ims.IServices.IWManagerService;
-import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.WareHouseAddRequest;
 import com.project.ims.Services.WareHouseService;
-
 import java.util.List;
 import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,25 +21,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api")
 public class WarehouseController {
 
+    // necessary dependency injections
     @Autowired
     private WareHouseService wareHouseService;
 
+    // get warehouse by id
     @GetMapping("/warehouse/{id}")
     public WareHouse getWareHouseById(@PathVariable String id) {
-        return wareHouseService.getWareHouseById(id);
+        try{
+            WareHouse wareHouse = wareHouseService.getWareHouseById(id);
+            return wareHouse;
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return null;
+        }
     }
 
     @GetMapping("/warehouse")
     public List<WareHouse> getAllWareHouses() {
-        return wareHouseService.getAllWareHouse();
+        try{
+            List<WareHouse> wareHouses = wareHouseService.getAllWareHouse();
+            return wareHouses;
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return null;
+        }
     }
 
     @PostMapping("/warehouse")
     public WareHouse createWarehouse(@RequestBody WareHouseAddRequest data) {
 
+        String id = generateId();
+
         WareHouse wareHouse = new WareHouse();
-        Random rand = new Random();
-        String id = 'w' + String.valueOf(rand.nextInt(1000000));
         wareHouse.setId(id);
         wareHouse.setName(data.getName());
         wareHouse.setAddress(data.getAddress());
@@ -59,7 +64,16 @@ public class WarehouseController {
         wareHouse.setStatus(data.getStatus());
         wareHouse.setProduct_ids(data.getProduct_ids());
         wareHouse.setQuantities(data.getQuantities());
-        return wareHouseService.addWareHouse(wareHouse);
+
+        try{
+            wareHouseService.addWareHouse(wareHouse);
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return null;
+        }
+
+        return wareHouse;
 
     }
     
@@ -74,11 +88,33 @@ public class WarehouseController {
         wareHouse.setStatus(data.getStatus());
         wareHouse.setProduct_ids(data.getProduct_ids());
         wareHouse.setQuantities(data.getQuantities());
-        return wareHouseService.addWareHouse(wareHouse);
+
+        try{
+            wareHouseService.updateWareHouse(wareHouse);
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return null;
+        }
+
+        return wareHouse;
     }
     
     @DeleteMapping("/warehouse/{id}")
     public void deleteWareHouse(@PathVariable String id) {
-        wareHouseService.deleteWareHouse(id);
+        try{
+            wareHouseService.deleteWareHouse(id);
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
+    public String generateId() {
+        // id generation
+        Random rand = new Random();
+        String id = 'w' + String.valueOf(rand.nextInt(1000000));
+
+        return id;
     }
 }

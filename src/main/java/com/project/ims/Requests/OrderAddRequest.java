@@ -17,7 +17,7 @@ public class OrderAddRequest {
 
     private List<String> quantities;
 
-    private List<String> warehouse_ids;
+    private String warehouse_id;
 
     private String customer_id;
 

@@ -1,20 +1,13 @@
 package com.project.ims.Controllers;
+
+// imports
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import com.project.ims.IServices.IAdminService;
-import com.project.ims.IServices.ICustomerService;
-import com.project.ims.IServices.IDeliveryManService;
-import com.project.ims.IServices.IOrderService;
-import com.project.ims.IServices.IProductService;
-import com.project.ims.IServices.ISupplierService;
-import com.project.ims.IServices.IWManagerService;
-import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Requests.WManagerAddRequest;
 import com.project.ims.Services.WManagerService;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,32 +19,62 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api")
 public class WManagerController {
 
+    // necessary dependency injections
     @Autowired
     private WManagerService wManagerService;
 
+    // Controllers 
+
     @GetMapping("/wmanager")
     public List<WareHouse_Manager> getAllWManagers() {
-        return wManagerService.getAllWManager();
+
+        try{
+            List<WareHouse_Manager> wareHouse_Managers = wManagerService.getAllWManager();
+            return wareHouse_Managers;
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+        
     }
     
     @GetMapping("/wmanager/{id}")
     public WareHouse_Manager getWManagerById(@PathVariable String id) {
-        return wManagerService.getWManagerById(id);
+
+        try{
+            WareHouse_Manager wareHouse_Manager = wManagerService.getWManagerById(id);
+            return wareHouse_Manager;
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+
     }
     
 
     @PostMapping("/wmanager")
     public WareHouse_Manager createWManager(@RequestBody WManagerAddRequest data) {
+
+        String id = generateId();
+
         WareHouse_Manager wManager = new WareHouse_Manager();
-        Random rand = new Random();
-        String id = "wm" + String.valueOf(rand.nextInt(1000000));
         wManager.setId(id);
         wManager.setName(data.getName());
         wManager.setEmail(data.getEmail());
         wManager.setPassword(data.getPassword());
         wManager.setPhone(data.getPhone());
         wManager.setWarehouse_id(data.getWarehouse_id());
-        wManagerService.addWManager(wManager);
+
+        try{
+            wManagerService.addWManager(wManager);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+
         return wManager;
     }
 
@@ -63,12 +86,33 @@ public class WManagerController {
         wManager.setPassword(data.getPassword());
         wManager.setPhone(data.getPhone());
         wManager.setWarehouse_id(data.getWarehouse_id());
-        wManagerService.addWManager(wManager);
+
+        try{
+            wManagerService.updateWManager(wManager);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+
         return wManager;
     }
 
     @DeleteMapping("/wmanager/{id}")
     public void deleteWManager(@PathVariable String id) {
-        wManagerService.deleteWManager(id);
+        try{
+            wManagerService.deleteWManager(id);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public String generateId() {
+        // id generation
+        Random rand = new Random();
+        String id = 'm' + String.valueOf(rand.nextInt(1000000));
+
+        return id;
     }
 }

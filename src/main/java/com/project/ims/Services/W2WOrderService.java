@@ -23,36 +23,6 @@ import com.project.ims.Repo.WareHouseRepo;
 @Component
 @Service
 public class W2WOrderService implements IW2WOrderService {
-    
-    @Autowired
-    private AdminRepo adminRepo;
-
-    @Autowired
-    private CustomerRepo customerRepo;
-
-    @Autowired
-    private OrderRepo orderRepo;
-
-    @Autowired
-    private DeliveryManRepo deliveryManRepo;
-
-    @Autowired
-    private ProductRepo productRepo;
-
-    @Autowired
-    private SupplierRepo supplierRepo;
-
-    @Autowired
-    private WareHouseRepo wareHouseRepo;
-
-    @Autowired
-    private WManagerRepo wManagerRepo;
-
-    @Autowired
-    private ReturnOrderRepo returnOrderRepo;
-
-    @Autowired
-    private SupplyOrderRepo supplyOrderRepo;
 
     @Autowired
     private W2WOrderRepo w2wOrderRepo;

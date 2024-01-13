@@ -1,59 +1,50 @@
 package com.project.ims.Services;
 
+// imports
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.WareHouse;
-import com.project.ims.Repo.AdminRepo;
-import com.project.ims.Repo.CustomerRepo;
-import com.project.ims.Repo.DeliveryManRepo;
-import com.project.ims.Repo.OrderRepo;
-import com.project.ims.Repo.ProductRepo;
-import com.project.ims.Repo.SupplierRepo;
+import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Repo.WManagerRepo;
 import com.project.ims.Repo.WareHouseRepo;
 
 @Component
 @Service
 public class WareHouseService implements IWareHouseService {
-    
-    @Autowired
-    private AdminRepo adminRepo;
 
-    @Autowired
-    private CustomerRepo customerRepo;
 
-    @Autowired
-    private OrderRepo orderRepo;
-
-    @Autowired
-    private DeliveryManRepo deliveryManRepo;
-
-    @Autowired
-    private ProductRepo productRepo;
-
-    @Autowired
-    private SupplierRepo supplierRepo;
-
+    // necessary dependency Injections
     @Autowired
     private WareHouseRepo wareHouseRepo;
-    
+
     @Autowired
     private WManagerRepo wManagerRepo;
 
+    // Services
+
+
     @Override
     public WareHouse getWareHouseById(String id) {
+
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+
         return wareHouseRepo.findById(id).orElse(null);
     }
 
     @Override
     public WareHouse addWareHouse(WareHouse wareHouse) {
 
-        if (wareHouse.getId() == null || wareHouse.getId().isEmpty())
+        if (wareHouse == null)
+        {
+            throw new RuntimeException("WareHouse data shouldn't be null");
+        }
+        else if (wareHouse.getId() == null || wareHouse.getId().isEmpty())
         {
             throw new RuntimeException("WareHouse ID cannot be empty");
         }
@@ -66,17 +57,46 @@ public class WareHouseService implements IWareHouseService {
             throw new RuntimeException("WareHouse ID must start with 'w'");
         }
 
+        // check if manager id exists
+
+        if(wareHouse.getManager_id() == null)
+        {
+            throw new RuntimeException("WareHouse Manager ID cannot be empty");
+        }
+        else if (wareHouse.getManager_id().charAt(0) != 'm')
+        {
+            throw new RuntimeException("WareHouse Manager ID must start with 'm'");
+        }
+
+        WareHouse_Manager wManager = wManagerRepo.findById(wareHouse.getManager_id()).orElse(null);
+
+        if (wManager == null)
+        {
+            throw new RuntimeException("WareHouse Manager ID does not exist");
+        }
+
         return wareHouseRepo.save(wareHouse);
     }
 
     @Override
     public WareHouse updateWareHouse(WareHouse wareHouse) {
+
+        if (wareHouse == null)
+        {
+            throw new RuntimeException("WareHouse data shouldn't be null");
+        }
+
         return wareHouseRepo.save(wareHouse);
     }
 
     @Override
     public void deleteWareHouse(String id) {
-        if (!wareHouseRepo.existsById(id))
+
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+        else if (!wareHouseRepo.existsById(id))
         {
             throw new RuntimeException("WareHouse ID does not exist");
         }

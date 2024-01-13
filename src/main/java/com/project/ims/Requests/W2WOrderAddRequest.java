@@ -9,13 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class W2WOrderAddRequest {
-    private List<String> product_ids;
+    private String product_id;
 
-    private List<String> quantities;
+    private String quantity;
 
     private String s_warehouse_id;
 
     private String r_warehouse_id;
-
-    private String delivery_address;
 }

@@ -1,52 +1,36 @@
 package com.project.ims.Services;
 
+// imports
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.project.ims.IServices.IOrderService;
 import com.project.ims.Models.Order;
-import com.project.ims.Repo.AdminRepo;
-import com.project.ims.Repo.CustomerRepo;
-import com.project.ims.Repo.DeliveryManRepo;
 import com.project.ims.Repo.OrderRepo;
 import com.project.ims.Repo.ProductRepo;
-import com.project.ims.Repo.SupplierRepo;
-import com.project.ims.Repo.WManagerRepo;
-import com.project.ims.Repo.WareHouseRepo;
 
 @Component
 @Service
 public class OrderService implements IOrderService {
-    
-    @Autowired
-    private AdminRepo adminRepo;
 
-    @Autowired
-    private CustomerRepo customerRepo;
-
+    // necessary dependency Injections
     @Autowired
     private OrderRepo orderRepo;
 
     @Autowired
-    private DeliveryManRepo deliveryManRepo;
-
-    @Autowired
     private ProductRepo productRepo;
 
-    @Autowired
-    private SupplierRepo supplierRepo;
-
-    @Autowired
-    private WareHouseRepo wareHouseRepo;
-
-    @Autowired
-    private WManagerRepo wManagerRepo;
+    // Services
 
     @Override
     public Order getOrderById(String id) {
+
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+
         return orderRepo.findById(id).orElse(null);
     }
 
@@ -88,13 +72,25 @@ public class OrderService implements IOrderService {
 
     @Override
     public Order updateOrder(Order order) {
+        
+        // Checking if the order data is null or not
+        if(order == null)
+        {
+            throw new RuntimeException("Order data shouldn't be null");
+        }
+
         return orderRepo.save(order);
     }
 
     @Override
     public void deleteOrder(String id) {
 
-        if(!orderRepo.existsById(id))
+        // Checking if the order ID is valid or not
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+        else if(!orderRepo.existsById(id))
         {
             throw new RuntimeException("Order with id " + id + " does not exist");
         }

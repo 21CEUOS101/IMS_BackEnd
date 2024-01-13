@@ -1,5 +1,6 @@
 package com.project.ims.Controllers;
 
+// imports
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,23 +11,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.project.ims.IServices.IAdminService;
-import com.project.ims.IServices.ICustomerService;
-import com.project.ims.IServices.IDeliveryManService;
-import com.project.ims.IServices.IOrderService;
-import com.project.ims.IServices.IProductService;
-import com.project.ims.IServices.ISupplierService;
-import com.project.ims.IServices.IWManagerService;
-import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.Supplier;
 import com.project.ims.Requests.SupplierAddRequest;
 import com.project.ims.Services.SupplierService;
-import com.project.ims.Services.WareHouseService;
 
 @RestController
 @RequestMapping("/api")
 public class SupplierController {
 
+    // necessary dependency injections
     @Autowired
     private SupplierService supplierService;
 
@@ -34,16 +27,32 @@ public class SupplierController {
 
     // get all suppliers
 
-    @GetMapping("/suppliers")
+    @GetMapping("/supplier")
     public List<Supplier> getAllSuppliers() {
-        return supplierService.getAllSupplier();
+        try{
+            List<Supplier> suppliers = supplierService.getAllSupplier();
+            return suppliers;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     // get supplier by id
 
     @GetMapping("/supplier/{id}")
     public Supplier getSupplierById(@PathVariable("id") String id) {
-        return supplierService.getSupplierById(id);
+        try{
+            Supplier supplier = supplierService.getSupplierById(id);
+            return supplier;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     // add supplier
@@ -51,17 +60,26 @@ public class SupplierController {
     @PostMapping("/supplier")
     public Supplier addSupplier(@RequestBody SupplierAddRequest data) {
 
+        String id = generateId();
+
         Supplier supplier = new Supplier();
-        Random rand = new Random();
-        int id = rand.nextInt(1000000);
-        supplier.setId('s' + Integer.toString(id));
+        supplier.setId(id);
         supplier.setName(data.getName());
         supplier.setAddress(data.getAddress());
         supplier.setEmail(data.getEmail());
         supplier.setPassword(data.getPassword());
         supplier.setPhone(data.getPhone());
         supplier.setPincode(data.getPincode());
-        return supplierService.addSupplier(supplier);
+        
+        try{
+            supplierService.addSupplier(supplier);
+            return supplier;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
     
     // update supplier
@@ -76,13 +94,36 @@ public class SupplierController {
         supplier.setPassword(data.getPassword());
         supplier.setPhone(data.getPhone());
         supplier.setPincode(data.getPincode());
-        return supplierService.updateSupplier(supplier);
+
+        try {
+            supplierService.updateSupplier(supplier);
+            return supplier;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     // delete supplier
 
     @DeleteMapping("/supplier/{id}")
     public void deleteSupplier(@PathVariable("id") String id) {
-        supplierService.deleteSupplier(id);
+        try{
+            supplierService.deleteSupplier(id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public String generateId() {
+        // id generation
+        Random rand = new Random();
+        String id = 's' + String.valueOf(rand.nextInt(1000000));
+
+        return id;
     }
 }
