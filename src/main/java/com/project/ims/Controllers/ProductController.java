@@ -1,8 +1,8 @@
 package com.project.ims.Controllers;
 
+// imports
 import java.util.List;
 import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,15 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.project.ims.IServices.IAdminService;
-import com.project.ims.IServices.ICustomerService;
-import com.project.ims.IServices.IDeliveryManService;
-import com.project.ims.IServices.IOrderService;
-import com.project.ims.IServices.IProductService;
-import com.project.ims.IServices.ISupplierService;
-import com.project.ims.IServices.IWManagerService;
-import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.Product;
 import com.project.ims.Requests.ProductAddRequest;
 import com.project.ims.Services.ProductService;
@@ -28,56 +19,99 @@ import com.project.ims.Services.ProductService;
 @RequestMapping("/api")
 public class ProductController {
 
+    // necessary dependency injections
     @Autowired
     private ProductService productService;
 
-    @GetMapping("/products")
+    // controllers
+
+    @GetMapping("/product")
     public List<Product> getProducts() {
-        return productService.getAllProduct();
+        
+        try{
+            List<Product> products = productService.getAllProduct();
+            return products;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
     }
 
-    @GetMapping("/products/{id}")
+    @GetMapping("/product/{id}")
     public Product getProductById(@PathVariable String id) {
-        return productService.getProductById(id);
+        try{
+            Product product = productService.getProductById(id);
+            return product;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
-    @PostMapping("/products")
+    @PostMapping("/product")
     public Product addProduct(@RequestBody ProductAddRequest data) {
+
+        String id = generateId();
         Product product = new Product();
-        Random rand = new Random();
-        product.setId("p" + rand.nextInt(100000));
+        product.setId(id);
         product.setName(data.getName());
         product.setPrice(data.getPrice());
-        product.setDescription(data.getDescription());
-        product.setCategory(data.getCategory());
-        product.setCompany_name(data.getCompany_name());
         product.setExpiry_date(data.getExpiry_date());
-        product.setImage(data.getImage());
-        product.setMrp(data.getMrp());
-        product.setManufactured_date(data.getManufactured_date());
         product.setSupplier_id(data.getSupplier_id());
-        return productService.addProduct(product);
+
+        try{
+            productService.addProduct(product);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return product;
     }
 
-    @PostMapping("/products/{id}")
+    @PostMapping("/product/{id}")
     public Product updateProduct(@PathVariable String id, @RequestBody ProductAddRequest data) {
         Product product = productService.getProductById(id);
         product.setName(data.getName());
         product.setPrice(data.getPrice());
-        product.setDescription(data.getDescription());
-        product.setCategory(data.getCategory());
-        product.setCompany_name(data.getCompany_name());
         product.setExpiry_date(data.getExpiry_date());
-        product.setImage(data.getImage());
-        product.setMrp(data.getMrp());
-        product.setManufactured_date(data.getManufactured_date());
         product.setSupplier_id(data.getSupplier_id());
-        return productService.updateProduct(product);
+
+        try{
+            productService.updateProduct(product);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return product;
     }
 
-    @DeleteMapping("/products/{id}")
+    @DeleteMapping("/product/{id}")
     public void deleteProduct(@PathVariable String id) {
-        productService.deleteProduct(id);
+        try{
+            productService.deleteProduct(id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public String generateId()
+    {
+        Random rand = new Random();
+        String id = "p" + rand.nextInt(100000);
+        return id;
     }
 
 }

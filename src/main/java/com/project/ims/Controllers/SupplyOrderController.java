@@ -1,10 +1,10 @@
 package com.project.ims.Controllers;
 
+// imports
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,20 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.project.ims.IServices.IAdminService;
-import com.project.ims.IServices.ICustomerService;
-import com.project.ims.IServices.IDeliveryManService;
-import com.project.ims.IServices.IOrderService;
-import com.project.ims.IServices.IProductService;
-import com.project.ims.IServices.IRSOService;
-import com.project.ims.IServices.IReturnOrderService;
-import com.project.ims.IServices.ISupplierService;
-import com.project.ims.IServices.ISupplyOrderService;
-import com.project.ims.IServices.IW2WOrderService;
-import com.project.ims.IServices.IWManagerService;
-import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.SupplyOrder;
 import com.project.ims.Models.WareHouse;
@@ -40,6 +28,7 @@ import com.project.ims.Services.WareHouseService;
 @RequestMapping("/api")
 public class SupplyOrderController {
 
+    // necessary dependency injections
     @Autowired
     private DeliveryManService deliveryManService;
 
@@ -52,23 +41,40 @@ public class SupplyOrderController {
     @Autowired
     private SupplyOrderService supplyOrderService;
     
-    @GetMapping("/supplyorders")
+    // controllers
+
+    // get all supply orders
+    @GetMapping("/supply-order")
     public List<SupplyOrder> getAllSupplyOrders() {
-        return supplyOrderService.getAllSupplyOrder();
+        try{
+            List<SupplyOrder> supplyOrders = supplyOrderService.getAllSupplyOrder();
+            return supplyOrders;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
-    @GetMapping("/supplyorder/{id}")
+    @GetMapping("/supply-order/{id}")
     public SupplyOrder getSupplyOrder(@PathVariable String id) {
-        return supplyOrderService.getSupplyOrderById(id);
+        try{
+            SupplyOrder supplyOrder = supplyOrderService.getSupplyOrderById(id);
+            return supplyOrder;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
-    @PostMapping("/supplyorder")
+    @PostMapping("/supply-order")
     public SupplyOrder addSupplyOrder(@RequestBody SupplyOrderAddRequest data) {
-        SupplyOrder supplyOrder = new SupplyOrder();
 
-        Random rand = new Random();
-        int random = rand.nextInt(1000000);
-        String id = "so" + random;
+        String id = generateId();
+        SupplyOrder supplyOrder = new SupplyOrder();
         supplyOrder.setId(id);
         supplyOrder.setProduct_id(data.getProduct_id());
         supplyOrder.setQuantity(data.getQuantity());
@@ -76,7 +82,7 @@ public class SupplyOrderController {
         supplyOrder.setWarehouse_id(data.getWarehouse_id());
         supplyOrder.setPayment_method(data.getPayment_method());
 
-        if (data.getPayment_method().equals("Online")) {
+        if (data.getPayment_method().equals("online")) {
             supplyOrder.setTransaction_id(data.getTransaction_id());
         }
 
@@ -97,19 +103,37 @@ public class SupplyOrderController {
         List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(supplyOrder.getWarehouse_id());
             
         for (DeliveryMan d : deliveryMen) {
-            if (d.getStatus() == "available") {
+            if (d.getStatus().equals("available")) {
                 d.setStatus("unavailable");
                 supplyOrder.setDelivery_man_id(d.getId());
-                deliveryManService.updateDeliveryMan(d);
+                
+                try{
+                    deliveryManService.updateDeliveryMan(d);
+                }
+                catch(Exception e)
+                {
+                    System.out.println(e.getMessage());
+                    return null;
+                }
+                
                 break;
             }
         }
 
-        return supplyOrderService.addSupplyOrder(supplyOrder);
+        try{
+            supplyOrderService.addSupplyOrder(supplyOrder);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return supplyOrder;
     }
     
-    @PostMapping("/supplyorder/{id}/status")
-    public SupplyOrder updateSupplyOrderStatus(@PathVariable("id") String id, @RequestBody String status) {
+    @PostMapping("/supply-order/{id}/status")
+    public SupplyOrder updateSupplyOrderStatus(@PathVariable("id") String id, @RequestParam("status") String status) {
         SupplyOrder supplyOrder = supplyOrderService.getSupplyOrderById(id);
 
         if (status.equals("delivered")) {
@@ -124,7 +148,14 @@ public class SupplyOrderController {
                 }
             }
 
-            wareHouseService.updateWareHouse(wareHouse);
+            try{
+                wareHouseService.updateWareHouse(wareHouse);
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.getMessage());
+                return null;
+            }
 
             supplyOrder.setDelivered_date_time(LocalDateTime.now().toString());
 
@@ -136,15 +167,39 @@ public class SupplyOrderController {
 
         m.setStatus("available");
 
-        deliveryManService.updateDeliveryMan(m);
+        try{
+            deliveryManService.updateDeliveryMan(m);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        // checking if status is enum of pending, delivered or cancelled
+
+        if (!(status.equals("pending") || status.equals("delivered") || status.equals("cancelled")))
+        {
+            System.out.println("Invalid status");    
+            return null;
+        }
 
         supplyOrder.setStatus(status);
 
-        return supplyOrderService.updateSupplyOrder(supplyOrder);
+        try{
+            supplyOrderService.updateSupplyOrder(supplyOrder);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return supplyOrder;
     }
 
     // update supply order
-    @PostMapping("/supplyorder/{id}")
+    @PostMapping("/supply-order/{id}")
     public SupplyOrder updateSupplyOrder(@PathVariable("id") String id, @RequestBody SupplyOrderUpdateRequest data) {
         SupplyOrder supplyOrder = supplyOrderService.getSupplyOrderById(id);
         supplyOrder.setDate_time(data.getDate_time());
@@ -159,11 +214,36 @@ public class SupplyOrderController {
         supplyOrder.setTotal_amount(data.getTotal_amount());
         supplyOrder.setTransaction_id(data.getTransaction_id());
         supplyOrder.setWarehouse_id(data.getWarehouse_id());
-        return supplyOrderService.updateSupplyOrder(supplyOrder);
+        
+        try{
+            supplyOrderService.updateSupplyOrder(supplyOrder);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return supplyOrder;
     }
     
-    @DeleteMapping("/supplyorder/{id}")
+    @DeleteMapping("/supply-order/{id}")
     public void deleteSupplyOrder(@PathVariable String id) {
-        supplyOrderService.deleteSupplyOrder(id);
+
+        try{
+            supplyOrderService.deleteSupplyOrder(id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // generate id
+    public String generateId() {
+        Random rand = new Random();
+        int random = rand.nextInt(1000000);
+        String id = "so" + random;
+        return id;
     }
 }

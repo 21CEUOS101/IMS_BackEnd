@@ -1,4 +1,6 @@
 package com.project.ims.Controllers;
+
+// imports
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -12,18 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.project.ims.IServices.IAdminService;
-import com.project.ims.IServices.ICustomerService;
-import com.project.ims.IServices.IDeliveryManService;
-import com.project.ims.IServices.IOrderService;
-import com.project.ims.IServices.IProductService;
-import com.project.ims.IServices.IRSOService;
-import com.project.ims.IServices.IReturnOrderService;
-import com.project.ims.IServices.ISupplierService;
-import com.project.ims.IServices.ISupplyOrderService;
-import com.project.ims.IServices.IW2WOrderService;
-import com.project.ims.IServices.IWManagerService;
-import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.Product;
@@ -43,6 +33,7 @@ import com.project.ims.Services.SupplierService;
 @RequestMapping("/api")
 public class ReturnOrderController {
 
+    // necessary dependency injections
     @Autowired
     private DeliveryManService deliveryManService;
 
@@ -64,30 +55,53 @@ public class ReturnOrderController {
     // Return Order APIs
 
     // get all return orders
-    @GetMapping("/returnOrders")
+    @GetMapping("/return-order")
     public List<ReturnOrder> getReturnOrders() {
-        return returnOrderService.getAllReturnOrder();
+        try{
+            List<ReturnOrder> returnOrders = returnOrderService.getAllReturnOrder();
+            return returnOrders;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     // get return order by id
-    @GetMapping("/returnOrder/{id}")
+    @GetMapping("/return-order/{id}")
     public ReturnOrder getReturnOrderById(@PathVariable String id) {
-        return returnOrderService.getReturnOrderById(id);
+        try{
+            ReturnOrder returnOrder = returnOrderService.getReturnOrderById(id);
+            return returnOrder;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     // get return orders by customer id
-    @GetMapping("/returnOrders/customer/{id}")
+    @GetMapping("/return-order/customer/{id}")
     public List<ReturnOrder> getReturnOrdersByCustomerId(@PathVariable String id) {
-        return returnOrderService.getAllReturnOrderByCustomerId(id);
+        try{
+            List<ReturnOrder> returnOrders = returnOrderService.getAllReturnOrderByCustomerId(id);
+            return returnOrders;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     // create return order
-    @PostMapping("/returnOrder")
+    @PostMapping("/return-order")
     public ReturnOrder createReturnOrder(@RequestBody ReturnOrderAddRequest data) {
 
+        String id = generateId();
         ReturnOrder returnOrder = new ReturnOrder();
-        Random rand = new Random();
-        String id = "r" + rand.nextInt(1000000);
         returnOrder.setId(id);
         returnOrder.setCustomerId(data.getCustomer_id());
         returnOrder.setPickup_address(data.getPickup_address());
@@ -108,8 +122,15 @@ public class ReturnOrderController {
         returnOrder.setRefund_amount(order.getTotal_amount());
         returnOrder.setOrder_id(order.getId());
 
-        return returnOrderService.addReturnOrder(returnOrder);
+        try{
+            returnOrderService.addReturnOrder(returnOrder);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
 
+        return returnOrder;
     }
 
     // update return order status
@@ -123,7 +144,15 @@ public class ReturnOrderController {
         if (status.equals("approved")) {
             Order order = orderService.getOrderById(returnOrder.getOrder_id());
             order.setStatus("returned");
-            orderService.updateOrder(order);
+            
+            try{
+                orderService.updateOrder(order);
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.getMessage());
+                return null;
+            }
 
             List<DeliveryMan> deliveryMans = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
 
@@ -131,27 +160,50 @@ public class ReturnOrderController {
             {
                 if (i.getStatus() == "available") {
                     i.setStatus("unavailable");
-                    deliveryManService.updateDeliveryMan(i);
+                    try{
+                        deliveryManService.updateDeliveryMan(i);
+                    }
+                    catch(Exception e)
+                    {
+                        System.out.println(e.getMessage());
+                        return null;
+                    }
                     returnOrder.setDelivery_man_id(i.getId());
                 }
             }
             
             if(returnOrder.getDelivery_man_id() == null)
             {
-                throw new RuntimeException("Deliveryman not currently available");
+                System.out.println("No deliveryman available");
+                return null;
             }
 
         } else if (status.equals("rejected")) {
 
             Order order = orderService.getOrderById(returnOrder.getOrder_id());
             order.setStatus("delivered");
-            orderService.updateOrder(order);
+            
+            try{
+                orderService.updateOrder(order);
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.getMessage());
+                return null;
+            }
 
             DeliveryMan m = deliveryManService.getDeliveryManById(returnOrder.getDelivery_man_id());
 
             m.setStatus("available");
 
-            deliveryManService.updateDeliveryMan(m);
+            try{
+                deliveryManService.updateDeliveryMan(m);
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.getMessage());
+                return null;
+            }
 
         } else if (status.equals("arrived")) {
             ReturnSupplyOrder returnSupplyOrder = new ReturnSupplyOrder();
@@ -180,7 +232,14 @@ public class ReturnOrderController {
             Supplier supplier = supplierService.getSupplierById(product.getSupplier_id());
             returnSupplyOrder.setDelivery_address(supplier.getAddress());
 
-            returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
+            try{
+                returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.getMessage());
+                return null;
+            }
 
             List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
             
@@ -188,16 +247,32 @@ public class ReturnOrderController {
                 if (d.getStatus() == "available") {
                     d.setStatus("unavailable");
                     returnSupplyOrder.setDelivery_man_id(d.getId());
-                    deliveryManService.updateDeliveryMan(d);
+                    
+                    try{
+                        deliveryManService.updateDeliveryMan(d);
+                    }
+                    catch(Exception e)
+                    {
+                        System.out.println(e.getMessage());
+                        return null;
+                    }
+
                     break;
                 }
             }
 
         }
 
-        // set date and time
+        try{
+            returnOrderService.updateReturnOrder(returnOrder);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
 
-        return returnOrderService.updateReturnOrder(returnOrder);
+        return returnOrder;
     }
 
     // update return order
@@ -236,5 +311,11 @@ public class ReturnOrderController {
     @DeleteMapping("/returnOrder/{id}")
     public void deleteReturnOrder(@PathVariable("id") String id) {
         returnOrderService.deleteReturnOrder(id);
+    }
+
+    public String generateId() {
+        Random rand = new Random();
+        String id = "r" + rand.nextInt(1000000);
+        return id;
     }
 }
