@@ -1,65 +1,27 @@
 package com.project.ims.Services;
 
+// imports
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.project.ims.IServices.IRSOService;
 import com.project.ims.Models.ReturnSupplyOrder;
-import com.project.ims.Repo.AdminRepo;
-import com.project.ims.Repo.CustomerRepo;
-import com.project.ims.Repo.DeliveryManRepo;
-import com.project.ims.Repo.OrderRepo;
-import com.project.ims.Repo.ProductRepo;
 import com.project.ims.Repo.RSORepo;
 import com.project.ims.Repo.ReturnOrderRepo;
-import com.project.ims.Repo.SupplierRepo;
-import com.project.ims.Repo.SupplyOrderRepo;
-import com.project.ims.Repo.W2WOrderRepo;
-import com.project.ims.Repo.WManagerRepo;
-import com.project.ims.Repo.WareHouseRepo;
 
 @Component
 @Service
 public class RSOService implements IRSOService {
-    
-    @Autowired
-    private AdminRepo adminRepo;
 
-    @Autowired
-    private CustomerRepo customerRepo;
-
-    @Autowired
-    private OrderRepo orderRepo;
-
-    @Autowired
-    private DeliveryManRepo deliveryManRepo;
-
-    @Autowired
-    private ProductRepo productRepo;
-
-    @Autowired
-    private SupplierRepo supplierRepo;
-
-    @Autowired
-    private WareHouseRepo wareHouseRepo;
-
-    @Autowired
-    private WManagerRepo wManagerRepo;
-
+    // necessary dependency Injections
     @Autowired
     private ReturnOrderRepo returnOrderRepo;
 
     @Autowired
-    private SupplyOrderRepo supplyOrderRepo;
-
-    @Autowired
-    private W2WOrderRepo w2wOrderRepo;
-
-    @Autowired
     private RSORepo returnSupplyOrderRepo;
+
+    // Services
 
     @Override
     public List<ReturnSupplyOrder> getAllReturnSupplyOrder() {
@@ -68,6 +30,12 @@ public class RSOService implements IRSOService {
 
     @Override
     public ReturnSupplyOrder getReturnSupplyOrderById(String id) {
+
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+
         return returnSupplyOrderRepo.findById(id).orElse(null);
     }
 
@@ -82,7 +50,7 @@ public class RSOService implements IRSOService {
         {
             throw new RuntimeException("Return Supply Order with this id already exists");
         }
-        else if(returnSupplyOrder.getId().startsWith("rso")) 
+        else if(!returnSupplyOrder.getId().startsWith("rso")) 
         {
             throw new RuntimeException("Return Supply Order id must start with 'rso'");
         }
@@ -92,12 +60,23 @@ public class RSOService implements IRSOService {
 
     @Override
     public ReturnSupplyOrder updateReturnSupplyOrder(ReturnSupplyOrder returnSupplyOrder) {
+
+        if (returnSupplyOrder == null)
+        {
+            throw new RuntimeException("Return Supply Order data shouldn't be null");
+        }
+
         return returnSupplyOrderRepo.save(returnSupplyOrder);
     }
 
     @Override
     public void deleteReturnSupplyOrder(String id) {
-        if (!returnSupplyOrderRepo.existsById(id))
+
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+        else if (!returnSupplyOrderRepo.existsById(id))
         {
             throw new RuntimeException("Return Supply Order with id " + id + " does not exist");
         }

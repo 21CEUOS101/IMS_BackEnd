@@ -1,9 +1,10 @@
 package com.project.ims.Controllers;
+
+// imports
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,20 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.project.ims.IServices.IAdminService;
-import com.project.ims.IServices.ICustomerService;
-import com.project.ims.IServices.IDeliveryManService;
-import com.project.ims.IServices.IOrderService;
-import com.project.ims.IServices.IProductService;
-import com.project.ims.IServices.IRSOService;
-import com.project.ims.IServices.IReturnOrderService;
-import com.project.ims.IServices.ISupplierService;
-import com.project.ims.IServices.ISupplyOrderService;
-import com.project.ims.IServices.IW2WOrderService;
-import com.project.ims.IServices.IWManagerService;
-import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.ReturnSupplyOrder;
@@ -38,6 +27,7 @@ import com.project.ims.Services.RSOService;
 @RequestMapping("/api")
 public class RSOController {
 
+    // necessary dependency injections
     @Autowired
     private DeliveryManService deliveryManService;
 
@@ -47,23 +37,39 @@ public class RSOController {
     @Autowired
     private RSOService returnSupplyOrderService;
 
-    @GetMapping("/returnSupplyOrders")
+    // controllers
+
+    @GetMapping("/return-supply-order")
     public List<ReturnSupplyOrder> getReturnSupplyOrders() {
-        return returnSupplyOrderService.getAllReturnSupplyOrder();
+        try{
+            List<ReturnSupplyOrder> returnSupplyOrders = returnSupplyOrderService.getAllReturnSupplyOrder();
+            return returnSupplyOrders;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
-    @GetMapping("/returnSupplyOrder/{id}")
+    @GetMapping("/return-supply-order/{id}")
     public ReturnSupplyOrder getReturnSupplyOrderById(@PathVariable("id") String id) {
-        return returnSupplyOrderService.getReturnSupplyOrderById(id);
+        try{
+            ReturnSupplyOrder returnSupplyOrder = returnSupplyOrderService.getReturnSupplyOrderById(id);
+            return returnSupplyOrder;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
-    @PostMapping("/returnSupplyOrder")
+    @PostMapping("/return-supply-order")
     public ReturnSupplyOrder addReturnSupplyOrder(@RequestBody RSOAddRequest data) {
 
+        String id = generateId();
         ReturnSupplyOrder returnSupplyOrder = new ReturnSupplyOrder();
-
-        Random rand = new Random();
-        String id = "rso" + rand.nextInt(10000);
         returnSupplyOrder.setId(id);
 
         // set date and time
@@ -73,6 +79,12 @@ public class RSOController {
         returnSupplyOrder.setDate_time(formattedDateTime);
 
         Order order = orderService.getOrderById(data.getOrder_id());
+
+        if (order == null) {
+            System.out.println("Order not found");
+            return null;
+        }
+
         returnSupplyOrder.setOrder_id(data.getOrder_id());
         returnSupplyOrder.setWarehouse_id(order.getWarehouse_id());
         returnSupplyOrder.setProduct_id(order.getProduct_id());
@@ -86,21 +98,35 @@ public class RSOController {
         List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
         
         for (DeliveryMan d : deliveryMen) {
-            if (d.getStatus() == "available") {
+            if (d.getStatus().equals("available")) {
                 d.setStatus("unavailable");
                 returnSupplyOrder.setDelivery_man_id(d.getId());
-                deliveryManService.updateDeliveryMan(d);
+                try{
+                    deliveryManService.updateDeliveryMan(d);
+                }
+                catch (Exception e) {
+                    System.out.println(e);
+                    return null;
+                }
                 break;
             }
         }
         
-        returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
+        try{
+            returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
         return returnSupplyOrder;
     }
 
-    @PostMapping("/returnSupplyOrder/{id}/status")
+    @PostMapping("/return-supply-order/{id}/status")
     public ReturnSupplyOrder updateReturnSupplyOrderStatus(@PathVariable("id") String id,
-            @RequestBody String status) {
+            @RequestParam("status") String status) {
         ReturnSupplyOrder returnSupplyOrder = returnSupplyOrderService.getReturnSupplyOrderById(id);
 
         if(status.equals("delivered")) {
@@ -113,14 +139,31 @@ public class RSOController {
 
             m.setStatus("available");
 
-            deliveryManService.updateDeliveryMan(m);
+            try{
+                deliveryManService.updateDeliveryMan(m);
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.getMessage());
+                return null;
+            }
         }
 
         returnSupplyOrder.setStatus(status);
-        return returnSupplyOrderService.updateReturnSupplyOrder(returnSupplyOrder);
+        
+        try{
+            returnSupplyOrderService.updateReturnSupplyOrder(returnSupplyOrder);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return returnSupplyOrder;
     }
     
-    @PostMapping("/returnSupplyOrder/{id}")
+    @PostMapping("/return-supply-order/{id}")
     public ReturnSupplyOrder updateReturnSupplyOrder(@PathVariable("id") String id,
             @RequestBody RSOUpdateRequest data) {
         ReturnSupplyOrder returnSupplyOrder = returnSupplyOrderService.getReturnSupplyOrderById(id);
@@ -136,11 +179,34 @@ public class RSOController {
         returnSupplyOrder.setDelivery_address(data.getDelivery_address());
         returnSupplyOrder.setReturn_reason(data.getReturn_reason());
         returnSupplyOrder.setSupplier_id(data.getSupplier_id());
-        return returnSupplyOrderService.updateReturnSupplyOrder(returnSupplyOrder);
+        
+        try{
+            returnSupplyOrderService.updateReturnSupplyOrder(returnSupplyOrder);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return returnSupplyOrder;
     }
     
-    @DeleteMapping("/returnSupplyOrder/{id}")
+    @DeleteMapping("/return-supply-order/{id}")
     public void deleteReturnSupplyOrder(@PathVariable("id") String id) {
-        returnSupplyOrderService.deleteReturnSupplyOrder(id);
+        try{
+            returnSupplyOrderService.deleteReturnSupplyOrder(id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public String generateId() {
+        // id generation
+        Random rand = new Random();
+        String id = "rso" + String.valueOf(rand.nextInt(1000000));
+        return id;
     }
 }
