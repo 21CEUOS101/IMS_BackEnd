@@ -118,9 +118,31 @@ public class ReturnOrderController {
 
         returnOrder.setProduct_id(order.getProduct_id());
         returnOrder.setQuantity(order.getQuantity());
-        returnOrder.setWarehouse_id(order.getWarehouse_id());
+        returnOrder.setWarehouseId(order.getWarehouse_id());
         returnOrder.setRefund_amount(order.getTotal_amount());
         returnOrder.setOrder_id(order.getId());
+
+        List<DeliveryMan> deliveryMans = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
+
+        for(DeliveryMan i : deliveryMans)
+        {
+            if (i.getStatus().equals("available")) {
+                i.setStatus("unavailable");
+                try {
+                    deliveryManService.updateDeliveryMan(i);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    return null;
+                }
+                returnOrder.setDelivery_man_id(i.getId());
+            }
+        }
+        
+        if(returnOrder.getDelivery_man_id() == null)
+        {
+            System.out.println("No deliveryman available");
+            return null;
+        }
 
         try{
             returnOrderService.addReturnOrder(returnOrder);
@@ -134,7 +156,7 @@ public class ReturnOrderController {
     }
 
     // update return order status
-    @PostMapping("/returnOrder/{id}/status")
+    @PostMapping("/return-order/{id}/status")
     public ReturnOrder updateReturnOrderStatus(@PathVariable("id") String id, @RequestParam("status") String status) {
 
         ReturnOrder returnOrder = returnOrderService.getReturnOrderById(id);
@@ -151,30 +173,6 @@ public class ReturnOrderController {
             catch(Exception e)
             {
                 System.out.println(e.getMessage());
-                return null;
-            }
-
-            List<DeliveryMan> deliveryMans = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
-
-            for(DeliveryMan i : deliveryMans)
-            {
-                if (i.getStatus() == "available") {
-                    i.setStatus("unavailable");
-                    try{
-                        deliveryManService.updateDeliveryMan(i);
-                    }
-                    catch(Exception e)
-                    {
-                        System.out.println(e.getMessage());
-                        return null;
-                    }
-                    returnOrder.setDelivery_man_id(i.getId());
-                }
-            }
-            
-            if(returnOrder.getDelivery_man_id() == null)
-            {
-                System.out.println("No deliveryman available");
                 return null;
             }
 
@@ -206,32 +204,9 @@ public class ReturnOrderController {
             }
 
         } else if (status.equals("arrived")) {
-            ReturnSupplyOrder returnSupplyOrder = new ReturnSupplyOrder();
-            Random rand = new Random();
-            String returnSupplyOrderId = "rso" + rand.nextInt(1000000);
-            returnSupplyOrder.setId(returnSupplyOrderId);
-
-            // set date and time when returned order arrives at warehouse
-            LocalDateTime currentDateTime = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String formattedDateTime = currentDateTime.format(formatter);
-            returnSupplyOrder.setDate_time(formattedDateTime);
-
-            Order order = orderService.getOrderById(returnOrder.getOrder_id());
-            returnSupplyOrder.setOrder_id(order.getId());
-            returnSupplyOrder.setProduct_id(order.getProduct_id());
-            returnSupplyOrder.setQuantity(order.getQuantity());
-            returnSupplyOrder.setWarehouse_id(order.getWarehouse_id());
-            returnSupplyOrder.setRefund_amount(order.getTotal_amount());
-            returnSupplyOrder.setStatus("pending");
-            returnSupplyOrder.setReturn_reason(returnOrder.getReturn_reason());
-
-            Product product = productService.getProductById(order.getProduct_id());
-            returnSupplyOrder.setSupplier_id(product.getSupplier_id());
-
-            Supplier supplier = supplierService.getSupplierById(product.getSupplier_id());
-            returnSupplyOrder.setDelivery_address(supplier.getAddress());
-
+            
+            ReturnSupplyOrder returnSupplyOrder = createRSO(returnOrder);
+            
             try{
                 returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
             }
@@ -239,26 +214,6 @@ public class ReturnOrderController {
             {
                 System.out.println(e.getMessage());
                 return null;
-            }
-
-            List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
-            
-            for (DeliveryMan d : deliveryMen) {
-                if (d.getStatus() == "available") {
-                    d.setStatus("unavailable");
-                    returnSupplyOrder.setDelivery_man_id(d.getId());
-                    
-                    try{
-                        deliveryManService.updateDeliveryMan(d);
-                    }
-                    catch(Exception e)
-                    {
-                        System.out.println(e.getMessage());
-                        return null;
-                    }
-
-                    break;
-                }
             }
 
         }
@@ -277,7 +232,7 @@ public class ReturnOrderController {
 
     // update return order
 
-    @PostMapping("/returnOrder/{id}")
+    @PostMapping("/return-order/{id}")
     public ReturnOrder updateReturnOrder(@PathVariable("id") String id, @RequestBody ReturnOrderUpdateRequest data) {
 
         ReturnOrder returnOrder = returnOrderService.getReturnOrderById(id);
@@ -288,7 +243,7 @@ public class ReturnOrderController {
         Order order = orderService.getOrderById(returnOrder.getOrder_id());
         returnOrder.setProduct_id(order.getProduct_id());
         returnOrder.setQuantity(order.getQuantity());
-        returnOrder.setWarehouse_id(order.getWarehouse_id());
+        returnOrder.setWarehouseId(order.getWarehouse_id());
         returnOrder.setRefund_amount(order.getTotal_amount());
         returnOrder.setOrder_id(order.getId());
         returnOrder.setCustomerId(order.getCustomerId());
@@ -297,25 +252,97 @@ public class ReturnOrderController {
         returnOrder.setDelivered_date_time(data.getDelivered_date_time());
         returnOrder.setDelivery_man_id(data.getDelivery_man_id());
 
-        return returnOrderService.updateReturnOrder(returnOrder);
+        try{
+            returnOrderService.updateReturnOrder(returnOrder);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return returnOrder;
     }
 
     // get return orders by warehouse id
-    // @GetMapping("/returnOrders/warehouse/{id}")
-    // public List<ReturnOrder> getReturnOrdersByWarehouseId(@PathVariable String id) {
-    //     return returnOrderService.getAllReturnOrderByWarehouseId(id);
-    // }
+    @GetMapping("/return-orders/warehouse/{id}")
+    public List<ReturnOrder> getReturnOrdersByWarehouseId(@PathVariable String id) {
+        try{
+            List<ReturnOrder> returnOrders = returnOrderService.findByWarehouseId(id);
+            return returnOrders;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 
     // delete return order
 
-    @DeleteMapping("/returnOrder/{id}")
+    @DeleteMapping("/return-order/{id}")
     public void deleteReturnOrder(@PathVariable("id") String id) {
-        returnOrderService.deleteReturnOrder(id);
+        try{
+            returnOrderService.deleteReturnOrder(id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
     }
 
     public String generateId() {
         Random rand = new Random();
         String id = "r" + rand.nextInt(1000000);
         return id;
+    }
+
+    public ReturnSupplyOrder createRSO(ReturnOrder returnOrder)
+    {
+        ReturnSupplyOrder returnSupplyOrder = new ReturnSupplyOrder();
+        Random rand = new Random();
+        String returnSupplyOrderId = "rso" + rand.nextInt(1000000);
+        returnSupplyOrder.setId(returnSupplyOrderId);
+
+        // set date and time when returned order arrives at warehouse
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = currentDateTime.format(formatter);
+        returnSupplyOrder.setDate_time(formattedDateTime);
+
+        Order order = orderService.getOrderById(returnOrder.getOrder_id());
+        returnSupplyOrder.setOrder_id(order.getId());
+        returnSupplyOrder.setProduct_id(order.getProduct_id());
+        returnSupplyOrder.setQuantity(order.getQuantity());
+        returnSupplyOrder.setWarehouse_id(order.getWarehouse_id());
+        returnSupplyOrder.setRefund_amount(order.getTotal_amount());
+        returnSupplyOrder.setStatus("pending");
+        returnSupplyOrder.setReturn_reason(returnOrder.getReturn_reason());
+
+        Product product = productService.getProductById(order.getProduct_id());
+        returnSupplyOrder.setSupplier_id(product.getSupplier_id());
+
+        Supplier supplier = supplierService.getSupplierById(product.getSupplier_id());
+        returnSupplyOrder.setDelivery_address(supplier.getAddress());
+
+        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
+        
+        for (DeliveryMan d : deliveryMen) {
+            if (d.getStatus() == "available") {
+                d.setStatus("unavailable");
+                returnSupplyOrder.setDelivery_man_id(d.getId());
+
+                try {
+                    deliveryManService.updateDeliveryMan(d);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    return null;
+                }
+
+                break;
+            }
+        }
+
+        return returnSupplyOrder;
     }
 }

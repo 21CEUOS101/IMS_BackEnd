@@ -96,5 +96,19 @@ public class ReturnOrderService implements IReturnOrderService {
     public List<ReturnOrder> getAllReturnOrderByCustomerId(String id) {
         return returnOrderRepo.findAllByCustomerId(id);
     }
+
+    public List<ReturnOrder> findByWarehouseId(String id) {
+
+        if (id == null || id.isEmpty())
+        {
+            throw new RuntimeException("Warehouse ID cannot be empty");
+        }
+        else if (!wareHouseRepo.existsById(id))
+        {
+            throw new RuntimeException("Warehouse ID does not exist");
+        }
+
+        return returnOrderRepo.findAllByWarehouseId(id);
+    }
     
 }

@@ -13,7 +13,5 @@ public class ReturnOrderAddRequest {
 
     private String return_reason;
 
-    private String status;
-
     private String pickup_address;
 }

@@ -22,7 +22,7 @@ public class ReturnOrder {
 
     private String quantity;
 
-    private String warehouse_id;
+    private String warehouseId;
 
     private String customerId;
 
