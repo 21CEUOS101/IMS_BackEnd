@@ -9,7 +9,6 @@ import com.project.ims.IServices.ICustomerService;
 import com.project.ims.Models.Customer;
 import com.project.ims.Repo.CustomerRepo;
 
-@Component
 @Service
 public class CustomerService implements ICustomerService {
 

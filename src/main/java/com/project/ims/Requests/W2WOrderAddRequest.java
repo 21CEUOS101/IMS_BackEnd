@@ -1,6 +1,6 @@
 package com.project.ims.Requests;
-import java.util.List;
 
+// imports
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,4 +16,6 @@ public class W2WOrderAddRequest {
     private String s_warehouse_id;
 
     private String r_warehouse_id;
+
+    private String orderId;
 }

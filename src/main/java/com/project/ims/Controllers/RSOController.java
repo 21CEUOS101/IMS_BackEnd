@@ -1,8 +1,6 @@
 package com.project.ims.Controllers;
 
 // imports
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.ReturnSupplyOrder;
+import com.project.ims.Repo.OrderRepo;
 import com.project.ims.Requests.RSOAddRequest;
 import com.project.ims.Requests.RSOUpdateRequest;
-import com.project.ims.Services.DeliveryManService;
-import com.project.ims.Services.OrderService;
 import com.project.ims.Services.RSOService;
 
 @RestController
@@ -28,11 +24,9 @@ import com.project.ims.Services.RSOService;
 public class RSOController {
 
     // necessary dependency injections
-    @Autowired
-    private DeliveryManService deliveryManService;
 
     @Autowired
-    private OrderService orderService;
+    private OrderRepo orderRepo;
 
     @Autowired
     private RSOService returnSupplyOrderService;
@@ -72,14 +66,9 @@ public class RSOController {
         ReturnSupplyOrder returnSupplyOrder = new ReturnSupplyOrder();
         returnSupplyOrder.setId(id);
 
-        // set date and time
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateTime = currentDateTime.format(formatter);
-        returnSupplyOrder.setDate_time(formattedDateTime);
-
-        Order order = orderService.getOrderById(data.getOrder_id());
-
+        
+        Order order = orderRepo.findById(data.getOrder_id()).orElse(null);
+        
         if (order == null) {
             System.out.println("Order not found");
             return null;
@@ -92,25 +81,8 @@ public class RSOController {
         returnSupplyOrder.setRefund_amount(order.getTotal_amount());
         returnSupplyOrder.setDelivery_address(data.getDelivery_address());
         returnSupplyOrder.setReturn_reason(data.getReturn_reason());
-        returnSupplyOrder.setStatus("pending");
+        returnSupplyOrder.setStatus("shipped");
         returnSupplyOrder.setSupplier_id(data.getSupplier_id());
-        
-        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
-        
-        for (DeliveryMan d : deliveryMen) {
-            if (d.getStatus().equals("available")) {
-                d.setStatus("unavailable");
-                returnSupplyOrder.setDelivery_man_id(d.getId());
-                try{
-                    deliveryManService.updateDeliveryMan(d);
-                }
-                catch (Exception e) {
-                    System.out.println(e);
-                    return null;
-                }
-                break;
-            }
-        }
         
         try{
             returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
@@ -127,32 +99,10 @@ public class RSOController {
     @PostMapping("/return-supply-order/{id}/status")
     public ReturnSupplyOrder updateReturnSupplyOrderStatus(@PathVariable("id") String id,
             @RequestParam("status") String status) {
-        ReturnSupplyOrder returnSupplyOrder = returnSupplyOrderService.getReturnSupplyOrderById(id);
-
-        if(status.equals("delivered")) {
-            LocalDateTime currentDateTime = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String formattedDateTime = currentDateTime.format(formatter);
-            returnSupplyOrder.setDelivered_date_time(formattedDateTime);
-
-            DeliveryMan m = deliveryManService.getDeliveryManById(returnSupplyOrder.getDelivery_man_id());
-
-            m.setStatus("available");
-
-            try{
-                deliveryManService.updateDeliveryMan(m);
-            }
-            catch(Exception e)
-            {
-                System.out.println(e.getMessage());
-                return null;
-            }
-        }
-
-        returnSupplyOrder.setStatus(status);
         
         try{
-            returnSupplyOrderService.updateReturnSupplyOrder(returnSupplyOrder);
+            ReturnSupplyOrder returnSupplyOrder = returnSupplyOrderService.updateReturnSupplyOrderStatus(id, status);
+            return returnSupplyOrder;
         }
         catch(Exception e)
         {
@@ -160,7 +110,6 @@ public class RSOController {
             return null;
         }
 
-        return returnSupplyOrder;
     }
     
     @PostMapping("/return-supply-order/{id}")

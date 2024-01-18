@@ -16,6 +16,8 @@ public interface IRSOService {
         public ReturnSupplyOrder addReturnSupplyOrder(ReturnSupplyOrder returnSupplyOrder);
         
         public ReturnSupplyOrder updateReturnSupplyOrder(ReturnSupplyOrder returnSupplyOrder);
+
+        public ReturnSupplyOrder updateReturnSupplyOrderStatus(String id, String status);
     
         public void deleteReturnSupplyOrder(String id);
 }

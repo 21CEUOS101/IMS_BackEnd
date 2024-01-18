@@ -17,5 +17,7 @@ public interface ISupplyOrderService{
     
     public SupplyOrder updateSupplyOrder(SupplyOrder supplyOrder);
 
+    public SupplyOrder updateSupplyOrderStatus(String id, String status);
+
     public void deleteSupplyOrder(String id);
 }

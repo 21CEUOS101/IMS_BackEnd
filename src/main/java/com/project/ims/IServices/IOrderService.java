@@ -13,5 +13,6 @@ public interface IOrderService {
     public Order getOrderById(String id);
     public Order addOrder(Order order);
     public Order updateOrder(Order order);
+    public Order updateOrderStatus(String id, String status);
     public void deleteOrder(String id);
 }

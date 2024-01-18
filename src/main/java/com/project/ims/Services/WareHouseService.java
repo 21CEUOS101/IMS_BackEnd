@@ -6,12 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.IWareHouseService;
+import com.project.ims.Models.GlobalProducts;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Models.WareHouse_Manager;
+import com.project.ims.Repo.GlobalProductsRepo;
 import com.project.ims.Repo.WManagerRepo;
 import com.project.ims.Repo.WareHouseRepo;
 
-@Component
 @Service
 public class WareHouseService implements IWareHouseService {
 
@@ -22,6 +23,9 @@ public class WareHouseService implements IWareHouseService {
 
     @Autowired
     private WManagerRepo wManagerRepo;
+
+    @Autowired
+    private GPService gpService;
 
     // Services
 
@@ -75,6 +79,29 @@ public class WareHouseService implements IWareHouseService {
             throw new RuntimeException("WareHouse Manager ID does not exist");
         }
 
+        String id = wareHouse.getId();
+
+        // add to global products
+        for(int i=0;i<wareHouse.getProduct_ids().size();i++)
+        {
+            String productId = wareHouse.getProduct_ids().get(i);
+            Integer quantity = Integer.parseInt(wareHouse.getQuantities().get(i));
+
+            GlobalProducts globalProducts = gpService.getById(productId);
+
+            if(globalProducts == null)
+            {
+                throw new RuntimeException("Product with id " + productId + " does not exist");
+            }
+
+            try{
+                gpService.addByWarehouse(productId, id, quantity);
+            }
+            catch(Exception e){
+                throw new RuntimeException(e);
+            }
+        }
+
         return wareHouseRepo.save(wareHouse);
     }
 
@@ -84,6 +111,29 @@ public class WareHouseService implements IWareHouseService {
         if (wareHouse == null)
         {
             throw new RuntimeException("WareHouse data shouldn't be null");
+        }
+
+        String id = wareHouse.getId();
+
+        // update global products
+        for(int i=0;i<wareHouse.getProduct_ids().size();i++)
+        {
+            String productId = wareHouse.getProduct_ids().get(i);
+            Integer quantity = Integer.parseInt(wareHouse.getQuantities().get(i));
+
+            GlobalProducts globalProducts = gpService.getById(productId);
+
+            if(globalProducts == null)
+            {
+                throw new RuntimeException("Product with id " + productId + " does not exist");
+            }
+
+            try{
+                gpService.updateByWarehouse(productId, id, quantity);
+            }
+            catch(Exception e){
+                throw new RuntimeException(e);
+            }
         }
 
         return wareHouseRepo.save(wareHouse);
@@ -100,6 +150,30 @@ public class WareHouseService implements IWareHouseService {
         {
             throw new RuntimeException("WareHouse ID does not exist");
         }
+
+        WareHouse wareHouse = wareHouseRepo.findById(id).orElse(null);
+
+        // update global products
+
+        for(int i=0;i<wareHouse.getProduct_ids().size();i++)
+        {
+            String productId = wareHouse.getProduct_ids().get(i);
+
+            GlobalProducts globalProducts = gpService.getById(productId);
+
+            if(globalProducts == null)
+            {
+                throw new RuntimeException("Product with id " + productId + " does not exist");
+            }
+
+            try{
+                gpService.deleteByWarehouse(productId, id);
+            }
+            catch(Exception e){
+                throw new RuntimeException(e);
+            }
+        }
+
         wareHouseRepo.deleteById(id);
     }
 

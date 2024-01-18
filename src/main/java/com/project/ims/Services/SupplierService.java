@@ -9,7 +9,6 @@ import com.project.ims.IServices.ISupplierService;
 import com.project.ims.Models.Supplier;
 import com.project.ims.Repo.SupplierRepo;
 
-@Component
 @Service
 public class SupplierService implements ISupplierService {
 

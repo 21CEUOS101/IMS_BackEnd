@@ -1,8 +1,6 @@
 package com.project.ims.Controllers;
 
 // imports
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,29 +12,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.SupplyOrder;
-import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.SupplyOrderAddRequest;
 import com.project.ims.Requests.SupplyOrderUpdateRequest;
-import com.project.ims.Services.DeliveryManService;
-import com.project.ims.Services.ProductService;
 import com.project.ims.Services.SupplyOrderService;
-import com.project.ims.Services.WareHouseService;
 
 @RestController
 @RequestMapping("/api")
 public class SupplyOrderController {
 
     // necessary dependency injections
-    @Autowired
-    private DeliveryManService deliveryManService;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private WareHouseService wareHouseService;
 
     @Autowired
     private SupplyOrderService supplyOrderService;
@@ -88,38 +73,6 @@ public class SupplyOrderController {
 
         supplyOrder.setPickup_address(data.getPickup_address());
 
-        int price = Integer.parseInt(productService.getProductById(data.getProduct_id()).getPrice());
-        int quantity = Integer.parseInt(data.getQuantity());
-        int total_amount = price * quantity;
-        supplyOrder.setTotal_amount(Integer.toString(total_amount));
-
-        supplyOrder.setStatus("Pending");
-
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateTime = currentDateTime.format(formatter);
-        supplyOrder.setDate_time(formattedDateTime);
-
-        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(supplyOrder.getWarehouse_id());
-            
-        for (DeliveryMan d : deliveryMen) {
-            if (d.getStatus().equals("available")) {
-                d.setStatus("unavailable");
-                supplyOrder.setDelivery_man_id(d.getId());
-                
-                try{
-                    deliveryManService.updateDeliveryMan(d);
-                }
-                catch(Exception e)
-                {
-                    System.out.println(e.getMessage());
-                    return null;
-                }
-                
-                break;
-            }
-        }
-
         try{
             supplyOrderService.addSupplyOrder(supplyOrder);
         }
@@ -134,41 +87,10 @@ public class SupplyOrderController {
     
     @PostMapping("/supply-order/{id}/status")
     public SupplyOrder updateSupplyOrderStatus(@PathVariable("id") String id, @RequestParam("status") String status) {
-        SupplyOrder supplyOrder = supplyOrderService.getSupplyOrderById(id);
-
-        if (status.equals("delivered")) {
-
-            WareHouse wareHouse = wareHouseService.getWareHouseById(supplyOrder.getWarehouse_id());
-
-            for (int i = 0; i < wareHouse.getProduct_ids().size(); i++) {
-                if (wareHouse.getProduct_ids().get(i).equals(supplyOrder.getProduct_id())) {
-                    int quantity = Integer.parseInt(wareHouse.getQuantities().get(i));
-                    quantity = quantity + Integer.parseInt(supplyOrder.getQuantity());
-                    wareHouse.getQuantities().set(i, Integer.toString(quantity));
-                }
-            }
-
-            try{
-                wareHouseService.updateWareHouse(wareHouse);
-            }
-            catch(Exception e)
-            {
-                System.out.println(e.getMessage());
-                return null;
-            }
-
-            supplyOrder.setDelivered_date_time(LocalDateTime.now().toString());
-
-        } else if (status.equals("cancelled")) {
-            // do nothing
-        }
-
-        DeliveryMan m = deliveryManService.getDeliveryManById(supplyOrder.getDelivery_man_id());
-
-        m.setStatus("available");
-
+        
         try{
-            deliveryManService.updateDeliveryMan(m);
+          SupplyOrder supplyOrder = supplyOrderService.updateSupplyOrderStatus(id, status);
+          return supplyOrder;
         }
         catch(Exception e)
         {
@@ -176,26 +98,6 @@ public class SupplyOrderController {
             return null;
         }
 
-        // checking if status is enum of pending, delivered or cancelled
-
-        if (!(status.equals("pending") || status.equals("delivered") || status.equals("cancelled")))
-        {
-            System.out.println("Invalid status");    
-            return null;
-        }
-
-        supplyOrder.setStatus(status);
-
-        try{
-            supplyOrderService.updateSupplyOrder(supplyOrder);
-        }
-        catch(Exception e)
-        {
-            System.out.println(e.getMessage());
-            return null;
-        }
-
-        return supplyOrder;
     }
 
     // update supply order

@@ -24,4 +24,6 @@ public class W2WOrderUpdateRequest {
     private String delivery_man_id;
 
     private String delivered_date_time;
+
+    private String orderId;
 }

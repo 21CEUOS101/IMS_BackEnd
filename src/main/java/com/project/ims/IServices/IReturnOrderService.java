@@ -19,6 +19,8 @@ public interface IReturnOrderService {
     
     public ReturnOrder updateReturnOrder(ReturnOrder returnOrder);
 
+    public ReturnOrder updateReturnOrderStatus(String id, String status);
+
     public void deleteReturnOrder(String id);
     
 }

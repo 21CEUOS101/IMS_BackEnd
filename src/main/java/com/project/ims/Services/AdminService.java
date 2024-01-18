@@ -9,7 +9,6 @@ import com.project.ims.IServices.IAdminService;
 import com.project.ims.Models.Admin;
 import com.project.ims.Repo.AdminRepo;
 
-@Component
 @Service
 public class AdminService implements IAdminService {
 

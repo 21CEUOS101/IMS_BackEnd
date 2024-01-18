@@ -1,8 +1,6 @@
 package com.project.ims.Controllers;
 
 // imports
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,33 +11,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.project.ims.Models.DeliveryMan;
-import com.project.ims.Models.Product;
 import com.project.ims.Models.W2WOrder;
-import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.W2WOrderAddRequest;
 import com.project.ims.Requests.W2WOrderUpdateRequest;
-import com.project.ims.Services.DeliveryManService;
-import com.project.ims.Services.ProductService;
 import com.project.ims.Services.W2WOrderService;
-import com.project.ims.Services.WareHouseService;
 
 @RestController
 @RequestMapping("/api")
 public class W2WOrderController {
 
     // necessary dependency injections
-    @Autowired
-    private DeliveryManService deliveryManService;
-
-    @Autowired
-    private WareHouseService wareHouseService;
 
     @Autowired
     private W2WOrderService w2wOrderService;
-
-    @Autowired
-    private ProductService productService;
 
     // controllers
 
@@ -79,21 +63,8 @@ public class W2WOrderController {
         w2wOrder.setQuantity(data.getQuantity());
         w2wOrder.setR_warehouse_id(data.getR_warehouse_id());
         w2wOrder.setS_warehouse_id(data.getS_warehouse_id());
-        w2wOrder.setStatus("pending");
-
-        // set total amount
-        Product product = productService.getProductById(w2wOrder.getProduct_id());
-
-        int total_amount = Integer.parseInt(product.getPrice()) * Integer.parseInt(w2wOrder.getQuantity());
-
-        w2wOrder.setTotal_amount(Integer.toString(total_amount));
-
-        // ----------------------------------------------
-
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateTime = currentDateTime.format(formatter);
-        w2wOrder.setDate_time(formattedDateTime);
+        w2wOrder.setOrderId(data.getOrderId());
+        w2wOrder.setStatus("shipped");
 
         try{
             w2wOrderService.addW2WOrder(w2wOrder);
@@ -102,149 +73,19 @@ public class W2WOrderController {
             System.out.println(e);
             return null;
         }
-
         return w2wOrder;
     }
 
     @PostMapping("/w2worder/{id}/status")
     public W2WOrder updateW2WOrderStatus(@PathVariable("id") String id, @RequestBody String status) {
-
-        W2WOrder w2wOrder = w2wOrderService.getW2WOrderById(id);
-
-        if(status.equals("delivered"))
-        {
-            LocalDateTime currentDateTime = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String formattedDateTime = currentDateTime.format(formatter);
-            w2wOrder.setDelivered_date_time(formattedDateTime);
-
-            WareHouse r_warehouse = wareHouseService.getWareHouseById(w2wOrder.getR_warehouse_id());
-
-            for(int i=0;i<r_warehouse.getProduct_ids().size();i++)
-            {
-                if (r_warehouse.getProduct_ids().get(i).equals(w2wOrder.getProduct_id())) {
-                    int quantity = Integer.parseInt(r_warehouse.getQuantities().get(i));
-                    quantity = quantity + Integer.parseInt(w2wOrder.getQuantity());
-                    r_warehouse.getQuantities().set(i, Integer.toString(quantity));
-                    break;
-                } else {
-                    r_warehouse.getProduct_ids().add(w2wOrder.getProduct_id());
-                    r_warehouse.getQuantities().add(w2wOrder.getQuantity());
-                }
-            }
-            
-            try{
-                wareHouseService.updateWareHouse(r_warehouse);
-            }
-            catch(Exception e){
-                System.out.println(e);
-                return null;
-            }
-
-            DeliveryMan m = deliveryManService.getDeliveryManById(w2wOrder.getDelivery_man_id());
-
-            m.setStatus("available");
-
-            try{
-                deliveryManService.updateDeliveryMan(m);
-            }
-            catch(Exception e){
-                System.out.println(e);
-                return null;
-            }
-        }
-        else if (status.equals("shipped"))
-        {
-            WareHouse s_warehouse = wareHouseService.getWareHouseById(w2wOrder.getS_warehouse_id());
-
-            for (int i = 0; i < s_warehouse.getProduct_ids().size(); i++) {
-                if (s_warehouse.getProduct_ids().get(i).equals(w2wOrder.getProduct_id())) {
-                    int quantity = Integer.parseInt(s_warehouse.getQuantities().get(i));
-                    quantity = quantity - Integer.parseInt(w2wOrder.getQuantity());
-                    s_warehouse.getQuantities().set(i, Integer.toString(quantity));
-                    break;
-                }
-            }
-
-            List<DeliveryMan> deliveryMans = deliveryManService.getAllDeliveryManByWarehouse(s_warehouse.getId());
-
-            for (DeliveryMan m : deliveryMans) {
-                if (m.getStatus() == "available") {
-                    m.setStatus("unavailable");
-                    
-                    try{
-                        deliveryManService.updateDeliveryMan(m);
-                    }
-                    catch (Exception e) {
-                        System.out.println(e);
-                        return null;
-                    }
-                    
-                    w2wOrder.setDelivery_man_id(m.getId());
-                }
-            }
-
-            if (w2wOrder.getDelivery_man_id() == null) {
-                System.out.println("Deliveryman not currently available");
-                return null;
-            }
-
-            try{
-                wareHouseService.updateWareHouse(s_warehouse);
-            }
-            catch(Exception e){
-                System.out.println(e);
-                return null;
-            }
-        }
-        else if (status.equals("cancel"))
-        {
-            DeliveryMan m = deliveryManService.getDeliveryManById(w2wOrder.getDelivery_man_id());
-
-            m.setStatus("available");
-
-            try{
-                deliveryManService.updateDeliveryMan(m);
-            }
-            catch(Exception e){
-                System.out.println(e);
-                return null;
-            }
-
-            if(w2wOrder.getStatus().equals("shipped"))
-            {
-                WareHouse s_warehouse = wareHouseService.getWareHouseById(w2wOrder.getS_warehouse_id());
-
-                for (int i = 0; i < s_warehouse.getProduct_ids().size(); i++) {
-                    if (s_warehouse.getProduct_ids().get(i).equals(w2wOrder.getProduct_id())) {
-                        int quantity = Integer.parseInt(s_warehouse.getQuantities().get(i));
-                        quantity = quantity + Integer.parseInt(w2wOrder.getQuantity());
-                        s_warehouse.getQuantities().set(i, Integer.toString(quantity));
-                        break;
-                    }
-                }
-
-                try{
-                    wareHouseService.updateWareHouse(s_warehouse);
-                }
-                catch(Exception e){
-                    System.out.println(e);
-                    return null;
-                }
-            }
-        }
-
-        w2wOrder.setStatus(status);
-
         try{
-            w2wOrderService.updateW2WOrder(w2wOrder);
+            W2WOrder w2wOrder  = w2wOrderService.updateW2WOrderStatus(id, status);
+            return w2wOrder;
         }
         catch(Exception e){
             System.out.println(e);
             return null;
         }
-
-        return w2wOrder;
     }
     
     @PostMapping("/w2worder/{id}")
@@ -260,6 +101,7 @@ public class W2WOrderController {
         w2wOrder.setDate_time(data.getDate_time());
         w2wOrder.setDelivered_date_time(data.getDelivered_date_time());
         w2wOrder.setDelivery_man_id(data.getDelivery_man_id());
+        w2wOrder.setOrderId(data.getOrderId());
         
         try{
             w2wOrderService.updateW2WOrder(w2wOrder);
@@ -287,4 +129,6 @@ public class W2WOrderController {
         String id = "w2w" + rand.nextInt(1000000);
         return id;
     }
+
+    
 }

@@ -9,8 +9,8 @@ import com.project.ims.IServices.IWManagerService;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Repo.WManagerRepo;
+import com.project.ims.Repo.WareHouseRepo;
 
-@Component
 @Service
 public class WManagerService implements IWManagerService {
 
@@ -19,7 +19,7 @@ public class WManagerService implements IWManagerService {
     private WManagerRepo wManagerRepo;
 
     @Autowired
-    private WareHouseService wareHouseService;
+    private WareHouseRepo wareHouseRepo;
     
     @Override
     public WareHouse_Manager getWManagerById(String id) {
@@ -53,7 +53,7 @@ public class WManagerService implements IWManagerService {
             throw new RuntimeException("WareHouse ID cannot be empty");
         }
 
-        WareHouse wareHouse = wareHouseService.getWareHouseById(wManager.getWarehouse_id());
+        WareHouse wareHouse = wareHouseRepo.findById(wManager.getWarehouse_id()).orElse(null);
 
         if (wareHouse == null)
         {

@@ -25,6 +25,8 @@ public class WarehouseController {
     @Autowired
     private WareHouseService wareHouseService;
 
+    // controllers
+
     // get warehouse by id
     @GetMapping("/warehouse/{id}")
     public WareHouse getWareHouseById(@PathVariable String id) {
@@ -102,6 +104,7 @@ public class WarehouseController {
     
     @DeleteMapping("/warehouse/{id}")
     public void deleteWareHouse(@PathVariable String id) {
+
         try{
             wareHouseService.deleteWareHouse(id);
         }
@@ -117,4 +120,6 @@ public class WarehouseController {
 
         return id;
     }
+
+    
 }

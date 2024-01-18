@@ -1,53 +1,50 @@
 package com.project.ims.Services;
 
+// imports
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-
+import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.project.ims.IServices.IReturnOrderService;
+import com.project.ims.Models.DeliveryMan;
+import com.project.ims.Models.Order;
+import com.project.ims.Models.Product;
 import com.project.ims.Models.ReturnOrder;
-import com.project.ims.Repo.AdminRepo;
-import com.project.ims.Repo.CustomerRepo;
-import com.project.ims.Repo.DeliveryManRepo;
+import com.project.ims.Models.ReturnSupplyOrder;
+import com.project.ims.Models.Supplier;
 import com.project.ims.Repo.OrderRepo;
-import com.project.ims.Repo.ProductRepo;
 import com.project.ims.Repo.ReturnOrderRepo;
-import com.project.ims.Repo.SupplierRepo;
-import com.project.ims.Repo.WManagerRepo;
 import com.project.ims.Repo.WareHouseRepo;
 
-@Component
 @Service
 public class ReturnOrderService implements IReturnOrderService {
-    
+
+    // necessary dependency Injections
     @Autowired
-    private AdminRepo adminRepo;
+    private WareHouseRepo wareHouseRepo;
 
     @Autowired
-    private CustomerRepo customerRepo;
+    private ReturnOrderRepo returnOrderRepo;
+
+    @Autowired
+    private DeliveryManService deliveryManService;
 
     @Autowired
     private OrderRepo orderRepo;
 
     @Autowired
-    private DeliveryManRepo deliveryManRepo;
+    private RSOService returnSupplyOrderService;
 
     @Autowired
-    private ProductRepo productRepo;
+    private ProductService productService;
 
     @Autowired
-    private SupplierRepo supplierRepo;
+    private SupplierService supplierService;
 
-    @Autowired
-    private WareHouseRepo wareHouseRepo;
-
-    @Autowired
-    private WManagerRepo wManagerRepo;
-
-    @Autowired
-    private ReturnOrderRepo returnOrderRepo;
+    // Services
 
     @Override
     public List<ReturnOrder> getAllReturnOrder() {
@@ -75,6 +72,21 @@ public class ReturnOrderService implements IReturnOrderService {
             throw new RuntimeException("Return Order ID must start with 'r'");
         }
 
+        // set date and time
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = currentDateTime.format(formatter);
+        returnOrder.setDate_time(formattedDateTime);
+
+        // assign deliveryMan to return order
+        String deliveryManId = assignDeliveryMan(returnOrder);
+
+        if (deliveryManId == null) {
+            returnOrder.setStatus("pending");
+        }
+
+        returnOrder.setDelivery_man_id(deliveryManId);
+
         return returnOrderRepo.save(returnOrder);
     }
 
@@ -99,16 +111,122 @@ public class ReturnOrderService implements IReturnOrderService {
 
     public List<ReturnOrder> findByWarehouseId(String id) {
 
-        if (id == null || id.isEmpty())
-        {
+        if (id == null || id.isEmpty()) {
             throw new RuntimeException("Warehouse ID cannot be empty");
-        }
-        else if (!wareHouseRepo.existsById(id))
-        {
+        } else if (!wareHouseRepo.existsById(id)) {
             throw new RuntimeException("Warehouse ID does not exist");
         }
 
         return returnOrderRepo.findAllByWarehouseId(id);
+    }
+    
+    public String assignDeliveryMan(ReturnOrder returnOrder)
+    {
+        List<DeliveryMan> deliveryMans = deliveryManService.getAllDeliveryManByWarehouse(returnOrder.getWarehouseId());
+
+        for (DeliveryMan i : deliveryMans) {
+            if (i.getStatus().equals("available")) {
+                i.setStatus("unavailable");
+                try {
+                    deliveryManService.updateDeliveryMan(i);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    return null;
+                }
+                return i.getId();
+            }
+        }
+
+        System.out.println("No deliveryman available");
+        return null;
+    }
+    
+    @Override
+    public ReturnOrder updateReturnOrderStatus(String id, String status) {
+
+        ReturnOrder returnOrder = getReturnOrderById(id);
+        Order order = orderRepo.findById(returnOrder.getOrder_id()).orElse(null);
+
+        returnOrder.setStatus(status);
+
+        if (status.equals("approved")) {
+            order.setStatus("returned");
+
+            try {
+                orderRepo.save(order);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                return null;
+            }
+
+            createRSO(returnOrder);
+
+        } else if (status.equals("rejected")) {
+            order.setStatus("delivered");
+
+            try {
+                orderRepo.save(order);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                return null;
+            }
+
+            DeliveryMan m = deliveryManService.getDeliveryManById(returnOrder.getDelivery_man_id());
+
+            m.setStatus("available");
+
+            try {
+                deliveryManService.updateDeliveryMan(m);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                return null;
+            }
+
+        }
+
+        return returnOrderRepo.save(returnOrder);
+    }
+    
+    public ReturnSupplyOrder createRSO(ReturnOrder returnOrder)
+    {
+        ReturnSupplyOrder returnSupplyOrder = new ReturnSupplyOrder();
+        Random rand = new Random();
+        String returnSupplyOrderId = "rso" + rand.nextInt(1000000);
+        returnSupplyOrder.setId(returnSupplyOrderId);
+
+        
+        Order order = orderRepo.findById(returnOrder.getOrder_id()).orElse(null);
+        
+        if (order == null) {
+            System.out.println("Order not found");
+            return null;
+        }
+
+        returnSupplyOrder.setOrder_id(order.getId());
+        returnSupplyOrder.setWarehouse_id(order.getWarehouse_id());
+        returnSupplyOrder.setProduct_id(order.getProduct_id());
+        returnSupplyOrder.setQuantity(order.getQuantity());
+        returnSupplyOrder.setRefund_amount(order.getTotal_amount());
+
+        Product product = productService.getProductById(order.getProduct_id());
+
+        Supplier supplier = supplierService.getSupplierById(product.getSupplier_id());
+
+        returnSupplyOrder.setDelivery_address(supplier.getAddress());
+        returnSupplyOrder.setReturn_reason(returnOrder.getReturn_reason());
+        returnSupplyOrder.setStatus("shipped");
+        returnSupplyOrder.setSupplier_id(product.getSupplier_id());
+
+        try{
+            returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return returnSupplyOrder;
     }
     
 }

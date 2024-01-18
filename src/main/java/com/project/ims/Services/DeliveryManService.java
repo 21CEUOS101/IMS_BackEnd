@@ -11,7 +11,6 @@ import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Repo.DeliveryManRepo;
 import com.project.ims.Repo.WareHouseRepo;
 
-@Component
 @Service
 public class DeliveryManService implements IDeliveryManService {
 
