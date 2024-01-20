@@ -181,6 +181,8 @@ public class SupplyOrderService implements ISupplyOrderService {
         {
             String deliveryManId = assignDeliveryMan(supplyOrder);
 
+            supplyOrder.setDelivery_man_id(deliveryManId);
+
             if (deliveryManId == null) {
                 status = "pending";
             }
@@ -188,7 +190,7 @@ public class SupplyOrderService implements ISupplyOrderService {
 
         // checking if status is enum of pending, delivered or cancelled
 
-        if (!(status.equals("pending") || status.equals("delivered") || status.equals("cancelled")))
+        if (!(status.equals("pending") || status.equals("delivered") || status.equals("cancelled") || status.equals("approved")))
         {
             System.out.println("Invalid status");    
             return null;

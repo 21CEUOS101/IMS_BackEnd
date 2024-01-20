@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.W2WOrder;
 import com.project.ims.Requests.W2WOrderAddRequest;
@@ -77,7 +78,7 @@ public class W2WOrderController {
     }
 
     @PostMapping("/w2worder/{id}/status")
-    public W2WOrder updateW2WOrderStatus(@PathVariable("id") String id, @RequestBody String status) {
+    public W2WOrder updateW2WOrderStatus(@PathVariable("id") String id, @RequestParam("status") String status) {
         try{
             W2WOrder w2wOrder  = w2wOrderService.updateW2WOrderStatus(id, status);
             return w2wOrder;

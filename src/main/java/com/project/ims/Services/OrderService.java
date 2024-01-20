@@ -168,19 +168,18 @@ public class OrderService implements IOrderService {
 
         }
         else if (status.equals("cancel")) {
-            
+
             // making delivery man available again
-            
+
             DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(order.getDelivery_man_id());
-            
+
             deliveryMan.setStatus("available");
-            
+
             deliveryManService.updateDeliveryMan(deliveryMan);
 
             // ------------------------------------------------------------------------
-            
-            if(order.getStatus() == "shipped")
-            {
+
+            if (order.getStatus() == "shipped") {
                 // re-adding products to warehouse
 
                 String product_id = order.getProduct_id();
@@ -199,21 +198,43 @@ public class OrderService implements IOrderService {
                 }
 
                 wareHouseService.updateWareHouse(warehouse);
-            }
-            else if(order.getStatus() == "pending")
-            {
+            } else if (order.getStatus() == "pending") {
                 // all active w2w orders with this order id should be cancelled
 
                 List<W2WOrder> w2wOrders = w2wOrderService.getAllW2WOrderByOrderId(order.getId());
 
-                for(W2WOrder w2wOrder : w2wOrders)
-                {
+                for (W2WOrder w2wOrder : w2wOrders) {
                     w2wOrderService.updateW2WOrderStatus(w2wOrder.getId(), status);
                 }
-            }
-            else if(order.getStatus() == "delivered")
-            {
+
+                // re-adding products to warehouse
+
+                String product_id = order.getProduct_id();
+                String quantity = order.getQuantity();
+                String warehouse_id = order.getWarehouse_id();
+
+                WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
+
+                for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
+                    if (warehouse.getProduct_ids().get(j).equals(product_id)) {
+                        String q = warehouse.getQuantities().get(j);
+                        int p_quantity = Integer.parseInt(q);
+                        p_quantity += Integer.parseInt(quantity);
+                        warehouse.getQuantities().set(j, String.valueOf(p_quantity));
+                    }
+                }
+
+                wareHouseService.updateWareHouse(warehouse);
+            } else if (order.getStatus() == "delivered") {
                 throw new RuntimeException("Order already delivered");
+            }
+        }
+        else if (status.equals("shipped"))
+        {
+            String deliveryMan = assignDeliveryMan(order);
+            order.setDelivery_man_id(deliveryMan);
+            if (deliveryMan == null) {
+                order.setStatus("pending");
             }
         }
 
@@ -325,13 +346,13 @@ public class OrderService implements IOrderService {
                 throw new RuntimeException("Product not available in any warehouse");
             }
 
-            needed_quantity -= max;
-
-            if (needed_quantity < 0) {
-                createW2WOrder(product_id, String.valueOf(needed_quantity), r_warehouse_id, r_warehouse_id, orderId);
+            if (needed_quantity - max < 0) {
+                createW2WOrder(product_id, String.valueOf(needed_quantity), r_warehouse_id, max_warehouse_id, orderId);
                 needed_quantity = 0;
                 break;
             }
+            
+            needed_quantity -= max;
 
             createW2WOrder(product_id, String.valueOf(max), r_warehouse_id, max_warehouse_id, orderId);
 

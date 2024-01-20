@@ -93,6 +93,8 @@ public class W2WOrderService implements IW2WOrderService {
 
         String deliveryMan = assignDeliveryMan(w2wOrder);
 
+        w2wOrder.setDelivery_man_id(deliveryMan);
+
         if (deliveryMan == null) {
             System.out.println("Deliveryman not currently available");
             w2wOrder.setStatus("pending");
@@ -185,8 +187,9 @@ public class W2WOrderService implements IW2WOrderService {
 
             boolean allDelivered = true;
 
+            
             for (W2WOrder w : w2wOrders) {
-                if (!w.getStatus().equals("delivered")) {
+                if (!w.getStatus().equals("delivered") && !w.getId().equals(w2wOrder.getId())) {
                     allDelivered = false;
                     break;
                 }
@@ -199,10 +202,11 @@ public class W2WOrderService implements IW2WOrderService {
 
                 String deliveryMan = assignDeliveryMan(order);
 
+                order.setDelivery_man_id(deliveryMan);
+
                 if (deliveryMan == null) {
                     System.out.println("Deliveryman not currently available");
                     order.setStatus("pending");
-                    return null;
                 }
 
                 try{
@@ -263,6 +267,9 @@ public class W2WOrderService implements IW2WOrderService {
     {
         String assigned_deliveryMan = null;
         List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(w2wOrder.getS_warehouse_id());
+
+        // testing
+        System.out.println("Deliverymen in warehouse " + w2wOrder.getS_warehouse_id() + " are: ");
 
         for (DeliveryMan d : deliveryMen) {
             if (d.getStatus().equals("available")) {

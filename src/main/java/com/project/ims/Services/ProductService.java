@@ -66,7 +66,7 @@ public class ProductService implements IProductService {
         {
             throw new RuntimeException("Product ID cannot be empty");
         }
-        else if (!productRepo.existsById(product.getId()))
+        else if (!(productRepo.existsById(product.getId())))
         {
             throw new RuntimeException("Product with id " + product.getId() + " does not exist");
         }

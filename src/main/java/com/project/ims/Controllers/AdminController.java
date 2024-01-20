@@ -25,7 +25,6 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-
     // controllers
 
     // get all admins
