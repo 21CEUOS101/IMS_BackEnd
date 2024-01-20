@@ -1,14 +1,11 @@
 package com.project.ims.Services;
 
+// imports
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-// imports
 import java.util.List;
 import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.IOrderService;
 import com.project.ims.Models.DeliveryMan;

@@ -159,7 +159,9 @@ public class GPService {
         List<String> quantities = globalProducts.getQuantities();
 
         if (warehouses.contains(warehouseId)) {
+            int index = warehouses.indexOf(warehouseId);
             warehouses.remove(warehouseId);
+            quantities.remove(index);
         } else {
             throw new RuntimeException("Warehouse with id " + warehouseId + " does not exist");
         }

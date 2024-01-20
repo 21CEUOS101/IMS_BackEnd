@@ -48,18 +48,6 @@ public class WManagerService implements IWManagerService {
             throw new RuntimeException("WareHouse Manager ID must start with 'm'");
         }
 
-        if (wManager.getWarehouse_id() == null)
-        {
-            throw new RuntimeException("WareHouse ID cannot be empty");
-        }
-
-        WareHouse wareHouse = wareHouseRepo.findById(wManager.getWarehouse_id()).orElse(null);
-
-        if (wareHouse == null)
-        {
-            throw new RuntimeException("WareHouse ID does not exist");
-        }
-
         return wManagerRepo.save(wManager);
     }
 
