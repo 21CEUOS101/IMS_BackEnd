@@ -4,6 +4,7 @@ package com.project.ims.Controllers;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,9 @@ public class CustomerController {
     // necessary dependency injections
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // controllers
 
@@ -60,9 +64,6 @@ public class CustomerController {
 
         Customer customer = new Customer();
         customer.setId(id);
-        customer.setName(data.getName());
-        customer.setEmail(data.getEmail());
-        customer.setPassword(data.getPassword());
         customer.setPhone(data.getPhone());
         customer.setAddress(data.getAddress());
         customer.setPincode(data.getPincode());
@@ -82,9 +83,6 @@ public class CustomerController {
     public Customer updateCustomer(@PathVariable("id") String id, @RequestBody CustomerAddRequest data) {
 
         Customer customer = customerService.getCustomerById(id);
-        customer.setName(data.getName());
-        customer.setEmail(data.getEmail());
-        customer.setPassword(data.getPassword());
         customer.setPhone(data.getPhone());
         customer.setAddress(data.getAddress());
         customer.setPincode(data.getPincode());

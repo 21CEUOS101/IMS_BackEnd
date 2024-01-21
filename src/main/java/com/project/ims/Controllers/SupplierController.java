@@ -4,6 +4,7 @@ package com.project.ims.Controllers;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,9 @@ public class SupplierController {
     // necessary dependency injections
     @Autowired
     private SupplierService supplierService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Suppliers API
 
@@ -64,10 +68,7 @@ public class SupplierController {
 
         Supplier supplier = new Supplier();
         supplier.setId(id);
-        supplier.setName(data.getName());
         supplier.setAddress(data.getAddress());
-        supplier.setEmail(data.getEmail());
-        supplier.setPassword(data.getPassword());
         supplier.setPhone(data.getPhone());
         supplier.setPincode(data.getPincode());
         
@@ -88,10 +89,7 @@ public class SupplierController {
     public Supplier updateSupplier(@PathVariable("id") String id, @RequestBody SupplierAddRequest data) {
 
         Supplier supplier = supplierService.getSupplierById(id);
-        supplier.setName(data.getName());
         supplier.setAddress(data.getAddress());
-        supplier.setEmail(data.getEmail());
-        supplier.setPassword(data.getPassword());
         supplier.setPhone(data.getPhone());
         supplier.setPincode(data.getPincode());
 

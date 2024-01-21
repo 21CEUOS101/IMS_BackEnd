@@ -4,10 +4,14 @@ package com.project.ims.Controllers;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Admin;
+import com.project.ims.Models.User;
 import com.project.ims.Requests.AdminAddRequest;
 import com.project.ims.Services.AdminService;
+import com.project.ims.Services.UserService;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +28,12 @@ public class AdminController {
     // necessary dependency injections
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     // controllers
 
@@ -63,10 +73,16 @@ public class AdminController {
 
         Admin admin = new Admin();
         admin.setId(id);
-        admin.setName(data.getName());
-        admin.setEmail(data.getEmail());
-        admin.setPassword(data.getPassword());
         admin.setPhone(data.getPhone());
+
+        try{
+            // creating user
+            createUser(data.getName() , data.getEmail() , data.getPassword() , "admin" , id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
 
         try{
             // saving admin in database
@@ -84,10 +100,16 @@ public class AdminController {
     public Admin updateAdmin(@PathVariable("id") String id, @RequestBody AdminAddRequest data) {
 
         Admin admin = adminService.getAdminById(id);
-        admin.setName(data.getName());
-        admin.setEmail(data.getEmail());
-        admin.setPassword(data.getPassword());
         admin.setPhone(data.getPhone());
+
+        try{
+            // updating user
+            updateUser(data.getName() , data.getEmail() , data.getPassword() , "admin" , id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
 
         try {
             // updating admin in database
@@ -103,6 +125,16 @@ public class AdminController {
 
     @DeleteMapping("/admin/{id}")
     public void deleteAdmin(@PathVariable("id") String id) {
+
+        try{
+            // deleting user
+            deleteUser(id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
         try{
             adminService.deleteAdmin(id);
         }
@@ -117,5 +149,43 @@ public class AdminController {
         String id = 'a' + String.valueOf(rand.nextInt(1000000));
 
         return id;
+    }
+
+    public void createUser(String name, String email, String password, String role, String userId) {
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole("admin");
+        user.setUserId(userId);
+
+        try {
+            userService.addUser(user);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    public void updateUser(String name, String email, String password, String role, String userId) {
+        User user = userService.getUserByUserId(userId);
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole("admin");
+        user.setUserId(userId);
+
+        try {
+            userService.updateUser(user);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void deleteUser(String userId) {
+        try {
+            userService.deleteUserByUserId(userId);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

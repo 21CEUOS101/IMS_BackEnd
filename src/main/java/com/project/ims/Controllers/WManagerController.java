@@ -4,6 +4,7 @@ package com.project.ims.Controllers;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Requests.WManagerAddRequest;
@@ -22,6 +23,9 @@ public class WManagerController {
     // necessary dependency injections
     @Autowired
     private WManagerService wManagerService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Controllers 
 
@@ -61,9 +65,6 @@ public class WManagerController {
 
         WareHouse_Manager wManager = new WareHouse_Manager();
         wManager.setId(id);
-        wManager.setName(data.getName());
-        wManager.setEmail(data.getEmail());
-        wManager.setPassword(data.getPassword());
         wManager.setPhone(data.getPhone());
         wManager.setWarehouse_id(data.getWarehouse_id());
 
@@ -81,9 +82,6 @@ public class WManagerController {
     @PostMapping("/wmanager/{id}")
     public WareHouse_Manager updateWManager(@PathVariable String id, @RequestBody WManagerAddRequest data) {
         WareHouse_Manager wManager = wManagerService.getWManagerById(id);
-        wManager.setName(data.getName());
-        wManager.setEmail(data.getEmail());
-        wManager.setPassword(data.getPassword());
         wManager.setPhone(data.getPhone());
         wManager.setWarehouse_id(data.getWarehouse_id());
 

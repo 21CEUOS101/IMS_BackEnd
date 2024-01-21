@@ -98,7 +98,6 @@ public class W2WOrderService implements IW2WOrderService {
         if (deliveryMan == null) {
             System.out.println("Deliveryman not currently available");
             w2wOrder.setStatus("pending");
-            return null;
         }
 
         try{
@@ -221,6 +220,50 @@ public class W2WOrderService implements IW2WOrderService {
         }
         else if (status.equals("cancel"))
         {
+            if(w2wOrder.getStatus().equals("delivered"))
+            {
+                throw new RuntimeException("W2W Order with id " + id + " has already been delivered");
+            }
+            
+            WareHouse s_warehouse = wareHouseService.getWareHouseById(w2wOrder.getS_warehouse_id());
+
+            for (int i = 0; i < s_warehouse.getProduct_ids().size(); i++) {
+                if (s_warehouse.getProduct_ids().get(i).equals(w2wOrder.getProduct_id())) {
+                    int quantity = Integer.parseInt(s_warehouse.getQuantities().get(i));
+                    quantity = quantity + Integer.parseInt(w2wOrder.getQuantity());
+                    s_warehouse.getQuantities().set(i, Integer.toString(quantity));
+                    break;
+                }
+            }
+
+            try {
+                wareHouseService.updateWareHouse(s_warehouse);
+            } catch (Exception e) {
+                System.out.println(e);
+                return null;
+            }
+
+            if(w2wOrder.getStatus().equals("shipped"))
+            {
+                DeliveryMan m = deliveryManService.getDeliveryManById(w2wOrder.getDelivery_man_id());
+
+                m.setStatus("available");
+
+                try{
+                    deliveryManService.updateDeliveryMan(m);
+                }
+                catch (Exception e) {
+                    System.out.println(e);
+                    return null;
+                }
+            }
+            else if(w2wOrder.equals("pending"))
+            {
+
+            }
+        }
+        else if (status.equals("shipped"))
+        {
             DeliveryMan m = deliveryManService.getDeliveryManById(w2wOrder.getDelivery_man_id());
 
             m.setStatus("available");
@@ -228,31 +271,9 @@ public class W2WOrderService implements IW2WOrderService {
             try{
                 deliveryManService.updateDeliveryMan(m);
             }
-            catch(Exception e){
+            catch (Exception e) {
                 System.out.println(e);
                 return null;
-            }
-
-            if(w2wOrder.getStatus().equals("shipped"))
-            {
-                WareHouse s_warehouse = wareHouseService.getWareHouseById(w2wOrder.getS_warehouse_id());
-
-                for (int i = 0; i < s_warehouse.getProduct_ids().size(); i++) {
-                    if (s_warehouse.getProduct_ids().get(i).equals(w2wOrder.getProduct_id())) {
-                        int quantity = Integer.parseInt(s_warehouse.getQuantities().get(i));
-                        quantity = quantity + Integer.parseInt(w2wOrder.getQuantity());
-                        s_warehouse.getQuantities().set(i, Integer.toString(quantity));
-                        break;
-                    }
-                }
-
-                try{
-                    wareHouseService.updateWareHouse(s_warehouse);
-                }
-                catch(Exception e){
-                    System.out.println(e);
-                    return null;
-                }
             }
         }
 

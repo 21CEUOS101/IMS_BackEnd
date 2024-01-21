@@ -166,17 +166,11 @@ public class OrderService implements IOrderService {
         }
         else if (status.equals("cancel")) {
 
-            // making delivery man available again
 
-            DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(order.getDelivery_man_id());
-
-            deliveryMan.setStatus("available");
-
-            deliveryManService.updateDeliveryMan(deliveryMan);
 
             // ------------------------------------------------------------------------
 
-            if (order.getStatus() == "shipped") {
+            if (order.getStatus().equals("shipped")) {
                 // re-adding products to warehouse
 
                 String product_id = order.getProduct_id();
@@ -195,7 +189,16 @@ public class OrderService implements IOrderService {
                 }
 
                 wareHouseService.updateWareHouse(warehouse);
-            } else if (order.getStatus() == "pending") {
+
+                // making delivery man available again
+
+                DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(order.getDelivery_man_id());
+
+                deliveryMan.setStatus("available");
+
+                deliveryManService.updateDeliveryMan(deliveryMan);
+
+            } else if (order.getStatus().equals("pending")) {
                 // all active w2w orders with this order id should be cancelled
 
                 List<W2WOrder> w2wOrders = w2wOrderService.getAllW2WOrderByOrderId(order.getId());
@@ -222,7 +225,7 @@ public class OrderService implements IOrderService {
                 }
 
                 wareHouseService.updateWareHouse(warehouse);
-            } else if (order.getStatus() == "delivered") {
+            } else if (order.getStatus().equals("delivered")) {
                 throw new RuntimeException("Order already delivered");
             }
         }
@@ -333,7 +336,7 @@ public class OrderService implements IOrderService {
                 int quantity1 = quantities.get(warehouses.indexOf(key)).equals("null") ? 0
                         : Integer.parseInt(quantities.get(warehouses.indexOf(key)));
 
-                if (quantity1 > max) {
+                if (quantity1 > max && !key.equals(r_warehouse_id)) {
                     max = quantity1;
                     max_warehouse_id = key;
                 }

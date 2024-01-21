@@ -4,6 +4,7 @@ package com.project.ims.Controllers;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,8 @@ public class DeliveryManController {
     @Autowired
     private DeliveryManService deliveryManService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // controllers
 
@@ -63,9 +66,6 @@ public class DeliveryManController {
 
         DeliveryMan deliveryMan = new DeliveryMan();
         deliveryMan.setId(id);
-        deliveryMan.setName(data.getName());
-        deliveryMan.setEmail(data.getEmail());
-        deliveryMan.setPassword(data.getPassword());
         deliveryMan.setPhone(data.getPhone());
         deliveryMan.setWarehouseId(data.getWarehouseId());
         deliveryMan.setStatus(data.getStatus());
@@ -85,9 +85,6 @@ public class DeliveryManController {
     public DeliveryMan updateDeliveryMan(@PathVariable("id") String id, @RequestBody DeliveryManAddRequest data) {
 
         DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
-        deliveryMan.setName(data.getName());
-        deliveryMan.setEmail(data.getEmail());
-        deliveryMan.setPassword(data.getPassword());
         deliveryMan.setPhone(data.getPhone());
         deliveryMan.setWarehouseId(data.getWarehouseId());
         deliveryMan.setStatus(data.getStatus());
