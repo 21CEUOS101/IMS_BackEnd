@@ -165,16 +165,19 @@ public class SupplyOrderService implements ISupplyOrderService {
                 return null;
             }
 
-        } else if (status.equals("cancelled")) {
-            DeliveryMan m = deliveryManService.getDeliveryManById(supplyOrder.getDelivery_man_id());
+        } else if (status.equals("cancel")) {
+            if(supplyOrder.getStatus().equals("approved"))
+            {
+                DeliveryMan m = deliveryManService.getDeliveryManById(supplyOrder.getDelivery_man_id());
 
-            m.setStatus("available");
+                m.setStatus("available");
 
-            try {
-                deliveryManService.updateDeliveryMan(m);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                return null;
+                try {
+                    deliveryManService.updateDeliveryMan(m);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    return null;
+                }
             }
         }
         else if (status.equals("approved"))
