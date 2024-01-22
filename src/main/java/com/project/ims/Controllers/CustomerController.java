@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Customer;
+import com.project.ims.Models.User;
 import com.project.ims.Requests.CustomerAddRequest;
 import com.project.ims.Services.CustomerService;
+import com.project.ims.Services.UserService;
 
 @RestController
 @RequestMapping("/api")
@@ -26,6 +28,9 @@ public class CustomerController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     // controllers
 
@@ -69,6 +74,15 @@ public class CustomerController {
         customer.setPincode(data.getPincode());
 
         try{
+            // creating user
+            createUser(data.getName() , data.getEmail() , data.getPassword() , "customer" , id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        try{
             customerService.addCustomer(customer);
         }
         catch(Exception e)
@@ -87,6 +101,15 @@ public class CustomerController {
         customer.setAddress(data.getAddress());
         customer.setPincode(data.getPincode());
 
+        try{
+            // updating user
+            updateUser(data.getName() , data.getEmail() , data.getPassword() , "customer" , id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
         try {
             customerService.updateCustomer(customer);
         }
@@ -99,6 +122,15 @@ public class CustomerController {
 
     @DeleteMapping("/customer/{id}")
     public void deleteCustomer(@PathVariable("id") String id) {
+
+        try{
+            // deleting user
+            deleteUser(id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
 
         try{
             customerService.deleteCustomer(id);
@@ -115,5 +147,43 @@ public class CustomerController {
         String id = 'c' + String.valueOf(rand.nextInt(1000000));
 
         return id;
+    }
+
+        public void createUser(String name, String email, String password, String role, String userId) {
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setUserId(userId);
+
+        try {
+            userService.addUser(user);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    public void updateUser(String name, String email, String password, String role, String userId) {
+        User user = userService.getUserByUserId(userId);
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setUserId(userId);
+
+        try {
+            userService.updateUser(user);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void deleteUser(String userId) {
+        try {
+            userService.deleteUserByUserId(userId);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

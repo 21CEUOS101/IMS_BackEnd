@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Supplier;
+import com.project.ims.Models.User;
 import com.project.ims.Requests.SupplierAddRequest;
 import com.project.ims.Services.SupplierService;
+import com.project.ims.Services.UserService;
 
 @RestController
 @RequestMapping("/api")
@@ -26,6 +28,9 @@ public class SupplierController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     // Suppliers API
 
@@ -71,6 +76,15 @@ public class SupplierController {
         supplier.setAddress(data.getAddress());
         supplier.setPhone(data.getPhone());
         supplier.setPincode(data.getPincode());
+
+        try{
+            // creating user
+            createUser(data.getName() , data.getEmail() , data.getPassword() , "supplier" , id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
         
         try{
             supplierService.addSupplier(supplier);
@@ -93,6 +107,15 @@ public class SupplierController {
         supplier.setPhone(data.getPhone());
         supplier.setPincode(data.getPincode());
 
+        try{
+            // updating user
+            updateUser(data.getName() , data.getEmail() , data.getPassword() , "supplier" , id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
         try {
             supplierService.updateSupplier(supplier);
             return supplier;
@@ -108,6 +131,16 @@ public class SupplierController {
 
     @DeleteMapping("/supplier/{id}")
     public void deleteSupplier(@PathVariable("id") String id) {
+
+        try{
+            // deleting user
+            deleteUser(id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
         try{
             supplierService.deleteSupplier(id);
         }
@@ -123,5 +156,43 @@ public class SupplierController {
         String id = 's' + String.valueOf(rand.nextInt(1000000));
 
         return id;
+    }
+
+    public void createUser(String name, String email, String password, String role, String userId) {
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setUserId(userId);
+
+        try {
+            userService.addUser(user);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    public void updateUser(String name, String email, String password, String role, String userId) {
+        User user = userService.getUserByUserId(userId);
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setUserId(userId);
+
+        try {
+            userService.updateUser(user);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void deleteUser(String userId) {
+        try {
+            userService.deleteUserByUserId(userId);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

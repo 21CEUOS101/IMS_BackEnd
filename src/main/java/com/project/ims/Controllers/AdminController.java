@@ -156,7 +156,7 @@ public class AdminController {
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole("admin");
+        user.setRole(role);
         user.setUserId(userId);
 
         try {
@@ -171,7 +171,7 @@ public class AdminController {
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole("admin");
+        user.setRole(role);
         user.setUserId(userId);
 
         try {

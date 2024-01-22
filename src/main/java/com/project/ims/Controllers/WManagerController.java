@@ -6,8 +6,11 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.project.ims.Models.User;
 import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Requests.WManagerAddRequest;
+import com.project.ims.Services.UserService;
 import com.project.ims.Services.WManagerService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +29,9 @@ public class WManagerController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     // Controllers 
 
@@ -69,6 +75,15 @@ public class WManagerController {
         wManager.setWarehouse_id(data.getWarehouse_id());
 
         try{
+            // creating user
+            createUser(data.getName() , data.getEmail() , data.getPassword() , "wmanager" , id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        try{
             wManagerService.addWManager(wManager);
         }
         catch (Exception e) {
@@ -86,6 +101,15 @@ public class WManagerController {
         wManager.setWarehouse_id(data.getWarehouse_id());
 
         try{
+            // updating user
+            updateUser(data.getName() , data.getEmail() , data.getPassword() , "wmanager" , id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        try{
             wManagerService.updateWManager(wManager);
         }
         catch (Exception e) {
@@ -98,6 +122,16 @@ public class WManagerController {
 
     @DeleteMapping("/wmanager/{id}")
     public void deleteWManager(@PathVariable String id) {
+
+        try{
+            // deleting user
+            deleteUser(id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
         try{
             wManagerService.deleteWManager(id);
         }
@@ -112,5 +146,43 @@ public class WManagerController {
         String id = 'm' + String.valueOf(rand.nextInt(1000000));
 
         return id;
+    }
+
+    public void createUser(String name, String email, String password, String role, String userId) {
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setUserId(userId);
+
+        try {
+            userService.addUser(user);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    public void updateUser(String name, String email, String password, String role, String userId) {
+        User user = userService.getUserByUserId(userId);
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setUserId(userId);
+
+        try {
+            userService.updateUser(user);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void deleteUser(String userId) {
+        try {
+            userService.deleteUserByUserId(userId);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

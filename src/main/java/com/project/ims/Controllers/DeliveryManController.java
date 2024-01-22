@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.DeliveryMan;
+import com.project.ims.Models.User;
 import com.project.ims.Requests.DeliveryManAddRequest;
 import com.project.ims.Services.DeliveryManService;
+import com.project.ims.Services.UserService;
 
 @RestController
 @RequestMapping("/api")
@@ -26,6 +28,9 @@ public class DeliveryManController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     // controllers
 
@@ -70,6 +75,14 @@ public class DeliveryManController {
         deliveryMan.setWarehouseId(data.getWarehouseId());
         deliveryMan.setStatus(data.getStatus());
 
+        try{
+            // creating user
+            createUser(data.getName() , data.getEmail() , data.getPassword() , "deliveryman" , id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
 
         try{
             deliveryManService.addDeliveryMan(deliveryMan);
@@ -89,6 +102,15 @@ public class DeliveryManController {
         deliveryMan.setWarehouseId(data.getWarehouseId());
         deliveryMan.setStatus(data.getStatus());
 
+        try{
+            // updating user
+            updateUser(data.getName() , data.getEmail() , data.getPassword() , "deliveryman" , id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
         try {
             deliveryManService.updateDeliveryMan(deliveryMan);
         }
@@ -101,6 +123,16 @@ public class DeliveryManController {
     
     @DeleteMapping("/deliveryman/{id}")
     public void deleteDeliveryMan(@PathVariable("id") String id) {
+
+        try{
+            // deleting user
+            deleteUser(id);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
         try{
             deliveryManService.deleteDeliveryMan(id);
         }
@@ -115,5 +147,43 @@ public class DeliveryManController {
         String id = 'd' + String.valueOf(rand.nextInt(1000000));
 
         return id;
+    }
+
+    public void createUser(String name, String email, String password, String role, String userId) {
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setUserId(userId);
+
+        try {
+            userService.addUser(user);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    public void updateUser(String name, String email, String password, String role, String userId) {
+        User user = userService.getUserByUserId(userId);
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setUserId(userId);
+
+        try {
+            userService.updateUser(user);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void deleteUser(String userId) {
+        try {
+            userService.deleteUserByUserId(userId);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
