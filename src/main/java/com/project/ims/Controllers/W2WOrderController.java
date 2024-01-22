@@ -22,7 +22,6 @@ import com.project.ims.Services.W2WOrderService;
 public class W2WOrderController {
 
     // necessary dependency injections
-
     @Autowired
     private W2WOrderService w2wOrderService;
 

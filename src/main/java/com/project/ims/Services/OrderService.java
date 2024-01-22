@@ -231,6 +231,18 @@ public class OrderService implements IOrderService {
         }
         else if (status.equals("shipped"))
         {
+            // checking if w2w orders are delivered or not
+
+            List<W2WOrder> w2wOrders = w2wOrderService.getAllW2WOrderByOrderId(order.getId());
+
+            for (W2WOrder w2wOrder : w2wOrders) {
+                if (!w2wOrder.getStatus().equals("delivered")) {
+                    throw new RuntimeException("W2W orders are not delivered yet");
+                }
+            }
+
+            // assigning deliveryman to order
+
             String deliveryMan = assignDeliveryMan(order);
             order.setDelivery_man_id(deliveryMan);
             if (deliveryMan == null) {
