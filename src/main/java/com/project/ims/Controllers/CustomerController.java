@@ -3,6 +3,7 @@ package com.project.ims.Controllers;
 // imports 
 import java.util.List;
 import java.util.Random;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Customer;
 import com.project.ims.Models.User;
 import com.project.ims.Requests.CustomerAddRequest;
+import com.project.ims.Responses.CustomerOutput;
 import com.project.ims.Services.CustomerService;
 import com.project.ims.Services.UserService;
 
@@ -36,10 +38,27 @@ public class CustomerController {
 
     // get all customers
     @GetMapping("/customer")
-    public List<Customer> getAllCustomers() {
-        try{
+    public List<CustomerOutput> getAllCustomers() {
+        try {
+            List<CustomerOutput> output = new ArrayList<>();
             List<Customer> customers = customerService.getAllCustomer();
-            return customers;
+
+            // also get user details
+            for(int i=0;i<customers.size();i++)
+            {
+                User user = userService.getUserByUserId(customers.get(i).getId());
+                CustomerOutput customerOutput = new CustomerOutput();
+                customerOutput.setId(customers.get(i).getId());
+                customerOutput.setName(user.getName());
+                customerOutput.setEmail(user.getEmail());
+                customerOutput.setPassword(user.getPassword());
+                customerOutput.setPhone(user.getPhone());
+                customerOutput.setAddress(customers.get(i).getAddress());
+                customerOutput.setPincode(customers.get(i).getPincode());
+                output.add(customerOutput);
+            }
+
+            return output;
         }
         catch(Exception e)
         {
@@ -50,10 +69,22 @@ public class CustomerController {
 
     // get customer by id
     @GetMapping("/customer/{id}")
-    public Customer getCustomerById(@PathVariable("id") String id) {
-        try{
+    public CustomerOutput getCustomerById(@PathVariable("id") String id) {
+        try {
             Customer customer = customerService.getCustomerById(id);
-            return customer;
+
+            // also get user details
+            User user = userService.getUserByUserId(customer.getId());
+            CustomerOutput customerOutput = new CustomerOutput();
+            customerOutput.setId(customer.getId());
+            customerOutput.setName(user.getName());
+            customerOutput.setEmail(user.getEmail());
+            customerOutput.setPassword(user.getPassword());
+            customerOutput.setPhone(user.getPhone());
+            customerOutput.setAddress(customer.getAddress());
+            customerOutput.setPincode(customer.getPincode());
+
+            return customerOutput;
         }
         catch(Exception e)
         {
@@ -69,13 +100,12 @@ public class CustomerController {
 
         Customer customer = new Customer();
         customer.setId(id);
-        customer.setPhone(data.getPhone());
         customer.setAddress(data.getAddress());
         customer.setPincode(data.getPincode());
 
         try{
             // creating user
-            createUser(data.getName() , data.getEmail() , data.getPassword() , "customer" , id);
+            createUser(data.getName() , data.getEmail() , data.getPassword() , "customer" , data.getPhone() , id);
         }
         catch(Exception e)
         {
@@ -97,13 +127,12 @@ public class CustomerController {
     public Customer updateCustomer(@PathVariable("id") String id, @RequestBody CustomerAddRequest data) {
 
         Customer customer = customerService.getCustomerById(id);
-        customer.setPhone(data.getPhone());
         customer.setAddress(data.getAddress());
         customer.setPincode(data.getPincode());
 
         try{
             // updating user
-            updateUser(data.getName() , data.getEmail() , data.getPassword() , "customer" , id);
+            updateUser(data.getName() , data.getEmail() , data.getPassword() , "customer" , data.getPhone() , id);
         }
         catch(Exception e)
         {
@@ -149,11 +178,12 @@ public class CustomerController {
         return id;
     }
 
-        public void createUser(String name, String email, String password, String role, String userId) {
+    public void createUser(String name, String email, String password, String role, String phone, String userId) {
         User user = new User();
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
 
@@ -164,11 +194,12 @@ public class CustomerController {
         }
     }
     
-    public void updateUser(String name, String email, String password, String role, String userId) {
+    public void updateUser(String name, String email, String password, String role, String phone, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
 

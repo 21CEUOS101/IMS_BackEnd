@@ -16,8 +16,5 @@ public class Admin {
     // id will be a string starting from 'a' and random number upto 10,00,000
     @Id
     private String id;
-
-    // phone number will be a 10 digits number
-    private String phone;
     
 }

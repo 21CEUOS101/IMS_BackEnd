@@ -1,5 +1,6 @@
 package com.project.ims.Controllers;
 
+import java.util.ArrayList;
 // imports
 import java.util.List;
 import java.util.Random;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Supplier;
 import com.project.ims.Models.User;
 import com.project.ims.Requests.SupplierAddRequest;
+import com.project.ims.Responses.SupplierOutput;
 import com.project.ims.Services.SupplierService;
 import com.project.ims.Services.UserService;
 
@@ -37,10 +39,27 @@ public class SupplierController {
     // get all suppliers
 
     @GetMapping("/supplier")
-    public List<Supplier> getAllSuppliers() {
-        try{
+    public List<SupplierOutput> getAllSuppliers() {
+        try {
+            List<SupplierOutput> output = new ArrayList<>();
             List<Supplier> suppliers = supplierService.getAllSupplier();
-            return suppliers;
+
+            // also get user details
+            for(int i=0;i<suppliers.size();i++)
+            {
+                User user = userService.getUserByUserId(suppliers.get(i).getId());
+                SupplierOutput supplierOutput = new SupplierOutput();
+                supplierOutput.setId(suppliers.get(i).getId());
+                supplierOutput.setName(user.getName());
+                supplierOutput.setEmail(user.getEmail());
+                supplierOutput.setPassword(user.getPassword());
+                supplierOutput.setPhone(user.getPhone());
+                supplierOutput.setAddress(suppliers.get(i).getAddress());
+                supplierOutput.setPincode(suppliers.get(i).getPincode());
+                output.add(supplierOutput);
+            }
+
+            return output;
         }
         catch(Exception e)
         {
@@ -52,10 +71,23 @@ public class SupplierController {
     // get supplier by id
 
     @GetMapping("/supplier/{id}")
-    public Supplier getSupplierById(@PathVariable("id") String id) {
-        try{
+    public SupplierOutput getSupplierById(@PathVariable("id") String id) {
+        try {
+            
             Supplier supplier = supplierService.getSupplierById(id);
-            return supplier;
+
+            // also get user details
+            User user = userService.getUserByUserId(supplier.getId());
+            SupplierOutput supplierOutput = new SupplierOutput();
+            supplierOutput.setId(supplier.getId());
+            supplierOutput.setName(user.getName());
+            supplierOutput.setEmail(user.getEmail());
+            supplierOutput.setPassword(user.getPassword());
+            supplierOutput.setPhone(user.getPhone());
+            supplierOutput.setAddress(supplier.getAddress());
+            supplierOutput.setPincode(supplier.getPincode());
+
+            return supplierOutput;
         }
         catch(Exception e)
         {
@@ -74,12 +106,11 @@ public class SupplierController {
         Supplier supplier = new Supplier();
         supplier.setId(id);
         supplier.setAddress(data.getAddress());
-        supplier.setPhone(data.getPhone());
         supplier.setPincode(data.getPincode());
 
         try{
             // creating user
-            createUser(data.getName() , data.getEmail() , data.getPassword() , "supplier" , id);
+            createUser(data.getName() , data.getEmail() , data.getPassword() , "supplier" , data.getPhone() , id);
         }
         catch(Exception e)
         {
@@ -104,12 +135,11 @@ public class SupplierController {
 
         Supplier supplier = supplierService.getSupplierById(id);
         supplier.setAddress(data.getAddress());
-        supplier.setPhone(data.getPhone());
         supplier.setPincode(data.getPincode());
 
         try{
             // updating user
-            updateUser(data.getName() , data.getEmail() , data.getPassword() , "supplier" , id);
+            updateUser(data.getName() , data.getEmail() , data.getPassword() , "supplier" , data.getPhone() , id);
         }
         catch(Exception e)
         {
@@ -158,11 +188,12 @@ public class SupplierController {
         return id;
     }
 
-    public void createUser(String name, String email, String password, String role, String userId) {
+    public void createUser(String name, String email, String password, String role, String phone, String userId) {
         User user = new User();
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
 
@@ -173,11 +204,12 @@ public class SupplierController {
         }
     }
     
-    public void updateUser(String name, String email, String password, String role, String userId) {
+    public void updateUser(String name, String email, String password, String role, String phone, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
 

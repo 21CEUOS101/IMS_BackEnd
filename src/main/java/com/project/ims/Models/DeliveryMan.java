@@ -15,8 +15,6 @@ public class DeliveryMan {
 
     @Id
     private String id;
-
-    private String phone;
     
     private String warehouseId;
 

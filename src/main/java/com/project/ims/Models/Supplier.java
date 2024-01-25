@@ -16,8 +16,6 @@ public class Supplier {
     @Id
     private String id;
 
-    private String phone;
-
     private String address;
 
     private String pincode;

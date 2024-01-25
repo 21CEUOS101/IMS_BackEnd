@@ -16,8 +16,6 @@ public class Customer {
     @Id
     private String id;
 
-    private String phone;
-
     private String address;
 
     private String pincode;

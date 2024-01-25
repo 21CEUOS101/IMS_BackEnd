@@ -1,5 +1,6 @@
 package com.project.ims.Controllers;
 
+import java.util.ArrayList;
 // imports
 import java.util.List;
 import java.util.Random;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Admin;
 import com.project.ims.Models.User;
 import com.project.ims.Requests.AdminAddRequest;
+import com.project.ims.Responses.AdminOutput;
 import com.project.ims.Services.AdminService;
 import com.project.ims.Services.UserService;
 
@@ -39,10 +41,25 @@ public class AdminController {
 
     // get all admins
     @GetMapping("/admin")
-    public List<Admin> getAllAdmins() {
-        try{
+    public List<AdminOutput> getAllAdmins() {
+        try {
+            List<AdminOutput> admins = new ArrayList<>();
             List<Admin> admin = adminService.getAllAdmin();
-            return admin;
+
+            // also get user details
+            for(int i=0;i<admin.size();i++)
+            {
+                User user = userService.getUserByUserId(admin.get(i).getId());
+                AdminOutput adminOutput = new AdminOutput();
+                adminOutput.setId(admin.get(i).getId());
+                adminOutput.setName(user.getName());
+                adminOutput.setEmail(user.getEmail());
+                adminOutput.setPassword(user.getPassword());
+                adminOutput.setPhone(user.getPhone());
+                admins.add(adminOutput);
+            }
+
+            return admins;
         }
         catch(Exception e)
         {
@@ -53,10 +70,19 @@ public class AdminController {
 
     // get admin by id
     @GetMapping("/admin/{id}")
-    public Admin getAdminById(@PathVariable("id") String id) {
-        try{
+    public AdminOutput getAdminById(@PathVariable("id") String id) {
+        try {
+            AdminOutput adminOutput = new AdminOutput();
             Admin admin = adminService.getAdminById(id);
-            return admin;
+            User user = userService.getUserByUserId(admin.getId());
+
+            adminOutput.setId(admin.getId());
+            adminOutput.setName(user.getName());
+            adminOutput.setEmail(user.getEmail());
+            adminOutput.setPassword(user.getPassword());
+            adminOutput.setPhone(user.getPhone());
+
+            return adminOutput;
         }
         catch(Exception e)
         {
@@ -73,11 +99,10 @@ public class AdminController {
 
         Admin admin = new Admin();
         admin.setId(id);
-        admin.setPhone(data.getPhone());
 
         try{
             // creating user
-            createUser(data.getName() , data.getEmail() , data.getPassword() , "admin" , id);
+            createUser(data.getName() , data.getEmail() , data.getPassword() , "admin" , data.getPhone() , id);
         }
         catch(Exception e)
         {
@@ -100,11 +125,10 @@ public class AdminController {
     public Admin updateAdmin(@PathVariable("id") String id, @RequestBody AdminAddRequest data) {
 
         Admin admin = adminService.getAdminById(id);
-        admin.setPhone(data.getPhone());
 
         try{
             // updating user
-            updateUser(data.getName() , data.getEmail() , data.getPassword() , "admin" , id);
+            updateUser(data.getName() , data.getEmail() , data.getPassword() , data.getPhone() , "admin" , id);
         }
         catch(Exception e)
         {
@@ -151,11 +175,12 @@ public class AdminController {
         return id;
     }
 
-    public void createUser(String name, String email, String password, String role, String userId) {
+    public void createUser(String name, String email, String password, String role, String phone, String userId) {
         User user = new User();
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
 
@@ -166,11 +191,12 @@ public class AdminController {
         }
     }
     
-    public void updateUser(String name, String email, String password, String role, String userId) {
+    public void updateUser(String name, String email, String password, String role, String phone, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
 

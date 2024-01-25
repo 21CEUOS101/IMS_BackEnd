@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeliveryManAddRequest {
+public class DeliveryManUpdateRequest {
     private String name;
 
     private String email;
@@ -17,4 +17,6 @@ public class DeliveryManAddRequest {
     private String phone;
     
     private String warehouseId;
+
+    private String status;
 }

@@ -16,7 +16,5 @@ public class WareHouse_Manager {
     @Id
     private String id;
 
-    private String phone;
-
     private String warehouse_id;
 }

@@ -6,7 +6,6 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.project.ims.Models.User;
 import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Requests.WManagerAddRequest;
@@ -71,12 +70,11 @@ public class WManagerController {
 
         WareHouse_Manager wManager = new WareHouse_Manager();
         wManager.setId(id);
-        wManager.setPhone(data.getPhone());
         wManager.setWarehouse_id(data.getWarehouse_id());
 
         try{
             // creating user
-            createUser(data.getName() , data.getEmail() , data.getPassword() , "wmanager" , id);
+            createUser(data.getName() , data.getEmail() , data.getPassword() , "wmanager", data.getPhone() , id);
         }
         catch(Exception e)
         {
@@ -97,12 +95,11 @@ public class WManagerController {
     @PostMapping("/wmanager/{id}")
     public WareHouse_Manager updateWManager(@PathVariable String id, @RequestBody WManagerAddRequest data) {
         WareHouse_Manager wManager = wManagerService.getWManagerById(id);
-        wManager.setPhone(data.getPhone());
         wManager.setWarehouse_id(data.getWarehouse_id());
 
         try{
             // updating user
-            updateUser(data.getName() , data.getEmail() , data.getPassword() , "wmanager" , id);
+            updateUser(data.getName() , data.getEmail() , data.getPassword() , "wmanager" , data.getPhone() , id);
         }
         catch(Exception e)
         {
@@ -148,11 +145,12 @@ public class WManagerController {
         return id;
     }
 
-    public void createUser(String name, String email, String password, String role, String userId) {
+    public void createUser(String name, String email, String password, String role, String phone, String userId) {
         User user = new User();
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
 
@@ -163,11 +161,12 @@ public class WManagerController {
         }
     }
     
-    public void updateUser(String name, String email, String password, String role, String userId) {
+    public void updateUser(String name, String email, String password, String role, String phone, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
 
