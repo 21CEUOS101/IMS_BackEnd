@@ -3,19 +3,32 @@ package com.project.ims.Services;
 // imports
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.IOrderService;
+import com.project.ims.Models.Customer;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.GlobalProducts;
 import com.project.ims.Models.Order;
+import com.project.ims.Models.Product;
+import com.project.ims.Models.User;
 import com.project.ims.Models.W2WOrder;
 import com.project.ims.Models.WareHouse;
+import com.project.ims.Repo.CustomerRepo;
+import com.project.ims.Repo.DeliveryManRepo;
 import com.project.ims.Repo.GlobalProductsRepo;
 import com.project.ims.Repo.OrderRepo;
 import com.project.ims.Repo.ProductRepo;
+import com.project.ims.Responses.CustomerOutput;
+import com.project.ims.Responses.DeliveryManOutput;
+import com.project.ims.Services.UserService;
+import java.util.Map;
+
+import java.util.HashMap;
 
 @Service
 public class OrderService implements IOrderService {
@@ -38,14 +51,23 @@ public class OrderService implements IOrderService {
 
     @Autowired
     private W2WOrderService w2wOrderService;
-
+    @Autowired
+    private DeliveryManRepo deliveryManRepo;
+    @Autowired
+    private CustomerRepo customerRepo;
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private UserService userService;
+   
+    @Autowired
+    private ProductService productService;
     // Services
 
     @Override
     public Order getOrderById(String id) {
 
-        if (id == null)
-        {
+        if (id == null) {
             throw new RuntimeException("Id shouldn't be null");
         }
 
@@ -54,18 +76,13 @@ public class OrderService implements IOrderService {
 
     @Override
     public Order addOrder(Order order) {
-        
+
         // Checking if the order ID is valid
-        if(order.getId() == null || order.getId().isEmpty())
-        {
+        if (order.getId() == null || order.getId().isEmpty()) {
             throw new RuntimeException("Order ID cannot be empty");
-        }
-        else if(orderRepo.existsById(order.getId()))
-        {
+        } else if (orderRepo.existsById(order.getId())) {
             throw new RuntimeException("Order ID already exists");
-        }
-        else if (order.getId().charAt(0) != 'o')
-        {
+        } else if (order.getId().charAt(0) != 'o') {
             throw new RuntimeException("Order ID must start with 'o'");
         }
 
@@ -76,7 +93,7 @@ public class OrderService implements IOrderService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = currentDateTime.format(formatter);
         order.setDate_time(formattedDateTime);
-        
+
         // set total amount
         Integer totalPrice = 0;
         String product_id = order.getProduct_id();
@@ -86,12 +103,12 @@ public class OrderService implements IOrderService {
         totalPrice += price * q;
         order.setTotal_amount(totalPrice.toString());
 
-        // checking if warehouse has the product or not otherwise create warehouse to warehouse order
-        
+        // checking if warehouse has the product or not otherwise create warehouse to
+        // warehouse order
+
         if (!checkStock(product_id, quantity, warehouse_id)) {
-            handleStock(product_id, quantity, warehouse_id , order.getId());
-        }
-        else {
+            handleStock(product_id, quantity, warehouse_id, order.getId());
+        } else {
             // removing products from warehouse
             WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
             for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
@@ -116,12 +133,10 @@ public class OrderService implements IOrderService {
             }
 
             order.setDelivery_man_id(deliveryMan);
-            
-            try{
+
+            try {
                 wareHouseService.updateWareHouse(warehouse);
-            }
-            catch(Exception e)
-            {
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -131,10 +146,9 @@ public class OrderService implements IOrderService {
 
     @Override
     public Order updateOrder(Order order) {
-        
+
         // Checking if the order data is null or not
-        if(order == null)
-        {
+        if (order == null) {
             throw new RuntimeException("Order data shouldn't be null");
         }
 
@@ -142,16 +156,15 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order updateOrderStatus(String id , String status)
-    {
+    public Order updateOrderStatus(String id, String status) {
         Order order = getOrderById(id);
 
         if (order == null) {
             throw new RuntimeException("Order not found");
         }
 
-        
         if (status.equals("delivered")) {
+            // System.out.println(id);
             LocalDateTime currentDateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = currentDateTime.format(formatter);
@@ -163,10 +176,7 @@ public class OrderService implements IOrderService {
 
             deliveryManService.updateDeliveryMan(deliveryMan);
 
-        }
-        else if (status.equals("cancel")) {
-
-
+        } else if (status.equals("cancel")) {
 
             // ------------------------------------------------------------------------
 
@@ -228,9 +238,7 @@ public class OrderService implements IOrderService {
             } else if (order.getStatus().equals("delivered")) {
                 throw new RuntimeException("Order already delivered");
             }
-        }
-        else if (status.equals("shipped"))
-        {
+        } else if (status.equals("shipped")) {
             // checking if w2w orders are delivered or not
 
             List<W2WOrder> w2wOrders = w2wOrderService.getAllW2WOrderByOrderId(order.getId());
@@ -245,8 +253,11 @@ public class OrderService implements IOrderService {
 
             String deliveryMan = assignDeliveryMan(order);
             order.setDelivery_man_id(deliveryMan);
+
             if (deliveryMan == null) {
+                System.out.println("delivery man is not avaliable");
                 order.setStatus("pending");
+                return orderRepo.save(order);
             }
         }
 
@@ -259,12 +270,9 @@ public class OrderService implements IOrderService {
     public void deleteOrder(String id) {
 
         // Checking if the order ID is valid or not
-        if (id == null)
-        {
+        if (id == null) {
             throw new RuntimeException("Id shouldn't be null");
-        }
-        else if(!orderRepo.existsById(id))
-        {
+        } else if (!orderRepo.existsById(id)) {
             throw new RuntimeException("Order with id " + id + " does not exist");
         }
 
@@ -282,7 +290,7 @@ public class OrderService implements IOrderService {
 
     // check in warehouse stock if product is available or not
     public boolean checkStock(String product_id, String quantity, String warehouse_id) {
-        
+
         GlobalProducts gp = globalProductsRepo.findById(product_id).orElse(null);
 
         if (gp == null) {
@@ -309,10 +317,10 @@ public class OrderService implements IOrderService {
 
         return false;
     }
-    
-    // if stock is not available then create warehouse to warehouse order if product is available in other warehouse
-    public void handleStock(String product_id , String quantity , String r_warehouse_id , String orderId)
-    {
+
+    // if stock is not available then create warehouse to warehouse order if product
+    // is available in other warehouse
+    public void handleStock(String product_id, String quantity, String r_warehouse_id, String orderId) {
 
         GlobalProducts gp = globalProductsRepo.findById(product_id).orElse(null);
 
@@ -338,7 +346,8 @@ public class OrderService implements IOrderService {
 
         // checking if product is available in other warehouses or not
 
-        // checking which warehouses has highest quantity of that product then create w2w order
+        // checking which warehouses has highest quantity of that product then create
+        // w2w order
 
         while (needed_quantity > 0) {
             int max = 0;
@@ -363,7 +372,7 @@ public class OrderService implements IOrderService {
                 needed_quantity = 0;
                 break;
             }
-            
+
             needed_quantity -= max;
 
             createW2WOrder(product_id, String.valueOf(max), r_warehouse_id, max_warehouse_id, orderId);
@@ -389,7 +398,7 @@ public class OrderService implements IOrderService {
             System.out.println(e.getMessage());
         }
     }
-    
+
     public void createW2WOrder(String product_id, String quantity, String r_warehouse_id, String s_warehouse_id,
             String orderId) {
 
@@ -410,29 +419,63 @@ public class OrderService implements IOrderService {
             System.out.println(e);
         }
     }
-    
-    public String assignDeliveryMan(Order order)
-    {
+
+    public String assignDeliveryMan(Order order) {
         String assigned_deliveryMan = null;
         List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
-            
+
         for (DeliveryMan d : deliveryMen) {
             if (d.getStatus().equals("available")) {
                 d.setStatus("unavailable");
                 assigned_deliveryMan = d.getId();
-                try{
+                try {
                     deliveryManService.updateDeliveryMan(d);
-                }
-                catch(Exception e)
-                {
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
-                
+
                 break;
             }
         }
 
         return assigned_deliveryMan;
     }
-    
+
+    public List<Map<String, Object>> orderstatusCByDeliverymanId(String id) {
+
+        // Checking if the DelivereyMan data is null or not
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+
+        List<Order> orders = orderRepo.findAll();
+        List<Map<String, Object>> statusCorder = new ArrayList<>();
+
+        for (Order o : orders) {
+            if (o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)) {
+
+                User user = userService.getUserByUserId(o.getCustomerId());
+                Customer customer = customerService.getCustomerById(o.getCustomerId());
+                WareHouse wareHouse = wareHouseService.getWareHouseById(o.getWarehouse_id());
+                Product product = productService.getProductById(o.getProduct_id());
+                System.out.println(user);
+                if (user != null) {
+
+                    Map<String, Object> orderWithCustomer = new HashMap<>();
+                    orderWithCustomer.put("order", o);
+                    orderWithCustomer.put("user", user);
+                    orderWithCustomer.put("customer", customer);
+                    orderWithCustomer.put("warehouse", wareHouse);
+                    orderWithCustomer.put("product",product);
+                    statusCorder.add(orderWithCustomer);
+                }
+
+            }
+        }
+        return statusCorder;
+
+    }
+
 }

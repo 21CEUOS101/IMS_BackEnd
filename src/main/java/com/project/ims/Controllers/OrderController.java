@@ -3,6 +3,7 @@ package com.project.ims.Controllers;
 // imports
 import java.util.ArrayList;
 import java.util.List;
+import java.util.*;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.project.ims.Models.Order;
@@ -172,6 +173,20 @@ public class OrderController {
             System.out.println(e.getMessage());
         }
     }
+
+    @GetMapping("/order/orderstatusCByDId/{id}")
+    public List<Map<String, Object>> orderstatusCByDId(@PathVariable("id") String id) {
+        try {
+            List<Map<String, Object>> ordersWithCustomer = orderService.orderstatusCByDeliverymanId(id);
+            return ordersWithCustomer;
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+  
+    
     
     public String generateOrderId()
     {

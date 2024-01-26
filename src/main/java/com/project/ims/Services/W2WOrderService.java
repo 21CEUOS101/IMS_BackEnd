@@ -264,17 +264,20 @@ public class W2WOrderService implements IW2WOrderService {
         }
         else if (status.equals("shipped"))
         {
-            DeliveryMan m = deliveryManService.getDeliveryManById(w2wOrder.getDelivery_man_id());
 
-            m.setStatus("available");
+            System.out.println(id);
+            String Delivery_man_id = assignDeliveryMan(w2wOrder);
 
-            try{
-                deliveryManService.updateDeliveryMan(m);
+
+            w2wOrder.setDelivery_man_id(Delivery_man_id);
+            if(Delivery_man_id == null){
+                System.out.println("delivery man is not avaliable");
+                w2wOrder.setStatus("pending");
+                return w2wOrderRepo.save(w2wOrder);
             }
-            catch (Exception e) {
-                System.out.println(e);
-                return null;
-            }
+            
+
+          
         }
 
         w2wOrder.setStatus(status);
