@@ -16,7 +16,7 @@ import com.project.ims.Models.W2WOrder;
 import com.project.ims.Requests.W2WOrderAddRequest;
 import com.project.ims.Requests.W2WOrderUpdateRequest;
 import com.project.ims.Services.W2WOrderService;
-
+import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class W2WOrderController {
@@ -123,6 +123,28 @@ public class W2WOrderController {
             System.out.println(e);
         }
     }
+
+    @GetMapping("/w2worder/w2worderstatusCByDId/{id}")
+    public List<Map<String, Object>> orderstatusCByDId(@PathVariable("id") String id) {
+        try {
+            List<Map<String, Object>> w2wordersWithCustomer = w2wOrderService.w2worderstatusCByDeliverymanId(id);
+            return w2wordersWithCustomer;
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/w2worder/w2worderstatusPByDId/{id}")
+    public List<Map<String, Object>> orderstatusPByDId(@PathVariable("id") String id) {
+        try {
+            List<Map<String, Object>> w2wordersWithCustomer = w2wOrderService.w2worderstatusPByDeliverymanId(id);
+            return w2wordersWithCustomer;
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
 
     public String generateId() {
         Random rand = new Random();

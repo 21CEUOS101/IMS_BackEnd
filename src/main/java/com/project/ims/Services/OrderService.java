@@ -28,6 +28,7 @@ import com.project.ims.Responses.DeliveryManOutput;
 import com.project.ims.Services.UserService;
 import java.util.Map;
 
+
 import java.util.HashMap;
 
 @Service
@@ -472,6 +473,47 @@ public class OrderService implements IOrderService {
                     statusCorder.add(orderWithCustomer);
                 }
 
+            }
+        }
+        return statusCorder;
+
+    }
+    
+    public List<Map<String, Object>> orderstatusPByDeliverymanId(String id) {
+
+        // Checking if the DelivereyMan data is null or not
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+        DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
+        if(deliveryMan == null)
+        {
+            System.out.println("Delivery man not exists");
+            return null;
+        }
+        WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
+        if(wareHouse == null)
+        {
+            System.out.println("delivery man warehouse donot exists");
+            return null;
+        }
+        List<Order> orders = orderRepo.findAll();
+        List<Map<String, Object>> statusCorder = new ArrayList<>();
+
+        for (Order o : orders) {
+            if (o.getStatus().equals("pending") && o.getWarehouse_id().equals(wareHouse.getId())) {                
+                Customer customer = customerService.getCustomerById(o.getCustomerId());
+                User user = userService.getUserByUserId(o.getCustomerId());
+                Product product = productService.getProductById(o.getProduct_id());
+                    Map<String, Object> orderWithCustomer = new HashMap<>();
+                    orderWithCustomer.put("order", o);                   
+                    orderWithCustomer.put("customer", customer);
+                    orderWithCustomer.put("warehouse", wareHouse);
+                    orderWithCustomer.put("product",product);
+                    orderWithCustomer.put("user",user);
+                    statusCorder.add(orderWithCustomer);
             }
         }
         return statusCorder;

@@ -2,18 +2,24 @@ package com.project.ims.Services;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.project.ims.IServices.IW2WOrderService;
+import com.project.ims.Models.Customer;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.Product;
+import com.project.ims.Models.User;
 import com.project.ims.Models.W2WOrder;
 import com.project.ims.Models.WareHouse;
+import com.project.ims.Repo.DeliveryManRepo;
 import com.project.ims.Repo.OrderRepo;
 import com.project.ims.Repo.W2WOrderRepo;
 
@@ -35,6 +41,12 @@ public class W2WOrderService implements IW2WOrderService {
 
     @Autowired
     private OrderRepo orderRepo;
+
+    @Autowired
+    private DeliveryManRepo deliveryManRepo;
+
+   
+    
 
     // Services
 
@@ -335,4 +347,70 @@ public class W2WOrderService implements IW2WOrderService {
 
         return assigned_deliveryMan;
     }
+
+     public List<Map<String, Object>>w2worderstatusCByDeliverymanId(String id) {
+        // Checking if the DelivereyMan data is null or not
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+
+        List<W2WOrder> w2worders = w2wOrderRepo.findAll();
+        List<Map<String, Object>> statusCw2worder = new ArrayList<>();
+
+        for (W2WOrder o : w2worders) {
+            if (o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)) {     
+                WareHouse S_wareHouse = wareHouseService.getWareHouseById(o.getS_warehouse_id());
+                WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getR_warehouse_id());
+                Product product = productService.getProductById(o.getProduct_id());
+                    Map<String, Object> orderwithWarehouse = new HashMap<>();
+                    orderwithWarehouse.put("w2worder", o);                    
+                    orderwithWarehouse.put("s_warehouse", S_wareHouse);
+                    orderwithWarehouse.put("r_warehouse", R_wareHouse);
+                    orderwithWarehouse.put("product",product);
+                    statusCw2worder.add(orderwithWarehouse);               
+            }
+        }
+        return statusCw2worder;
+
+    }
+    public List<Map<String, Object>>w2worderstatusPByDeliverymanId(String id) {
+        // Checking if the DelivereyMan data is null or not
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+        DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
+        if(deliveryMan == null)
+        {
+            System.out.println("Delivery man not exists");
+            return null;
+        }
+        WareHouse S_wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
+        if(S_wareHouse == null)
+        {
+            System.out.println("delivery man warehouse donot exists");
+            return null;
+        }
+        List<W2WOrder> w2worders = w2wOrderRepo.findAll();
+        List<Map<String, Object>> statusCw2worder = new ArrayList<>();
+
+        for (W2WOrder o : w2worders) {
+            if (o.getStatus().equals("pending") && o.getS_warehouse_id().equals(S_wareHouse.getId())) {     
+                WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getR_warehouse_id());
+                Product product = productService.getProductById(o.getProduct_id());
+                    Map<String, Object> orderwithWarehouse = new HashMap<>();
+                    orderwithWarehouse.put("w2worder", o);                    
+                    orderwithWarehouse.put("s_warehouse", S_wareHouse);
+                    orderwithWarehouse.put("r_warehouse", R_wareHouse);
+                    orderwithWarehouse.put("product",product);
+                    statusCw2worder.add(orderwithWarehouse);               
+            }
+        }
+        return statusCw2worder;
+
+    }
+    
 }
