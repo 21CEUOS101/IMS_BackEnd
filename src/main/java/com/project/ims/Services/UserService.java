@@ -108,8 +108,14 @@ public class UserService {
 
         if (user == null) {
             throw new RuntimeException("User cannot be null");
-        } else if (userRepo.findByEmail(user.getEmail()) == null) {
-            throw new RuntimeException("User does not exist");
+        }
+        else if(userRepo.findById(user.getId()).orElse(null) == null)
+        {
+            throw new RuntimeException("User not Exists");
+        }
+        else if (userRepo.findByEmail(user.getEmail()) != null)
+        {
+            throw new RuntimeException("User Email Already Exists");
         }
 
         try {
