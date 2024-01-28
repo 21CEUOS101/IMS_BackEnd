@@ -12,9 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.W2WOrder;
+import com.project.ims.Repo.W2WOrderRepo;
 import com.project.ims.Requests.W2WOrderAddRequest;
 import com.project.ims.Requests.W2WOrderUpdateRequest;
+import com.project.ims.Services.DeliveryManService;
 import com.project.ims.Services.W2WOrderService;
 import java.util.Map;
 @RestController
@@ -24,6 +28,9 @@ public class W2WOrderController {
     // necessary dependency injections
     @Autowired
     private W2WOrderService w2wOrderService;
+    @Autowired
+    private DeliveryManService deliveryManService;
+  
 
     // controllers
 
@@ -139,6 +146,49 @@ public class W2WOrderController {
         try {
             List<Map<String, Object>> w2wordersWithCustomer = w2wOrderService.w2worderstatusPByDeliverymanId(id);
             return w2wordersWithCustomer;
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/w2worder/w2worderstatusSByDId/{id}")
+    public Map<String, Object> orderstatusSByDId(@PathVariable("id") String id) {
+        try {
+            Map<String, Object> w2wordersWithCustomer = w2wOrderService.w2worderstatusSByDeliverymanId(id);
+            return w2wordersWithCustomer;
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @PostMapping("/w2worder/assignBydeliveryman/{id}/data")
+    public W2WOrder assignDeliverymanById(@PathVariable("id") String id,@RequestParam("data") String data) {
+       System.out.println(data);
+        try {
+           W2WOrder w2wOrder = w2wOrderService.getW2WOrderById(data);
+           if(w2wOrder == null){
+            System.out.println("doesnot exist delivery man or warehouse");
+            return null;
+           }
+           DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
+           
+
+           if(w2wOrder.getStatus().equals("pending")){
+
+            w2wOrder.setDelivery_man_id(id);
+               w2wOrder.setStatus("shipped");
+               
+               w2wOrderService.updateW2WOrder(w2wOrder);
+               deliveryMan.setStatus("unavailable");
+               deliveryManService.updateDeliveryMan(deliveryMan);
+               return w2wOrder;
+           }
+           else{
+            System.out.println("delivery man is not available");
+            return null;
+
+           }
+           
         } catch(Exception e) {
             System.out.println(e.getMessage());
             return null;

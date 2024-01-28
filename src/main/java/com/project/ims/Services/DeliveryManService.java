@@ -1,6 +1,9 @@
 package com.project.ims.Services;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // imports
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.IDeliveryManService;
 import com.project.ims.Models.DeliveryMan;
+import com.project.ims.Models.User;
+import com.project.ims.Models.WareHouse;
 import com.project.ims.Repo.DeliveryManRepo;
 import com.project.ims.Repo.WareHouseRepo;
 
@@ -20,7 +25,10 @@ public class DeliveryManService implements IDeliveryManService {
 
     @Autowired
     private WareHouseRepo wareHouseRepo;
-
+    @Autowired
+    private WareHouseService wareHouseService;
+    @Autowired
+    private UserService userService;
     // Services
 
     // get deliveryman by id
@@ -107,6 +115,37 @@ public class DeliveryManService implements IDeliveryManService {
         }
         
         return deliveryManRepo.findByWarehouseId(wareHouseId);
+    }
+
+    //custom
+
+    public  Map<String, Object> Dprofile(String id){
+
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+        DeliveryMan deliveryMan = getDeliveryManById(id);
+        if(deliveryMan == null)
+        {
+            System.out.println("Delivery man not exists");
+            return null;
+        }
+        WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
+        if(wareHouse == null)
+        {
+            System.out.println("delivery man warehouse donot exists");
+            return null;
+        }
+        // System.out.println(deliveryMan);
+        User user = userService.getUserByUserId(id);
+        System.out.println("hello2");
+        Map<String, Object> profile = new HashMap<>();
+        profile.put("deliveryman", deliveryMan);
+        profile.put("warehouse",wareHouse);
+        profile.put("user", user);
+        return profile;
     }
     
 }

@@ -4,9 +4,13 @@ package com.project.ims.Controllers;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
+import com.project.ims.Models.W2WOrder;
 import com.project.ims.Requests.OrderAddRequest;
 import com.project.ims.Requests.OrderUpdateRequest;
+import com.project.ims.Services.DeliveryManService;
 import com.project.ims.Services.OrderService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +34,8 @@ public class OrderController {
 
 
     // Order APIs
+    @Autowired
+    private DeliveryManService deliveryManService;
 
 
     // Get Order by ID
@@ -187,6 +193,49 @@ public class OrderController {
         try {
             List<Map<String, Object>> ordersWithCustomer = orderService.orderstatusPByDeliverymanId(id);
             return ordersWithCustomer;
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/order/orderstatusSByDId/{id}")
+    public Map<String, Object> orderstatusSByDId(@PathVariable("id") String id) {
+        try {
+            Map<String, Object> ordersWithCustomer = orderService.orderstatusSByDeliverymanId(id);
+            return ordersWithCustomer;
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @PostMapping("/order/assignBydeliveryman/{id}/data")
+    public Order assignDeliverymanById(@PathVariable("id") String id,@RequestParam("data") String data) {
+    //    System.out.println(data);
+        try {
+           Order order = orderService.getOrderById(data);
+           if(order == null){
+            System.out.println("doesnot exist delivery man or warehouse");
+            return null;
+           }
+           DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
+           
+
+           if(order.getStatus().equals("pending")){
+
+            order.setDelivery_man_id(id);
+               order.setStatus("shipped");
+               
+               orderService.updateOrder(order);
+               deliveryMan.setStatus("unavailable");
+               deliveryManService.updateDeliveryMan(deliveryMan);
+               return order;
+           }
+           else{
+            System.out.println("delivery man is not available");
+            return null;
+
+           }
+           
         } catch(Exception e) {
             System.out.println(e.getMessage());
             return null;

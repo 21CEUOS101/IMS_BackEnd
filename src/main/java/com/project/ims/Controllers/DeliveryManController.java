@@ -20,7 +20,7 @@ import com.project.ims.Requests.DeliveryManUpdateRequest;
 import com.project.ims.Responses.DeliveryManOutput;
 import com.project.ims.Services.DeliveryManService;
 import com.project.ims.Services.UserService;
-
+import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class DeliveryManController {
@@ -131,7 +131,7 @@ public class DeliveryManController {
         DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
         deliveryMan.setWarehouseId(data.getWarehouseId());
         deliveryMan.setStatus(data.getStatus());
-
+       
         try{
             // updating user
             updateUser(data.getName() , data.getEmail() , data.getPassword() , "deliveryman" , data.getPhone() , id);
@@ -170,6 +170,23 @@ public class DeliveryManController {
             System.out.println(e);
         }
     }
+    //custom
+
+    @GetMapping("/deliveryman/profile/{id}")
+    public Map<String,Object> getDeliveryManProfileById(@PathVariable("id") String id) {
+        
+       System.out.println(id);
+        try{
+           Map<String, Object> Dprofile = deliveryManService.Dprofile(id);
+            return Dprofile;
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+
+    }
+    
 
     public String generateId() {
         // id generation
@@ -196,6 +213,7 @@ public class DeliveryManController {
     }
     
     public void updateUser(String name, String email, String password, String role, String phone, String userId) {
+        System.out.println(userId);
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);

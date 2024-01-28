@@ -105,7 +105,6 @@ public class UserService {
 
     // update User
     public User updateUser(User user) {
-
         if (user == null) {
             throw new RuntimeException("User cannot be null");
         }
@@ -114,13 +113,12 @@ public class UserService {
             throw new RuntimeException("User not Exists");
         }
         
-        User check = userRepo.findByEmail(user.getEmail());
+        // User check = userRepo.findByEmail(user.getEmail());
 
-        if (check.getId() != user.getId())
-        {
-            throw new RuntimeException("User Email Already Exists");
-        }
-
+        // if (check.getId() != user.getId())
+        // {
+        //     throw new RuntimeException("User Email Already Exists");
+        // }
         try {
             User newUser = userRepo.save(user);
             return newUser;

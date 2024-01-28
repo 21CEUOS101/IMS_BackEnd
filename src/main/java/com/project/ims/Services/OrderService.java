@@ -519,5 +519,46 @@ public class OrderService implements IOrderService {
         return statusCorder;
 
     }
+    public Map<String, Object> orderstatusSByDeliverymanId(String id) {
+
+        // Checking if the DelivereyMan data is null or not
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+        DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
+        if(deliveryMan == null)
+        {
+            System.out.println("Delivery man not exists");
+            return null;
+        }
+        WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
+        if(wareHouse == null)
+        {
+            System.out.println("delivery man warehouse donot exists");
+            return null;
+        }
+        List<Order> orders = orderRepo.findAll();
+        Map<String, Object> Filterorders = new HashMap<>();
+
+        for (Order o : orders) {
+            if (o.getStatus().equals("shipped") && o.getDelivery_man_id().equals(id)) {                
+                Customer customer = customerService.getCustomerById(o.getCustomerId());
+                User user = userService.getUserByUserId(o.getCustomerId());
+                Product product = productService.getProductById(o.getProduct_id());
+                   
+                Filterorders.put("order", o);                   
+                Filterorders.put("customer", customer);
+                Filterorders.put("warehouse", wareHouse);
+                Filterorders.put("product",product);
+                Filterorders.put("user",user);
+                break;
+                
+            }
+        }
+        return Filterorders;
+
+    }
 
 }

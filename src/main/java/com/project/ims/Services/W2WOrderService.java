@@ -412,5 +412,32 @@ public class W2WOrderService implements IW2WOrderService {
         return statusCw2worder;
 
     }
+    public Map<String, Object>w2worderstatusSByDeliverymanId(String id) {
+        // Checking if the DelivereyMan data is null or not
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+
+        List<W2WOrder> w2worders = w2wOrderRepo.findAll();
+        Map<String, Object> statusSw2worder = new HashMap<>();
+
+        for (W2WOrder o : w2worders) {
+            if (o.getStatus().equals("shipped") && o.getDelivery_man_id().equals(id)) {     
+                WareHouse S_wareHouse = wareHouseService.getWareHouseById(o.getS_warehouse_id());
+                WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getR_warehouse_id());
+                Product product = productService.getProductById(o.getProduct_id());
+                    
+                statusSw2worder.put("w2worder", o);                    
+                    statusSw2worder.put("s_warehouse", S_wareHouse);
+                    statusSw2worder.put("r_warehouse", R_wareHouse);
+                    statusSw2worder.put("product",product);
+                                   
+            }
+        }
+        return statusSw2worder;
+
+    }
     
 }
