@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -559,6 +560,45 @@ public class OrderService implements IOrderService {
         }
         return Filterorders;
 
+    }
+
+    public HashSet<Customer> numberofcustomerByDId(String id){
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+       
+        List<Order> orders = orderRepo.findAll();
+        HashSet<Customer> allcustomer = new HashSet<>();
+        for(Order o : orders){
+            if(o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)){
+                Customer cust = customerService.getCustomerById(o.getCustomerId());
+                if (cust == null) {
+                    System.out.println("donot have customer id");
+                    break;
+                }
+                allcustomer.add(cust);
+            }
+        }
+        return allcustomer;
+
+    }
+    public List<Order> numberofCancelorders(String id){
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+       
+        List<Order> orders = orderRepo.findAll();
+        List<Order> cancel = new ArrayList<>();
+        for(Order o : orders){
+            if(o.getStatus().equals("cancel") && o.getDelivery_man_id().equals(id)){
+                cancel.add(o);
+            }
+        }
+        return cancel;
     }
 
 }

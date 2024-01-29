@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -438,6 +439,44 @@ public class W2WOrderService implements IW2WOrderService {
         }
         return statusSw2worder;
 
+    }
+    public HashSet<WareHouse> numberofwarehouse(String id){
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+       
+        List<W2WOrder> w2worders = w2wOrderRepo.findAll();
+        HashSet<WareHouse> allwarehouse = new HashSet<>();
+        for(W2WOrder o : w2worders){
+            if(o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)){
+                WareHouse ware = wareHouseService.getWareHouseById(o.getR_warehouse_id());
+                if (ware == null) {
+                    System.out.println("donot have warehouse id");
+                    break;
+                }
+                allwarehouse.add(ware);
+            }
+        }
+        return allwarehouse;
+
+    }
+    public List<W2WOrder> numberofCancelw2worders(String id){
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+       
+        List<W2WOrder> orders = w2wOrderRepo.findAll();
+        List<W2WOrder> cancel = new ArrayList<>();
+        for(W2WOrder o : orders){
+            if(o.getStatus().equals("cancel") && o.getDelivery_man_id().equals(id)){
+                cancel.add(o);
+            }
+        }
+        return cancel;
     }
     
 }

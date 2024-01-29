@@ -170,6 +170,8 @@ public class CustomerController {
         }
     }
     
+
+    
     public String generateId() {
         // id generation
         Random rand = new Random();

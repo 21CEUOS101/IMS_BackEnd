@@ -1,5 +1,6 @@
 package com.project.ims.Controllers;
 
+import java.util.HashSet;
 // imports
 import java.util.List;
 import java.util.Random;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.ims.Models.DeliveryMan;
+import com.project.ims.Models.Order;
 import com.project.ims.Models.W2WOrder;
+import com.project.ims.Models.WareHouse;
 import com.project.ims.Repo.W2WOrderRepo;
 import com.project.ims.Requests.W2WOrderAddRequest;
 import com.project.ims.Requests.W2WOrderUpdateRequest;
@@ -195,7 +198,37 @@ public class W2WOrderController {
         }
     }
 
-
+    @GetMapping("/w2worder/numberofwarehouseByDid/{id}")
+    public HashSet<WareHouse> NumberofwarehouseByDid(@PathVariable("id") String id) {
+        try {
+           HashSet<WareHouse> allware = w2wOrderService.numberofwarehouse(id);
+           return allware;
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+     @GetMapping("/w2worder/totalw2wordercompletedByDid/{id}")
+    public int numberofCompletedorders(@PathVariable("id") String id) {
+        try {
+           
+            return orderstatusCByDId(id).size();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return 0;
+        }
+    } 
+    @GetMapping("/w2wworder/totalw2worderCancelByDid/{id}")
+    public List<W2WOrder> numberofCancelorders(@PathVariable("id") String id) {
+        try {
+           
+            List<W2WOrder>  allcancel = w2wOrderService.numberofCancelw2worders(id);     
+           return allcancel;      
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    } 
     public String generateId() {
         Random rand = new Random();
         String id = "w2w" + rand.nextInt(1000000);

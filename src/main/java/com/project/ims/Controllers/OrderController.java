@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.project.ims.Models.Customer;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.W2WOrder;
@@ -240,11 +241,40 @@ public class OrderController {
             System.out.println(e.getMessage());
             return null;
         }
-    }
-
+    } 
+    @GetMapping("/order/numberofcustomer/{id}")
+    public HashSet<Customer> Numberofcustomer(@PathVariable("id") String id) {
+        try {
+           
+           HashSet<Customer>  allCustomers = orderService.numberofcustomerByDId(id);     
+           return allCustomers;      
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    } 
+    @GetMapping("/order/totalordercompletedByDid/{id}")
+    public int numberofCompletedorders(@PathVariable("id") String id) {
+        try {
+           
+            return orderstatusCByDId(id).size();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return 0;
+        }
+    } 
+    @GetMapping("/order/totalorderCancelByDid/{id}")
+    public List<Order> numberofCancelorders(@PathVariable("id") String id) {
+        try {
+           
+            List<Order>  allcancel = orderService.numberofCancelorders(id);     
+           return allcancel;      
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    } 
   
-    
-    
     public String generateOrderId()
     {
         Random rand = new Random();
