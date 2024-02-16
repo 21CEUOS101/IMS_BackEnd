@@ -461,22 +461,7 @@ public class W2WOrderService implements IW2WOrderService {
         }
         return allwarehouse;
 
-    }
-    public List<W2WOrder> numberofCancelw2worders(String id){
-        if (id.equals("")) {
-            throw new RuntimeException("Id shouldn't be null");
-        } else if (!deliveryManRepo.existsById(id)) {
-            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
-        }
-       
-        List<W2WOrder> orders = w2wOrderRepo.findAll();
-        List<W2WOrder> cancel = new ArrayList<>();
-        for(W2WOrder o : orders){
-            if(o.getStatus().equals("cancel") && o.getDelivery_man_id().equals(id)){
-                cancel.add(o);
-            }
-        }
-        return cancel;
-    }
+    }   
+   
     
 }

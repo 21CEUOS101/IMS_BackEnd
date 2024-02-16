@@ -209,26 +209,16 @@ public class W2WOrderController {
         }
     }
      @GetMapping("/w2worder/totalw2wordercompletedByDid/{id}")
-    public int numberofCompletedorders(@PathVariable("id") String id) {
+    public String numberofCompletedorders(@PathVariable("id") String id) {
         try {
            
-            return orderstatusCByDId(id).size();
+            return String.valueOf(orderstatusCByDId(id).size());
         } catch(Exception e) {
             System.out.println(e.getMessage());
-            return 0;
+            return "error";
         }
     } 
-    @GetMapping("/w2wworder/totalw2worderCancelByDid/{id}")
-    public List<W2WOrder> numberofCancelorders(@PathVariable("id") String id) {
-        try {
-           
-            List<W2WOrder>  allcancel = w2wOrderService.numberofCancelw2worders(id);     
-           return allcancel;      
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    } 
+   
     public String generateId() {
         Random rand = new Random();
         String id = "w2w" + rand.nextInt(1000000);

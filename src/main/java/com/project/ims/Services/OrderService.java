@@ -19,6 +19,7 @@ import com.project.ims.Models.Product;
 import com.project.ims.Models.User;
 import com.project.ims.Models.W2WOrder;
 import com.project.ims.Models.WareHouse;
+import com.project.ims.Objects.CustomerUserPair;
 import com.project.ims.Repo.CustomerRepo;
 import com.project.ims.Repo.DeliveryManRepo;
 import com.project.ims.Repo.GlobalProductsRepo;
@@ -462,7 +463,7 @@ public class OrderService implements IOrderService {
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
                 WareHouse wareHouse = wareHouseService.getWareHouseById(o.getWarehouse_id());
                 Product product = productService.getProductById(o.getProduct_id());
-                System.out.println(user);
+                // System.out.println(user);
                 if (user != null) {
 
                     Map<String, Object> orderWithCustomer = new HashMap<>();
@@ -562,40 +563,66 @@ public class OrderService implements IOrderService {
 
     }
 
-    public HashSet<Customer> numberofcustomerByDId(String id){
-        if (id.equals("")) {
-            throw new RuntimeException("Id shouldn't be null");
-        } else if (!deliveryManRepo.existsById(id)) {
-            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+    public List<CustomerUserPair> numberofcustomerByDId(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Id shouldn't be null or empty");
         }
-       
         List<Order> orders = orderRepo.findAll();
-        HashSet<Customer> allcustomer = new HashSet<>();
-        for(Order o : orders){
-            if(o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)){
-                Customer cust = customerService.getCustomerById(o.getCustomerId());
-                if (cust == null) {
-                    System.out.println("donot have customer id");
-                    break;
+        Map<String, CustomerUserPair> uniquePairsMap = new HashMap<>(); // Use customer ID as key
+    
+        for (Order order : orders) {
+            if ("delivered".equals(order.getStatus()) && id.equals(order.getDelivery_man_id())) {
+                Customer customer = customerService.getCustomerById(order.getCustomerId());
+                User user = userService.getUserByUserId(order.getCustomerId());
+                CustomerUserPair pair = new CustomerUserPair(customer, user);
+                if (!uniquePairsMap.containsKey(customer.getId())) {
+                    uniquePairsMap.put(customer.getId(), pair);
                 }
-                allcustomer.add(cust);
             }
         }
-        return allcustomer;
-
+    
+   
+        List<CustomerUserPair> uniquePairs = new ArrayList<>(uniquePairsMap.values());
+    
+        return uniquePairs;
     }
-    public List<Order> numberofCancelorders(String id){
+    
+    public List<Map<String, Object>> numberofCancelorders(String id){
         if (id.equals("")) {
             throw new RuntimeException("Id shouldn't be null");
         } else if (!deliveryManRepo.existsById(id)) {
             throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
         }
        
+        
+        DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
+        if(deliveryMan == null)
+        {
+            System.out.println("Delivery man not exists");
+            return null;
+        }
+        WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
+        if(wareHouse == null)
+        {
+            System.out.println("delivery man warehouse donot exists");
+            return null;
+        }
+        List<Map<String, Object>> cancel = new ArrayList<>();
         List<Order> orders = orderRepo.findAll();
-        List<Order> cancel = new ArrayList<>();
+      
         for(Order o : orders){
+            Map<String, Object> Filterorders = new HashMap<>();
             if(o.getStatus().equals("cancel") && o.getDelivery_man_id().equals(id)){
-                cancel.add(o);
+                Customer customer = customerService.getCustomerById(o.getCustomerId());
+                User user = userService.getUserByUserId(o.getCustomerId());
+                Product product = productService.getProductById(o.getProduct_id());
+                   
+                Filterorders.put("order", o);                   
+                Filterorders.put("customer", customer);
+                Filterorders.put("warehouse", wareHouse);
+                Filterorders.put("product",product);
+                Filterorders.put("user",user);
+                cancel.add(Filterorders);
             }
         }
         return cancel;

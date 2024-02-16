@@ -9,6 +9,7 @@ import com.project.ims.Models.Customer;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.W2WOrder;
+import com.project.ims.Objects.CustomerUserPair;
 import com.project.ims.Requests.OrderAddRequest;
 import com.project.ims.Requests.OrderUpdateRequest;
 import com.project.ims.Services.DeliveryManService;
@@ -243,10 +244,10 @@ public class OrderController {
         }
     } 
     @GetMapping("/order/numberofcustomer/{id}")
-    public HashSet<Customer> Numberofcustomer(@PathVariable("id") String id) {
+    public List<CustomerUserPair> Numberofcustomer(@PathVariable("id") String id) {
         try {
            
-           HashSet<Customer>  allCustomers = orderService.numberofcustomerByDId(id);     
+           List<CustomerUserPair> allCustomers = orderService.numberofcustomerByDId(id);     
            return allCustomers;      
         } catch(Exception e) {
             System.out.println(e.getMessage());
@@ -254,20 +255,21 @@ public class OrderController {
         }
     } 
     @GetMapping("/order/totalordercompletedByDid/{id}")
-    public int numberofCompletedorders(@PathVariable("id") String id) {
+    public String numberofCompletedorders(@PathVariable("id") String id) {
         try {
            
-            return orderstatusCByDId(id).size();
+            return String.valueOf(orderstatusCByDId(id).size());
+        
         } catch(Exception e) {
             System.out.println(e.getMessage());
-            return 0;
+            return "error";
         }
     } 
     @GetMapping("/order/totalorderCancelByDid/{id}")
-    public List<Order> numberofCancelorders(@PathVariable("id") String id) {
+    public List<Map<String, Object>> numberofCancelorders(@PathVariable("id") String id) {
         try {
            
-            List<Order>  allcancel = orderService.numberofCancelorders(id);     
+            List<Map<String, Object>>  allcancel = orderService.numberofCancelorders(id);     
            return allcancel;      
         } catch(Exception e) {
             System.out.println(e.getMessage());
