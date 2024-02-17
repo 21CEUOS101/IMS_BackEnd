@@ -222,7 +222,7 @@ public class OrderController {
            DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
            
 
-           if(order.getStatus().equals("pending")){
+           if(order.getStatus().equals("pending") &&  deliveryMan.getStatus().equals("available")){
 
             order.setDelivery_man_id(id);
                order.setStatus("shipped");

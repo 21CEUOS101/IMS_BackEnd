@@ -2,16 +2,29 @@ package com.project.ims.Services;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 // imports
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.IRSOService;
+import com.project.ims.Models.Customer;
 import com.project.ims.Models.DeliveryMan;
+import com.project.ims.Models.Order;
+import com.project.ims.Models.Product;
 import com.project.ims.Models.ReturnSupplyOrder;
+import com.project.ims.Models.Supplier;
+import com.project.ims.Models.SupplyOrder;
+import com.project.ims.Models.User;
+import com.project.ims.Models.WareHouse;
+import com.project.ims.Repo.DeliveryManRepo;
 import com.project.ims.Repo.RSORepo;
 import com.project.ims.Repo.ReturnOrderRepo;
+import com.project.ims.Repo.SupplyOrderRepo;
 
 @Service
 public class RSOService implements IRSOService {
@@ -26,6 +39,26 @@ public class RSOService implements IRSOService {
     @Autowired
     private DeliveryManService deliveryManService;
 
+    @Autowired
+    private DeliveryManRepo deliveryManRepo;
+
+    @Autowired
+    private WareHouseService wareHouseService;
+
+    @Autowired
+    private SupplyOrderRepo supplyOrderRepo;
+
+    @Autowired
+    private CustomerService customerService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private SupplierService supplierService;
     // Services
 
     @Override
@@ -67,13 +100,13 @@ public class RSOService implements IRSOService {
         returnSupplyOrder.setDate_time(formattedDateTime);
         
         // assign deliveryman to return supply order if deliveryman not available then rso status will be pending
-        String deliveryManId = assignDeliveryMan(returnSupplyOrder);
+        // String deliveryManId = assignDeliveryMan(returnSupplyOrder);
 
-        if (deliveryManId == null) {
-            returnSupplyOrder.setStatus("pending");
-        }
+        // if (deliveryManId == null) {
+        //     returnSupplyOrder.setStatus("pending");
+        // }
 
-        returnSupplyOrder.setDelivery_man_id(deliveryManId);
+        // returnSupplyOrder.setDelivery_man_id(deliveryManId);
         
 
         return returnSupplyOrderRepo.save(returnSupplyOrder);
@@ -148,5 +181,85 @@ public class RSOService implements IRSOService {
         }
         return deliveryManId;
     }
+    public Map<String ,Object>getReturnSupplyOrderStatusSByDid(String id){
+         if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+        DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
+        if(deliveryMan == null)
+        {
+            System.out.println("Delivery man not exists");
+            return null;
+        }
+        WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
+        if(wareHouse == null)
+        {
+            System.out.println("delivery man warehouse donot exists");
+            return null;
+        }
+        List<ReturnSupplyOrder> orders = returnSupplyOrderRepo.findAll();
+        Map<String, Object> Filterorders = new HashMap<>();
+
+        for (ReturnSupplyOrder o : orders) {
+            if (o.getStatus().equals("shipped") && o.getDelivery_man_id().equals(id)) {                
+                Supplier s = supplierService.getSupplierById(o.getSupplier_id());
+                User user = userService.getUserByUserId(o.getSupplier_id());
+                Product product = productService.getProductById(o.getProduct_id());
+                   
+                Filterorders.put("rso", o);                   
+                Filterorders.put("supplier", s);
+                Filterorders.put("warehouse", wareHouse);
+                Filterorders.put("product",product);
+                Filterorders.put("user",user);
+                break;
+                
+            }
+        }
+        return Filterorders;
+    }
+    public List<Map<String ,Object>>getReturnSupplyOrderStatusCByDid(String id){
+        if (id.equals("")) {
+           throw new RuntimeException("Id shouldn't be null");
+       } else if (!deliveryManRepo.existsById(id)) {
+           throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+       }
+       DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
+       if(deliveryMan == null)
+       {
+           System.out.println("Delivery man not exists");
+           return null;
+       }
+       WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
+       if(wareHouse == null)
+       {
+           System.out.println("delivery man warehouse donot exists");
+           return null;
+       }
+       List<ReturnSupplyOrder> orders = returnSupplyOrderRepo.findAll();
+       List<Map<String ,Object>> ord = new ArrayList<>();
+
+       for (ReturnSupplyOrder o : orders) {
+           if (o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)) {                
+               Supplier s = supplierService.getSupplierById(o.getSupplier_id());
+               User user = userService.getUserByUserId(o.getSupplier_id());
+               Product product = productService.getProductById(o.getProduct_id());
+               Map<String, Object> Filterorders = new HashMap<>();
+                  
+               Filterorders.put("rso", o);                   
+               Filterorders.put("supplier", s);
+               Filterorders.put("warehouse", wareHouse);
+               Filterorders.put("product",product);
+               Filterorders.put("user",user);
+                ord.add(Filterorders);
+            //    break;
+               
+           }
+       }
+       return ord;
+   }
+    
+
     
 }

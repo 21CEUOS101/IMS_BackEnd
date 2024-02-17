@@ -1,20 +1,28 @@
 package com.project.ims.Services;
 
 // imports
+import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.IReturnOrderService;
+import com.project.ims.Models.Customer;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.Product;
 import com.project.ims.Models.ReturnOrder;
 import com.project.ims.Models.ReturnSupplyOrder;
 import com.project.ims.Models.Supplier;
+import com.project.ims.Models.User;
+import com.project.ims.Models.WareHouse;
+import com.project.ims.Repo.DeliveryManRepo;
 import com.project.ims.Repo.OrderRepo;
 import com.project.ims.Repo.ReturnOrderRepo;
 import com.project.ims.Repo.WareHouseRepo;
@@ -43,6 +51,22 @@ public class ReturnOrderService implements IReturnOrderService {
 
     @Autowired
     private SupplierService supplierService;
+
+    @Autowired
+    private DeliveryManRepo deliveryManRepo;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private CustomerService customerService;
+
+    @Autowired
+    private WareHouseService wareHouseService;
+
+    @Autowired
+    private OrderService orderService;
+
 
     // Services
 
@@ -148,6 +172,7 @@ public class ReturnOrderService implements IReturnOrderService {
         Order order = orderRepo.findById(returnOrder.getOrder_id()).orElse(null);
 
         returnOrder.setStatus(status);
+      
 
         if (status.equals("approved")) {
             order.setStatus("returned");
@@ -216,6 +241,7 @@ public class ReturnOrderService implements IReturnOrderService {
         returnSupplyOrder.setReturn_reason(returnOrder.getReturn_reason());
         returnSupplyOrder.setStatus("shipped");
         returnSupplyOrder.setSupplier_id(product.getSupplier_id());
+        returnSupplyOrder.setDelivery_man_id(order.getDelivery_man_id());
 
         try{
             returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
@@ -228,5 +254,143 @@ public class ReturnOrderService implements IReturnOrderService {
 
         return returnSupplyOrder;
     }
+
+    public List<Map<String, Object>> getReturnOrdersByRbyDid(String id){
+         if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+
+        List<Order> orders = orderRepo.findAll();
+        List<Map<String, Object>> statusCorder = new ArrayList<>();
+
+        for (Order o : orders) {
+            if (o.getStatus().equals("returned") && o.getDelivery_man_id().equals(id)) {
+
+                User user = userService.getUserByUserId(o.getCustomerId());
+                Customer customer = customerService.getCustomerById(o.getCustomerId());
+                WareHouse wareHouse = wareHouseService.getWareHouseById(o.getWarehouse_id());
+                Product product = productService.getProductById(o.getProduct_id());
+                // System.out.println(user);
+                if (user != null) {
+
+                    Map<String, Object> orderWithCustomer = new HashMap<>();
+                    orderWithCustomer.put("order", o);
+                    orderWithCustomer.put("user", user);
+                    orderWithCustomer.put("customer", customer);
+                    orderWithCustomer.put("warehouse", wareHouse);
+                    orderWithCustomer.put("product",product);
+                    statusCorder.add(orderWithCustomer);
+                }
+
+            }
+        }
+        return statusCorder;
+    }
+
+    public ReturnOrder updateOrderStatusSByDid(String ordId, String id) {
+        if(ordId.equals("")  ||  id.equals("")){
+            System.out.println("empty id/s");
+            return null;
+        }
+        ReturnOrder o = getReturnOrderById(ordId);
+        if(o == null)
+        {
+            System.out.println("no order of following order id");
+            return null;
+        }
+        DeliveryMan d = deliveryManService.getDeliveryManById(id);
+
+        if( o.getStatus().equals("pending") && d.getStatus().equals("available")){
+            o.setDelivery_man_id(id);
+            o.setStatus("shipped");
+            d.setStatus("unavailable");
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = currentDateTime.format(formatter);
+            o.setDelivered_date_time(formattedDateTime);
+            deliveryManService.updateDeliveryMan(d);
+           updateReturnOrder(o);
+        }
+        else{
+            System.out.println("either order status is not pending or delivery man is not free");
+            return null;
+        }
+        return o;
+    }
+    public List<Map<String,Object>> orderStatusP (String id){
+        if(id.equals("")){
+            System.out.println("id is empty");
+            return null;
+        }
+
+        List<ReturnOrder> ro = getAllReturnOrder();
+        List<Map<String,Object>> returnord = new ArrayList<>();
+        DeliveryMan d = deliveryManService.getDeliveryManById(id);
+        WareHouse wareHouse = wareHouseService.getWareHouseById(d.getWarehouseId());
+        if(d==null || wareHouse== null){
+            System.out.println("either deliveryman is not exist or ware house is not exist");
+            return null;
+        }
+        for(ReturnOrder o : ro){
+            if(o.getStatus().equals("pending") && o.getWarehouseId().equals(wareHouse.getId())){
+                Product p = productService.getProductById(o.getProduct_id());
+                User user = userService.getUserByUserId(o.getCustomerId());
+                Customer cust = customerService.getCustomerById(o.getCustomerId());
+                Map<String, Object> orderWithCustomer = new HashMap<>();
+                orderWithCustomer.put("returnorder", o);                   
+                orderWithCustomer.put("customer", cust);
+                orderWithCustomer.put("warehouse", wareHouse);
+                orderWithCustomer.put("product",p);
+                orderWithCustomer.put("user",user);
+                returnord.add(orderWithCustomer);
+            }
+        }
+        return returnord;
+    }
+
+    public Map<String, Object> orderStatusS(String id) {
+
+        // Checking if the DelivereyMan data is null or not
+        if (id.equals("")) {
+            throw new RuntimeException("Id shouldn't be null");
+        } else if (!deliveryManRepo.existsById(id)) {
+            throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
+        }
+        DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
+        if(deliveryMan == null)
+        {
+            System.out.println("Delivery man not exists");
+            return null;
+        }
+        WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
+        if(wareHouse == null)
+        {
+            System.out.println("delivery man warehouse donot exists");
+            return null;
+        }
+        List<ReturnOrder> orders = returnOrderRepo.findAll();
+        Map<String, Object> Filterorders = new HashMap<>();
+
+        for (ReturnOrder o : orders) {
+            if (o.getStatus().equals("shipped") && o.getDelivery_man_id().equals(id)) {                
+                Customer customer = customerService.getCustomerById(o.getCustomerId());
+                User user = userService.getUserByUserId(o.getCustomerId());
+                Product product = productService.getProductById(o.getProduct_id());
+                   
+                Filterorders.put("returnorder", o);                   
+                Filterorders.put("customer", customer);
+                Filterorders.put("warehouse", wareHouse);
+                Filterorders.put("product",product);
+                Filterorders.put("user",user);
+                break;
+                
+            }
+        }
+        return Filterorders;
+
+    }
     
+
 }

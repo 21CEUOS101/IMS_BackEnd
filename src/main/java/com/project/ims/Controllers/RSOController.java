@@ -2,6 +2,7 @@ package com.project.ims.Controllers;
 
 // imports
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -149,6 +150,31 @@ public class RSOController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+        }
+    }
+
+    @GetMapping("/return-supply-orderstatusSByDid/{id}")
+    public Map<String,Object> getReturnSupplyOrderStatusSByDid(@PathVariable("id") String id) {
+        try{
+            Map<String,Object> returnSupplyOrder = returnSupplyOrderService.getReturnSupplyOrderStatusSByDid(id);
+            return returnSupplyOrder;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/return-supply-orderstatusCByDid/{id}")
+    public List<Map<String,Object>> getReturnSupplyOrderStatusCByDid(@PathVariable("id") String id) {
+        try{
+            List<Map<String,Object>> returnSupplyOrder = returnSupplyOrderService.getReturnSupplyOrderStatusCByDid(id);
+            return returnSupplyOrder;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
         }
     }
 
