@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.project.ims.IServices.IWManagerService;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Models.WareHouse_Manager;
+import com.project.ims.Repo.UserRepo;
 import com.project.ims.Repo.WManagerRepo;
 import com.project.ims.Repo.WareHouseRepo;
 
@@ -19,7 +20,7 @@ public class WManagerService implements IWManagerService {
     private WManagerRepo wManagerRepo;
 
     @Autowired
-    private WareHouseRepo wareHouseRepo;
+    private UserRepo userRepo;
     
     @Override
     public WareHouse_Manager getWManagerById(String id) {
@@ -80,5 +81,4 @@ public class WManagerService implements IWManagerService {
     public List<WareHouse_Manager> getAllWManager() {
         return wManagerRepo.findAll();
     }
-    
 }

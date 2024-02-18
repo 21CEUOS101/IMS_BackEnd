@@ -14,4 +14,10 @@ public class ProductAddRequest {
     private String price;
 
     private String supplier_id;
+
+    private Integer tax;
+
+    private Integer whole_sale_price;
+
+    private Integer profit;
 }

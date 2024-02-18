@@ -115,5 +115,10 @@ public class ProductService implements IProductService {
     public List<Product> getAllProduct() {
         return productRepo.findAll();
     }
+
+    @Override
+    public List<Product> getProductBySupplireId(String id) {
+        return productRepo.findBySupplierId(id);
+    }
     
 }

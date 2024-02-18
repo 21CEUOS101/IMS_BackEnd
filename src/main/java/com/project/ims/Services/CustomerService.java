@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.project.ims.IServices.ICustomerService;
 import com.project.ims.Models.Customer;
 import com.project.ims.Repo.CustomerRepo;
+import com.project.ims.Repo.UserRepo;
 
 @Service
 public class CustomerService implements ICustomerService {
@@ -15,6 +16,9 @@ public class CustomerService implements ICustomerService {
     // necessary dependency Injections
     @Autowired
     private CustomerRepo customerRepo;
+
+    @Autowired
+    private UserRepo userRepo;
 
     @Override
     public Customer getCustomerById(String id) {
@@ -81,5 +85,4 @@ public class CustomerService implements ICustomerService {
     public List<Customer> getAllCustomer() {
         return customerRepo.findAll();
     }
-    
 }

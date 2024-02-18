@@ -85,9 +85,7 @@ public class CustomerController {
             customerOutput.setPincode(customer.getPincode());
 
             return customerOutput;
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
@@ -152,9 +150,10 @@ public class CustomerController {
     @DeleteMapping("/customer/{id}")
     public void deleteCustomer(@PathVariable("id") String id) {
 
+        User user = userService.getUserByUserId(id);
         try{
             // deleting user
-            deleteUser(id);
+            deleteUser(user.getUserId());
         }
         catch(Exception e)
         {

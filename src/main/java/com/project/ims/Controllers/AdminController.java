@@ -83,9 +83,7 @@ public class AdminController {
             adminOutput.setPhone(user.getPhone());
 
             return adminOutput;
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
@@ -150,9 +148,10 @@ public class AdminController {
     @DeleteMapping("/admin/{id}")
     public void deleteAdmin(@PathVariable("id") String id) {
 
+        User user = userService.getUserByUserId(id);
         try{
             // deleting user
-            deleteUser(id);
+            deleteUser(user.getUserId());
         }
         catch(Exception e)
         {
@@ -191,7 +190,7 @@ public class AdminController {
         }
     }
     
-    public void updateUser(String name, String email, String password, String role, String phone, String userId) {
+    public void updateUser(String name, String email, String password, String phone, String role, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);

@@ -207,9 +207,9 @@ public class W2WOrderService implements IW2WOrderService {
                 }
             }
 
-            Order order = orderRepo.findById(w2wOrder.getOrderId()).orElse(null);
-
+            
             if (allDelivered) {
+                Order order = orderRepo.findById(w2wOrder.getOrderId()).orElse(null);
                 order.setStatus("shipped");
 
                 String deliveryMan = assignDeliveryMan(order);

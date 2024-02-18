@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.project.ims.IServices.ISupplierService;
 import com.project.ims.Models.Supplier;
 import com.project.ims.Repo.SupplierRepo;
+import com.project.ims.Repo.UserRepo;
 
 @Service
 public class SupplierService implements ISupplierService {
@@ -15,6 +16,9 @@ public class SupplierService implements ISupplierService {
     // necessary dependency Injections
     @Autowired
     private SupplierRepo supplierRepo;
+
+    @Autowired
+    private UserRepo userRepo;
 
     @Override
     public Supplier getSupplierById(String id) {

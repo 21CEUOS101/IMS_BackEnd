@@ -73,7 +73,7 @@ public class SupplierController {
     @GetMapping("/supplier/{id}")
     public SupplierOutput getSupplierById(@PathVariable("id") String id) {
         try {
-            
+
             Supplier supplier = supplierService.getSupplierById(id);
 
             // also get user details
@@ -88,9 +88,7 @@ public class SupplierController {
             supplierOutput.setPincode(supplier.getPincode());
 
             return supplierOutput;
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
@@ -162,9 +160,10 @@ public class SupplierController {
     @DeleteMapping("/supplier/{id}")
     public void deleteSupplier(@PathVariable("id") String id) {
 
+        User user = userService.getUserByUserId(id);
         try{
             // deleting user
-            deleteUser(id);
+            deleteUser(user.getUserId());
         }
         catch(Exception e)
         {

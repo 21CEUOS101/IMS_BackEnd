@@ -1,5 +1,6 @@
 package com.project.ims.Controllers;
 
+import java.util.ArrayList;
 // imports
 import java.util.List;
 import java.util.Random;
@@ -11,8 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.project.ims.Models.GlobalProducts;
 import com.project.ims.Models.Product;
 import com.project.ims.Requests.ProductAddRequest;
+import com.project.ims.Services.GPService;
 import com.project.ims.Services.ProductService;
 
 @RestController
@@ -23,14 +27,25 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private GPService gpService;
+
     // controllers
 
-    @GetMapping("/product")
-    public List<Product> getProducts() {
+    @GetMapping("/global-product")
+    public List<GlobalProducts> getGlobalProducts() {
         
+        List<GlobalProducts> output = new ArrayList<>();
         try{
             List<Product> products = productService.getAllProduct();
-            return products;
+
+            for(int i=0;i<products.size();i++)
+            {
+                GlobalProducts globalProducts = gpService.getById(products.get(i).getId());
+                output.add(globalProducts);
+            }
+
+            return output;
         }
         catch(Exception e)
         {
@@ -40,14 +55,32 @@ public class ProductController {
 
     }
 
+    @GetMapping("/global-product/{id}")
+    public GlobalProducts getGlobalProductById(@PathVariable String id) {
+        try {
+            GlobalProducts product = gpService.getById(id);
+            return product;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    
+    @GetMapping("/product")
+    public List<Product> getProducts() {
+        try {
+            return productService.getAllProduct();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
     @GetMapping("/product/{id}")
     public Product getProductById(@PathVariable String id) {
-        try{
-            Product product = productService.getProductById(id);
-            return product;
-        }
-        catch(Exception e)
-        {
+        try {
+            return productService.getProductById(id);
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
@@ -63,7 +96,9 @@ public class ProductController {
         product.setPrice(data.getPrice());
         product.setExpiry_date(data.getExpiry_date());
         product.setSupplier_id(data.getSupplier_id());
-
+        product.setTax(data.getTax());
+        product.setWhole_sale_price(data.getWhole_sale_price());
+        product.setProfit(data.getProfit());
         try{
             productService.addProduct(product);
         }
@@ -83,7 +118,9 @@ public class ProductController {
         product.setPrice(data.getPrice());
         product.setExpiry_date(data.getExpiry_date());
         product.setSupplier_id(data.getSupplier_id());
-
+        product.setTax(data.getTax());
+        product.setWhole_sale_price(data.getWhole_sale_price());
+        product.setProfit(data.getProfit());
         try{
             productService.updateProduct(product);
         }

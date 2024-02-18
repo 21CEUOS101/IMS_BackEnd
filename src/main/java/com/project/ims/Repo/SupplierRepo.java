@@ -7,5 +7,4 @@ import com.project.ims.Models.Supplier;
 
 @Repository
 public interface SupplierRepo extends MongoRepository<Supplier, String>{
-    
 }

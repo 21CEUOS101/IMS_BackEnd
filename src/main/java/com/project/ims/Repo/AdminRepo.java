@@ -7,5 +7,4 @@ import com.project.ims.Models.Admin;
 
 @Repository
 public interface AdminRepo extends MongoRepository<Admin, String>{
-    
 }

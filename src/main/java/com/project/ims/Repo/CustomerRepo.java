@@ -7,5 +7,4 @@ import com.project.ims.Models.Customer;
 
 @Repository
 public interface CustomerRepo extends MongoRepository<Customer, String>{
-    
 }

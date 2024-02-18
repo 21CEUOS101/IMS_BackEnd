@@ -16,4 +16,7 @@ import lombok.ToString;
 public class JwtResponse {
     private String token;
     private String username;
+    private String role;
+    private String id;
+    private String success;
 }

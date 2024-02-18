@@ -61,6 +61,11 @@ public class AuthController {
         JwtResponse response = JwtResponse.builder()
                 .token(token)
                 .username(user.getUsername()).build();
+        
+        // append id and role to response
+        response.setId(user.getUserId());
+        response.setRole(user.getRole());
+        response.setSuccess("true");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -93,6 +98,7 @@ public class AuthController {
         newUser.setEmail(user.getEmail());
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setRole(user.getRole());
+        newUser.setPhone(user.getPhone());
 
         try{
             userRepo.save(newUser);

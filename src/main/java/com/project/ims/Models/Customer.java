@@ -12,12 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Customer {
-    
     @Id
     private String id;
-
     private String address;
-
     private String pincode;
-
 }

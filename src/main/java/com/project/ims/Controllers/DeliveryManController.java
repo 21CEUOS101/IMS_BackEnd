@@ -72,8 +72,8 @@ public class DeliveryManController {
     // get deliveryman by id
     @GetMapping("/deliveryman/{id}")
     public DeliveryManOutput getDeliveryManById(@PathVariable("id") String id) {
-        
-        try{
+
+        try {
             DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
 
             // also get user details
@@ -88,8 +88,7 @@ public class DeliveryManController {
             deliveryManOutput.setStatus(deliveryMan.getStatus());
 
             return deliveryManOutput;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             return null;
         }
@@ -154,9 +153,10 @@ public class DeliveryManController {
     @DeleteMapping("/deliveryman/{id}")
     public void deleteDeliveryMan(@PathVariable("id") String id) {
 
+        User user = userService.getUserByUserId(id);
         try{
             // deleting user
-            deleteUser(id);
+            deleteUser(user.getUserId());
         }
         catch(Exception e)
         {

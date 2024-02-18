@@ -1,5 +1,6 @@
 package com.project.ims.Controllers;
 
+import java.util.ArrayList;
 // imports
 import java.util.List;
 import java.util.Random;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.User;
 import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Requests.WManagerAddRequest;
+import com.project.ims.Responses.WManagerOutput;
 import com.project.ims.Services.UserService;
 import com.project.ims.Services.WManagerService;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,36 +34,54 @@ public class WManagerController {
     @Autowired
     private UserService userService;
 
-    // Controllers 
+    // Controllers
 
     @GetMapping("/wmanager")
-    public List<WareHouse_Manager> getAllWManagers() {
+    public List<WManagerOutput> getAllWManagers() {
 
-        try{
+        List<WManagerOutput> output = new ArrayList();
+        try {
             List<WareHouse_Manager> wareHouse_Managers = wManagerService.getAllWManager();
-            return wareHouse_Managers;
-        }
-        catch (Exception e) {
+
+            for (int i = 0; i < wareHouse_Managers.size(); i++) {
+                User user = userService.getUserByUserId(wareHouse_Managers.get(i).getId());
+                WManagerOutput wManagerOutput = new WManagerOutput();
+                wManagerOutput.setId(wareHouse_Managers.get(i).getId());
+                wManagerOutput.setName(user.getName());
+                wManagerOutput.setEmail(user.getEmail());
+                wManagerOutput.setPassword(user.getPassword());
+                wManagerOutput.setPhone(user.getPhone());
+                wManagerOutput.setWarehouse_id(wareHouse_Managers.get(i).getWarehouse_id());
+                output.add(wManagerOutput);
+            }
+
+            return output;
+        } catch (Exception e) {
             System.out.println(e);
             return null;
         }
-        
+
     }
-    
+
     @GetMapping("/wmanager/{id}")
-    public WareHouse_Manager getWManagerById(@PathVariable String id) {
+    public WManagerOutput getWManagerById(@PathVariable String id) {
 
-        try{
+        try {
             WareHouse_Manager wareHouse_Manager = wManagerService.getWManagerById(id);
-            return wareHouse_Manager;
-        }
-        catch (Exception e) {
+            User user = userService.getUserByUserId(wareHouse_Manager.getId());
+            WManagerOutput wManagerOutput = new WManagerOutput();
+            wManagerOutput.setId(wareHouse_Manager.getId());
+            wManagerOutput.setName(user.getName());
+            wManagerOutput.setEmail(user.getEmail());
+            wManagerOutput.setPassword(user.getPassword());
+            wManagerOutput.setPhone(user.getPhone());
+            wManagerOutput.setWarehouse_id(wareHouse_Manager.getWarehouse_id());
+            return wManagerOutput;
+        } catch (Exception e) {
             System.out.println(e);
             return null;
         }
-
     }
-    
 
     @PostMapping("/wmanager")
     public WareHouse_Manager createWManager(@RequestBody WManagerAddRequest data) {
@@ -72,19 +92,16 @@ public class WManagerController {
         wManager.setId(id);
         wManager.setWarehouse_id(data.getWarehouse_id());
 
-        try{
+        try {
             // creating user
-            createUser(data.getName() , data.getEmail() , data.getPassword() , "wmanager", data.getPhone() , id);
-        }
-        catch(Exception e)
-        {
+            createUser(data.getName(), data.getEmail(), data.getPassword(), "wmanager", data.getPhone(), id);
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
-        try{
+        try {
             wManagerService.addWManager(wManager);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             return null;
         }
@@ -97,19 +114,16 @@ public class WManagerController {
         WareHouse_Manager wManager = wManagerService.getWManagerById(id);
         wManager.setWarehouse_id(data.getWarehouse_id());
 
-        try{
+        try {
             // updating user
-            updateUser(data.getName() , data.getEmail() , data.getPassword() , "wmanager" , data.getPhone() , id);
-        }
-        catch(Exception e)
-        {
+            updateUser(data.getName(), data.getEmail(), data.getPassword(), "wmanager", data.getPhone(), id);
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
-        try{
+        try {
             wManagerService.updateWManager(wManager);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             return null;
         }
@@ -120,19 +134,19 @@ public class WManagerController {
     @DeleteMapping("/wmanager/{id}")
     public void deleteWManager(@PathVariable String id) {
 
+        User user = userService.getUserByUserId(id);
         try{
             // deleting user
-            deleteUser(id);
+            deleteUser(user.getUserId());
         }
         catch(Exception e)
         {
             System.out.println(e.getMessage());
         }
 
-        try{
+        try {
             wManagerService.deleteWManager(id);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
@@ -160,7 +174,7 @@ public class WManagerController {
             System.out.println(e.getMessage());
         }
     }
-    
+
     public void updateUser(String name, String email, String password, String role, String phone, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);

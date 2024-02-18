@@ -3,11 +3,11 @@ package com.project.ims.Services;
 // imports 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.IAdminService;
 import com.project.ims.Models.Admin;
 import com.project.ims.Repo.AdminRepo;
+import com.project.ims.Repo.UserRepo;
 
 @Service
 public class AdminService implements IAdminService {
@@ -16,6 +16,9 @@ public class AdminService implements IAdminService {
     @Autowired
     private AdminRepo adminRepo;
 
+    @Autowired
+    private UserRepo userRepo;
+
 
     // Services
 
@@ -23,13 +26,13 @@ public class AdminService implements IAdminService {
     @Override
     public Admin getAdminById(String id) {
 
-        if (id == null)
-        {
+        if (id == null) {
             throw new RuntimeException("Id shouldn't be null");
         }
 
         return adminRepo.findById(id).orElse(null);
     }
+    
 
     @Override
     public Admin addAdmin(Admin admin) {

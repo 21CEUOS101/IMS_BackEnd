@@ -7,5 +7,4 @@ import com.project.ims.Models.WareHouse_Manager;
 
 @Repository
 public interface WManagerRepo extends MongoRepository<WareHouse_Manager, String>{
-    
 }
