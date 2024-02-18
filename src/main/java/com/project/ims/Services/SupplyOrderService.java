@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.ISupplyOrderService;
 import com.project.ims.Models.DeliveryMan;
+import com.project.ims.Models.Product;
 import com.project.ims.Models.SupplyOrder;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Repo.SupplyOrderRepo;
@@ -63,7 +64,10 @@ public class SupplyOrderService implements ISupplyOrderService {
             throw new RuntimeException("Supply Order ID must start with 's'");
         }
 
-        int price = Integer.parseInt(productService.getProductById(supplyOrder.getProduct_id()).getPrice());
+        Product product = productService.getProductById(supplyOrder.getProduct_id());
+
+        int price = product.getWhole_sale_price();
+        
         int quantity = Integer.parseInt(supplyOrder.getQuantity());
         int total_amount = price * quantity;
         supplyOrder.setTotal_amount(Integer.toString(total_amount));

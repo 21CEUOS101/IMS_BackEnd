@@ -235,12 +235,12 @@ public class ReturnOrderService implements IReturnOrderService {
 
         Product product = productService.getProductById(order.getProduct_id());
 
-        Supplier supplier = supplierService.getSupplierById(product.getSupplier_id());
+        Supplier supplier = supplierService.getSupplierById(product.getSupplierId());
 
         returnSupplyOrder.setDelivery_address(supplier.getAddress());
         returnSupplyOrder.setReturn_reason(returnOrder.getReturn_reason());
         returnSupplyOrder.setStatus("shipped");
-        returnSupplyOrder.setSupplier_id(product.getSupplier_id());
+        returnSupplyOrder.setSupplier_id(product.getSupplierId());
         returnSupplyOrder.setDelivery_man_id(order.getDelivery_man_id());
 
         try{

@@ -101,7 +101,12 @@ public class OrderService implements IOrderService {
         Integer totalPrice = 0;
         String product_id = order.getProduct_id();
         String quantity = order.getQuantity();
-        Integer price = Integer.parseInt(productRepo.findById(product_id).get().getPrice());
+        Product product = productRepo.findById(product_id).orElse(null);
+        Integer p = Integer.parseInt(product.getPrice());
+
+        // calculating total price
+        Integer price = p + ( p * (product.getTax() / 100)) + ( p * (product.getProfit() / 100)) ;
+
         Integer q = Integer.parseInt(quantity);
         totalPrice += price * q;
         order.setTotal_amount(totalPrice.toString());

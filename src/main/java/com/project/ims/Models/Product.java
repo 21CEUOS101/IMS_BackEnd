@@ -22,7 +22,7 @@ public class Product {
 
     private String price;
 
-    private String supplier_id;
+    private String supplierId;
 
     private Integer tax;
 
