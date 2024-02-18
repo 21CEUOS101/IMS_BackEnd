@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Customer;
+import com.project.ims.Models.Order;
 import com.project.ims.Models.User;
 import com.project.ims.Requests.CustomerAddRequest;
 import com.project.ims.Responses.CustomerOutput;
 import com.project.ims.Services.CustomerService;
+import com.project.ims.Services.OrderService;
 import com.project.ims.Services.UserService;
 
 @RestController
@@ -33,6 +35,9 @@ public class CustomerController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private OrderService orderService;
 
     // controllers
 
@@ -216,6 +221,17 @@ public class CustomerController {
             userService.deleteUserByUserId(userId);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    // get all orders of a customer
+    @GetMapping("/customer/{id}/orders")
+    public List<Order> getCustomerOrders(@PathVariable("id") String id) {
+        try {
+            return orderService.getAllOrderByCustomerId(id);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
         }
     }
 }

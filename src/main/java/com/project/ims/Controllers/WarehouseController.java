@@ -66,6 +66,8 @@ public class WarehouseController {
         wareHouse.setStatus(data.getStatus());
         wareHouse.setProduct_ids(data.getProduct_ids());
         wareHouse.setQuantities(data.getQuantities());
+        wareHouse.setHigherLimits(data.getHigherLimits());
+        wareHouse.setLowerLimits(data.getLowerLimits());
 
         try{
             wareHouseService.addWareHouse(wareHouse);
@@ -90,6 +92,8 @@ public class WarehouseController {
         wareHouse.setStatus(data.getStatus());
         wareHouse.setProduct_ids(data.getProduct_ids());
         wareHouse.setQuantities(data.getQuantities());
+        wareHouse.setHigherLimits(data.getHigherLimits());
+        wareHouse.setLowerLimits(data.getLowerLimits());
 
         try{
             wareHouseService.updateWareHouse(wareHouse);

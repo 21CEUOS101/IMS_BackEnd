@@ -28,6 +28,10 @@ public class WareHouse {
 
     private List<String> quantities;
 
+    private List<Integer> higherLimits;
+
+    private List<Integer> lowerLimits;
+
     private String manager_id;
 
     private String status;
