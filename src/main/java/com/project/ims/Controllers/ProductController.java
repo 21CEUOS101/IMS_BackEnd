@@ -91,9 +91,11 @@ public class ProductController {
 
         String id = generateId();
         Product product = new Product();
+        Integer pr = data.getWhole_sale_price() +( data.getWhole_sale_price()*data.getProfit() )/100+ (data.getWhole_sale_price()*data.getTax())/100;
+        String prString = String.valueOf(pr);
         product.setId(id);
         product.setName(data.getName());
-        product.setPrice(data.getPrice());
+        product.setPrice(prString);
         product.setExpiry_date(data.getExpiry_date());
         product.setSupplierId(data.getSupplier_id());
         product.setTax(data.getTax());
@@ -115,7 +117,9 @@ public class ProductController {
     public Product updateProduct(@PathVariable String id, @RequestBody ProductAddRequest data) {
         Product product = productService.getProductById(id);
         product.setName(data.getName());
-        product.setPrice(data.getPrice());
+        Integer pr = data.getWhole_sale_price() +( data.getWhole_sale_price()*data.getProfit() )/100+ (data.getWhole_sale_price()*data.getTax())/100;
+        String prString = String.valueOf(pr);
+        product.setPrice(prString);
         product.setExpiry_date(data.getExpiry_date());
         product.setSupplierId(data.getSupplier_id());
         product.setTax(data.getTax());

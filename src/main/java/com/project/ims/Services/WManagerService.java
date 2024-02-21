@@ -1,16 +1,22 @@
 package com.project.ims.Services;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 // imports
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
 import com.project.ims.IServices.IWManagerService;
-import com.project.ims.Models.WareHouse;
+
 import com.project.ims.Models.WareHouse_Manager;
-import com.project.ims.Repo.UserRepo;
+
 import com.project.ims.Repo.WManagerRepo;
-import com.project.ims.Repo.WareHouseRepo;
+
 
 @Service
 public class WManagerService implements IWManagerService {
@@ -19,8 +25,8 @@ public class WManagerService implements IWManagerService {
     @Autowired
     private WManagerRepo wManagerRepo;
 
-    @Autowired
-    private UserRepo userRepo;
+ 
+
     
     @Override
     public WareHouse_Manager getWManagerById(String id) {
@@ -81,4 +87,28 @@ public class WManagerService implements IWManagerService {
     public List<WareHouse_Manager> getAllWManager() {
         return wManagerRepo.findAll();
     }
+   
+     public String generateId() {
+        Random rand = new Random();
+        int random = rand.nextInt(1000000);
+        String id = "so" + random;
+        return id;
+    }
+    
 }
+/*  private String product_id;
+
+private String quantity;//
+
+private String supplier_id;
+
+private String warehouse_id;
+
+private String payment_method;
+
+private String transaction_id;
+
+private String pickup_address;
+
+private boolean isdelivery_man_Available;
+*/

@@ -2,6 +2,7 @@ package com.project.ims.Controllers;
 
 // imports
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -66,7 +67,7 @@ public class SupplyOrderController {
         supplyOrder.setSupplier_id(data.getSupplier_id());
         supplyOrder.setWarehouse_id(data.getWarehouse_id());
         supplyOrder.setPayment_method(data.getPayment_method());
-
+        supplyOrder.setIsdelivery_man_Available(false);
         if (data.getPayment_method().equals("online")) {
             supplyOrder.setTransaction_id(data.getTransaction_id());
         }
@@ -116,6 +117,8 @@ public class SupplyOrderController {
         supplyOrder.setTotal_amount(data.getTotal_amount());
         supplyOrder.setTransaction_id(data.getTransaction_id());
         supplyOrder.setWarehouse_id(data.getWarehouse_id());
+        supplyOrder.setIsdelivery_man_Available(data.isIsdelivery_man_Available());
+    
         
         try{
             supplyOrderService.updateSupplyOrder(supplyOrder);
@@ -128,7 +131,19 @@ public class SupplyOrderController {
 
         return supplyOrder;
     }
-    
+    @PostMapping("/SetSupplyorderByDeliverymanid/{id}/data")
+    public SupplyOrder SetIsDelivery_manAvailableByDid(@PathVariable String id, @RequestParam("data") String data) {
+        try{
+            SupplyOrder supplyOrder = supplyOrderService.SetIsDelivery_manAvailableByDid(id,data);
+            return supplyOrder;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
     @DeleteMapping("/supply-order/{id}")
     public void deleteSupplyOrder(@PathVariable String id) {
 
@@ -140,6 +155,161 @@ public class SupplyOrderController {
             System.out.println(e.getMessage());
         }
     }
+    // All Supplier
+    @GetMapping("/supply-order/getSupplyorderPending/{id}")
+    public List<Map<String,Object>> getSupplyorderPendingBySuppilerID(@PathVariable String id) {
+        try{
+            List<Map<String,Object>> supplyOrder = supplyOrderService.getSupplyorderPending(id);
+            return supplyOrder;
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/getallapprovedbutisDFBySid/{id}")
+    public List<Map<String ,Object>> getallapprovedbutisDFBySid(@PathVariable("id") String id) {
+        try {
+
+            List<Map<String ,Object>> so =  supplyOrderService.getallapprovedbutisDF(id);
+
+            return so;
+         
+           
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/getallapprovedbutisDTBySid/{id}")
+    public List<Map<String ,Object>> getallapprovedbutisDTBySid(@PathVariable("id") String id) {
+        try {
+
+            List<Map<String ,Object>> so =  supplyOrderService.getallapprovedbutisDT(id);
+
+            return so;
+         
+           
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/getallDeliveredordersBySid/{id}")
+    public List<Map<String ,Object>> getallDeliveredordersBySid(@PathVariable("id") String id) {
+        try {
+
+            List<Map<String ,Object>> so =  supplyOrderService.getallDeliveredorders(id);
+
+            return so;
+         
+           
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/getallcancelledBySid/{id}")
+    public List<Map<String ,Object>> getallcancelledBySid(@PathVariable("id") String id) {
+        try {
+
+            List<Map<String ,Object>> so =  supplyOrderService.getallcancelledBySid(id);
+
+            return so;
+         
+           
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    
+
+
+    // All Manager
+  @GetMapping("/getallDeliveredordersByMid/{id}")
+    public List<Map<String ,Object>> getallDeliveredordersByMid(@PathVariable("id") String id) {
+        try {
+
+            List<Map<String ,Object>> so =  supplyOrderService.getallDeliveredordersByMid(id);
+
+            return so;
+         
+           
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/getallapprovedbutisDFByMid/{id}")
+    public List<Map<String ,Object>> getallapprovedbutisDFByMid(@PathVariable("id") String id) {
+        try {
+
+            List<Map<String ,Object>> so =  supplyOrderService.getallapprovedbutisDFByMid(id);
+
+            return so;
+         
+           
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/getallapprovedbutisDTByMid/{id}")
+    public List<Map<String ,Object>> getallapprovedbutisDTByMid(@PathVariable("id") String id) {
+        try {
+
+            List<Map<String ,Object>> so =  supplyOrderService.getallapprovedbutisDTByMid(id);
+
+            return so;
+         
+           
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+    @GetMapping("/getallcancelledByMid/{id}")
+    public List<Map<String ,Object>> getallcancelledByMid(@PathVariable("id") String id) {
+        try {
+
+            List<Map<String ,Object>> so =  supplyOrderService.getallcancelledByMid(id);
+
+            return so;
+         
+           
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    //from waremanager
+    @GetMapping("/wmanager/checkwarehousebyWid/{id}")
+    public List<Map<String,Object>> getCheckWarehouse(@PathVariable String id) {
+
+        try {
+            List<Map<String,Object>> wareHouse_Manager = supplyOrderService.getCheckWarehouseByWID(id);
+          
+            return wareHouse_Manager;
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+    @PostMapping("/wmanager/makeSupplierOrderByWId/{id}/data")
+    public SupplyOrder makeSupplierOrderByWId(@PathVariable String id,@RequestParam("data") String data) {
+
+        try {
+            SupplyOrder so = supplyOrderService.makeSupplierOrderByWId(id,data);
+          
+            return so;
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
 
     // generate id
     public String generateId() {
@@ -148,4 +318,6 @@ public class SupplyOrderController {
         String id = "so" + random;
         return id;
     }
+
+    
 }

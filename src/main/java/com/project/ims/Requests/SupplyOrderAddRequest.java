@@ -22,4 +22,6 @@ public class SupplyOrderAddRequest {
 
     private String pickup_address;
     
+    private boolean isdelivery_man_Available;
+    
 }

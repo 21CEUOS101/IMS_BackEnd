@@ -3,10 +3,12 @@ package com.project.ims.Controllers;
 import java.util.ArrayList;
 // imports
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.project.ims.Models.User;
 import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Requests.WManagerAddRequest;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api")
@@ -150,6 +153,7 @@ public class WManagerController {
             System.out.println(e);
         }
     }
+   
 
     public String generateId() {
         // id generation
@@ -198,4 +202,5 @@ public class WManagerController {
             System.out.println(e.getMessage());
         }
     }
+    
 }

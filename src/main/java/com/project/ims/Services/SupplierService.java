@@ -1,14 +1,20 @@
 package com.project.ims.Services;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 // imports
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.ISupplierService;
+
 import com.project.ims.Models.Supplier;
+
 import com.project.ims.Repo.SupplierRepo;
-import com.project.ims.Repo.UserRepo;
+
 
 @Service
 public class SupplierService implements ISupplierService {
@@ -17,8 +23,12 @@ public class SupplierService implements ISupplierService {
     @Autowired
     private SupplierRepo supplierRepo;
 
-    @Autowired
-    private UserRepo userRepo;
+
+
+
+
+    
+   
 
     @Override
     public Supplier getSupplierById(String id) {
@@ -80,5 +90,5 @@ public class SupplierService implements ISupplierService {
     public List<Supplier> getAllSupplier() {
         return supplierRepo.findAll();
     }
-    
+  
 }

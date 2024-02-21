@@ -39,5 +39,7 @@ public class SupplyOrder {
     private String delivered_date_time;
 
     private String pickup_address;
+
+    private boolean isdelivery_man_Available;
     
 }

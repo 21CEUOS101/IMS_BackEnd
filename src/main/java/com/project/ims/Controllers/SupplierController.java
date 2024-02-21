@@ -3,6 +3,7 @@ package com.project.ims.Controllers;
 import java.util.ArrayList;
 // imports
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Supplier;
+
 import com.project.ims.Models.User;
 import com.project.ims.Requests.SupplierAddRequest;
 import com.project.ims.Responses.SupplierOutput;
@@ -202,7 +204,7 @@ public class SupplierController {
             System.out.println(e.getMessage());
         }
     }
-    
+   
     public void updateUser(String name, String email, String password, String role, String phone, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);
@@ -226,4 +228,5 @@ public class SupplierController {
             System.out.println(e.getMessage());
         }
     }
+  
 }
