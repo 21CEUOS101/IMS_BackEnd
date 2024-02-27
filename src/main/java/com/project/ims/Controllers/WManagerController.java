@@ -101,6 +101,7 @@ public class WManagerController {
             createUser(data.getName(), data.getEmail(), data.getPassword(), "wmanager", data.getPhone(), id);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return null;
         }
 
         try {
@@ -123,6 +124,7 @@ public class WManagerController {
             updateUser(data.getName(), data.getEmail(), "wmanager", data.getPhone(), id);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return null;
         }
 
         try {
@@ -146,6 +148,7 @@ public class WManagerController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+            return;
         }
 
         try {

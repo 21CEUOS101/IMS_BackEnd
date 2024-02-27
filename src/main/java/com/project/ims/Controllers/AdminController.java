@@ -15,7 +15,6 @@ import com.project.ims.Responses.AdminOutput;
 import com.project.ims.Responses.RecentSales;
 import com.project.ims.Services.AdminService;
 import com.project.ims.Services.UserService;
-
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -118,6 +117,7 @@ public class AdminController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+            return null;
         }
 
         try{
@@ -144,6 +144,7 @@ public class AdminController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+            return null;
         }
 
         try {
@@ -169,6 +170,7 @@ public class AdminController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+            return;
         }
 
         try{

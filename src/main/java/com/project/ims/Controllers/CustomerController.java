@@ -114,6 +114,7 @@ public class CustomerController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+            return null;
         }
 
         try{
@@ -141,6 +142,7 @@ public class CustomerController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+            return null;
         }
 
         try {
@@ -164,6 +166,7 @@ public class CustomerController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+            return;
         }
 
         try{

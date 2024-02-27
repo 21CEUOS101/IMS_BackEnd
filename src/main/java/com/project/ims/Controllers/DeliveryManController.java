@@ -112,6 +112,7 @@ public class DeliveryManController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+            return null;
         }
 
         try{
@@ -138,6 +139,7 @@ public class DeliveryManController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+            return null;
         }
 
         try {
@@ -161,6 +163,7 @@ public class DeliveryManController {
         catch(Exception e)
         {
             System.out.println(e.getMessage());
+            return;
         }
 
         try{
