@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.ims.Models.User;
 import com.project.ims.Models.WareHouse_Manager;
-import com.project.ims.Requests.WManagerAddRequest;
-import com.project.ims.Requests.WManagerUpdateRequest;
+import com.project.ims.Requests.WManager.WManagerAddRequest;
+import com.project.ims.Requests.WManager.WManagerUpdateRequest;
 import com.project.ims.Responses.WManagerOutput;
 import com.project.ims.Services.UserService;
 import com.project.ims.Services.WManagerService;

@@ -1,4 +1,4 @@
-package com.project.ims.Requests;
+package com.project.ims.Requests.DeliveryMan;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,8 +11,6 @@ public class DeliveryManUpdateRequest {
     private String name;
 
     private String email;
-
-    private String password;
 
     private String phone;
     

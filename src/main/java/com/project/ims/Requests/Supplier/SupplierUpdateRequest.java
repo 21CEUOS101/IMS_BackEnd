@@ -1,4 +1,5 @@
-package com.project.ims.Requests;
+package com.project.ims.Requests.Supplier;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -6,12 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class WManagerUpdateRequest {
+public class SupplierUpdateRequest {
     private String name;
 
     private String email;
 
     private String phone;
 
-    private String warehouse_id;
+    private String address;
+
+    private String pincode;
 }

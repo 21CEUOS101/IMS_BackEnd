@@ -1,4 +1,4 @@
-package com.project.ims.Requests;
+package com.project.ims.Requests.Customer;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

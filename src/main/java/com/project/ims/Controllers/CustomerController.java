@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Customer;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.User;
-import com.project.ims.Requests.CustomerAddRequest;
+import com.project.ims.Requests.Customer.CustomerAddRequest;
+import com.project.ims.Requests.Customer.CustomerUpdateRequest;
 import com.project.ims.Responses.CustomerOutput;
 import com.project.ims.Services.CustomerService;
 import com.project.ims.Services.OrderService;
@@ -127,7 +128,7 @@ public class CustomerController {
     }
 
     @PostMapping("/customer/{id}")
-    public Customer updateCustomer(@PathVariable("id") String id, @RequestBody CustomerAddRequest data) {
+    public Customer updateCustomer(@PathVariable("id") String id, @RequestBody CustomerUpdateRequest data) {
 
         Customer customer = customerService.getCustomerById(id);
         customer.setAddress(data.getAddress());
@@ -135,7 +136,7 @@ public class CustomerController {
 
         try{
             // updating user
-            updateUser(data.getName() , data.getEmail() , data.getPassword() , "customer" , data.getPhone() , id);
+            updateUser(data.getName() , data.getEmail() , "customer" , data.getPhone() , id);
         }
         catch(Exception e)
         {
@@ -200,11 +201,10 @@ public class CustomerController {
         }
     }
     
-    public void updateUser(String name, String email, String password, String role, String phone, String userId) {
+    public void updateUser(String name, String email, String role, String phone, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
         user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);

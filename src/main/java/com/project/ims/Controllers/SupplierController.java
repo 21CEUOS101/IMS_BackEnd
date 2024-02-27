@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Supplier;
 
 import com.project.ims.Models.User;
-import com.project.ims.Requests.SupplierAddRequest;
+import com.project.ims.Requests.Supplier.SupplierAddRequest;
+import com.project.ims.Requests.Supplier.SupplierUpdateRequest;
 import com.project.ims.Responses.SupplierOutput;
 import com.project.ims.Services.SupplierService;
 import com.project.ims.Services.UserService;
@@ -131,7 +132,7 @@ public class SupplierController {
     // update supplier
 
     @PostMapping("/supplier/{id}")
-    public Supplier updateSupplier(@PathVariable("id") String id, @RequestBody SupplierAddRequest data) {
+    public Supplier updateSupplier(@PathVariable("id") String id, @RequestBody SupplierUpdateRequest data) {
 
         Supplier supplier = supplierService.getSupplierById(id);
         supplier.setAddress(data.getAddress());
@@ -139,7 +140,7 @@ public class SupplierController {
 
         try{
             // updating user
-            updateUser(data.getName() , data.getEmail() , data.getPassword() , "supplier" , data.getPhone() , id);
+            updateUser(data.getName() , data.getEmail() , "supplier" , data.getPhone() , id);
         }
         catch(Exception e)
         {
@@ -205,11 +206,10 @@ public class SupplierController {
         }
     }
    
-    public void updateUser(String name, String email, String password, String role, String phone, String userId) {
+    public void updateUser(String name, String email, String role, String phone, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
         user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);

@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.User;
-import com.project.ims.Requests.DeliveryManAddRequest;
-import com.project.ims.Requests.DeliveryManUpdateRequest;
+import com.project.ims.Requests.DeliveryMan.DeliveryManAddRequest;
+import com.project.ims.Requests.DeliveryMan.DeliveryManUpdateRequest;
 import com.project.ims.Responses.DeliveryManOutput;
 import com.project.ims.Services.DeliveryManService;
 import com.project.ims.Services.UserService;
@@ -133,7 +133,7 @@ public class DeliveryManController {
        
         try{
             // updating user
-            updateUser(data.getName() , data.getEmail() , data.getPassword() , "deliveryman" , data.getPhone() , id);
+            updateUser(data.getName() , data.getEmail() , "deliveryman" , data.getPhone() , id);
         }
         catch(Exception e)
         {
@@ -212,12 +212,11 @@ public class DeliveryManController {
         }
     }
     
-    public void updateUser(String name, String email, String password, String role, String phone, String userId) {
+    public void updateUser(String name, String email, String role, String phone, String userId) {
         System.out.println(userId);
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
         user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);

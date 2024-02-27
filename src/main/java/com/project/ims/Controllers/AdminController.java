@@ -9,7 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Admin;
 import com.project.ims.Models.User;
-import com.project.ims.Requests.AdminAddRequest;
+import com.project.ims.Requests.Admin.AdminAddRequest;
+import com.project.ims.Requests.Admin.AdminUpdateRequest;
 import com.project.ims.Responses.AdminOutput;
 import com.project.ims.Responses.RecentSales;
 import com.project.ims.Services.AdminService;
@@ -132,13 +133,13 @@ public class AdminController {
     }
     
     @PostMapping("/admin/{id}")
-    public Admin updateAdmin(@PathVariable("id") String id, @RequestBody AdminAddRequest data) {
+    public Admin updateAdmin(@PathVariable("id") String id, @RequestBody AdminUpdateRequest data) {
 
         Admin admin = adminService.getAdminById(id);
 
         try{
             // updating user
-            updateUser(data.getName() , data.getEmail() , data.getPassword() , data.getPhone() , "admin" , id);
+            updateUser(data.getName() , data.getEmail() ,data.getPhone() , "admin" , id);
         }
         catch(Exception e)
         {
@@ -202,11 +203,10 @@ public class AdminController {
         }
     }
     
-    public void updateUser(String name, String email, String password, String phone, String role, String userId) {
+    public void updateUser(String name, String email, String phone, String role, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
         user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);

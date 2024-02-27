@@ -1,5 +1,4 @@
-package com.project.ims.Requests;
-
+package com.project.ims.Requests.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,8 +6,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminAddRequest {
-
+public class SupplierAddRequest {
     private String name;
 
     private String email;
@@ -16,4 +14,8 @@ public class AdminAddRequest {
     private String password;
 
     private String phone;
+
+    private String address;
+
+    private String pincode;
 }
