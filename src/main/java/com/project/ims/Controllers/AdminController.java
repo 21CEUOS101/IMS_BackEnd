@@ -11,6 +11,7 @@ import com.project.ims.Models.Admin;
 import com.project.ims.Models.User;
 import com.project.ims.Requests.AdminAddRequest;
 import com.project.ims.Responses.AdminOutput;
+import com.project.ims.Responses.RecentSales;
 import com.project.ims.Services.AdminService;
 import com.project.ims.Services.UserService;
 
@@ -83,6 +84,17 @@ public class AdminController {
             adminOutput.setPhone(user.getPhone());
 
             return adminOutput;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    // analytics for admin
+    @GetMapping("/admin/analytics/recent-sales")
+    public List<RecentSales> getRecentSales() {
+        try {
+            return adminService.getRecentSales();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;

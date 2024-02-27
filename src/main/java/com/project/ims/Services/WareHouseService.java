@@ -79,6 +79,16 @@ public class WareHouseService implements IWareHouseService {
             throw new RuntimeException("WareHouse Manager ID does not exist");
         }
 
+        wManager.setWarehouse_id(wareHouse.getId());
+
+        try{
+            wManagerRepo.save(wManager);
+        }
+        catch(Exception e){
+            throw new RuntimeException(e);
+        }
+
+
         String id = wareHouse.getId();
 
         // add to global products

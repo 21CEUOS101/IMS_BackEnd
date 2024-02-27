@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.User;
 import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Requests.WManagerAddRequest;
+import com.project.ims.Requests.WManagerUpdateRequest;
 import com.project.ims.Responses.WManagerOutput;
 import com.project.ims.Services.UserService;
 import com.project.ims.Services.WManagerService;
@@ -113,13 +114,13 @@ public class WManagerController {
     }
 
     @PostMapping("/wmanager/{id}")
-    public WareHouse_Manager updateWManager(@PathVariable String id, @RequestBody WManagerAddRequest data) {
+    public WareHouse_Manager updateWManager(@PathVariable String id, @RequestBody WManagerUpdateRequest data) {
         WareHouse_Manager wManager = wManagerService.getWManagerById(id);
         wManager.setWarehouse_id(data.getWarehouse_id());
 
         try {
             // updating user
-            updateUser(data.getName(), data.getEmail(), data.getPassword(), "wmanager", data.getPhone(), id);
+            updateUser(data.getName(), data.getEmail(), "wmanager", data.getPhone(), id);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -179,11 +180,10 @@ public class WManagerController {
         }
     }
 
-    public void updateUser(String name, String email, String password, String role, String phone, String userId) {
+    public void updateUser(String name, String email, String role, String phone, String userId) {
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
         user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
