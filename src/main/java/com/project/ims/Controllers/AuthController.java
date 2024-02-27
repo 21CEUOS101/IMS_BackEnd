@@ -20,6 +20,7 @@ import com.project.ims.Models.JwtRequest;
 import com.project.ims.Models.JwtResponse;
 import com.project.ims.Models.User;
 import com.project.ims.Repo.UserRepo;
+import com.project.ims.Requests.ChangePassword;
 import com.project.ims.Security.JwtHelper;
 import com.project.ims.Services.CustomUserDetailService;
 
@@ -100,17 +101,34 @@ public class AuthController {
         newUser.setRole(user.getRole());
         newUser.setPhone(user.getPhone());
 
-        try{
+        try {
             userRepo.save(newUser);
 
             return newUser;
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
     }
+    
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody ChangePassword data) {
+
+        User user1 = userRepo.findByEmail(data.getEmail());
+
+        if (user1 != null) {
+            if (passwordEncoder.matches(data.getOldPassword(), user1.getPassword())) {
+                user1.setPassword(passwordEncoder.encode(data.getNewPassword()));
+                userRepo.save(user1);
+                return new ResponseEntity<>("Password Changed Successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Old Password is Incorrect", HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            return new ResponseEntity<>("User Not Found", HttpStatus.NOT_FOUND);
+        }
+    }
+
     
 }
 
