@@ -278,17 +278,10 @@ public class SupplyOrderService implements ISupplyOrderService {
     public List<Map<String, Object>> getallapprovedbutisDF(String id) {
         List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
-<<<<<<< Updated upstream
         
         for( SupplyOrder s : allSo){
             if(s.getSupplierId().equals(id) && s.getStatus().equals("approved") && !s.isIsdelivery_man_Available() ){
                 Map<String ,Object> ma = new HashMap<>();
-=======
-
-        for (SupplyOrder s : allSo) {
-            if (s.getSupplier_id().equals(id) && s.getStatus().equals("approved") && !s.isIsdelivery_man_Available()) {
-                Map<String, Object> ma = new HashMap<>();
->>>>>>> Stashed changes
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
                 WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
@@ -309,17 +302,10 @@ public class SupplyOrderService implements ISupplyOrderService {
     public List<Map<String, Object>> getallapprovedbutisDT(String id) {
         List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
-<<<<<<< Updated upstream
         
         for( SupplyOrder s : allSo){
             if(s.getSupplierId().equals(id) && s.getStatus().equals("approved") && s.isIsdelivery_man_Available() ){
                 Map<String ,Object> ma = new HashMap<>();
-=======
-
-        for (SupplyOrder s : allSo) {
-            if (s.getSupplier_id().equals(id) && s.getStatus().equals("approved") && s.isIsdelivery_man_Available()) {
-                Map<String, Object> ma = new HashMap<>();
->>>>>>> Stashed changes
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
                 WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
@@ -342,17 +328,10 @@ public class SupplyOrderService implements ISupplyOrderService {
     public List<Map<String, Object>> getallDeliveredorders(String id) {
         List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
-<<<<<<< Updated upstream
         
         for( SupplyOrder s : allSo){
             if(s.getSupplierId().equals(id) && s.getStatus().equals("delivered") && s.isIsdelivery_man_Available() ){
                 Map<String ,Object> ma = new HashMap<>();
-=======
-
-        for (SupplyOrder s : allSo) {
-            if (s.getSupplier_id().equals(id) && s.getStatus().equals("delivered") && s.isIsdelivery_man_Available()) {
-                Map<String, Object> ma = new HashMap<>();
->>>>>>> Stashed changes
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
                 WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
@@ -375,17 +354,10 @@ public class SupplyOrderService implements ISupplyOrderService {
     public List<Map<String, Object>> getallcancelledBySid(String id) {
         List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
-<<<<<<< Updated upstream
         
         for( SupplyOrder s : allSo){
             if(s.getSupplierId().equals(id) && s.getStatus().equals("cancel") ){
                 Map<String ,Object> ma = new HashMap<>();
-=======
-
-        for (SupplyOrder s : allSo) {
-            if (s.getSupplier_id().equals(id) && s.getStatus().equals("cancel")) {
-                Map<String, Object> ma = new HashMap<>();
->>>>>>> Stashed changes
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
                 WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
@@ -417,11 +389,7 @@ public class SupplyOrderService implements ISupplyOrderService {
                 Map<String, Object> ma = new HashMap<>();
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-<<<<<<< Updated upstream
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
-=======
-                Supplier sup = supplierService.getSupplierById(s.getSupplier_id());
->>>>>>> Stashed changes
                 User user = userService.getUserByUserId(sup.getId());
                 DeliveryMan d = deliveryManService.getDeliveryManById(s.getDelivery_man_id());
                 User d_user = userService.getUserByUserId(d.getId());
@@ -454,11 +422,7 @@ public class SupplyOrderService implements ISupplyOrderService {
                 Map<String, Object> ma = new HashMap<>();
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-<<<<<<< Updated upstream
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
-=======
-                Supplier sup = supplierService.getSupplierById(s.getSupplier_id());
->>>>>>> Stashed changes
                 User user = userService.getUserByUserId(sup.getId());
                 DeliveryMan d = deliveryManService.getDeliveryManById(s.getDelivery_man_id());
                 User d_user = userService.getUserByUserId(d.getId());
@@ -491,11 +455,7 @@ public class SupplyOrderService implements ISupplyOrderService {
                 Map<String, Object> ma = new HashMap<>();
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-<<<<<<< Updated upstream
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
-=======
-                Supplier sup = supplierService.getSupplierById(s.getSupplier_id());
->>>>>>> Stashed changes
                 User user = userService.getUserByUserId(sup.getId());
 
                 ma.put("supplyorder", s);
@@ -524,11 +484,7 @@ public class SupplyOrderService implements ISupplyOrderService {
                 Map<String, Object> ma = new HashMap<>();
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-<<<<<<< Updated upstream
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
-=======
-                Supplier sup = supplierService.getSupplierById(s.getSupplier_id());
->>>>>>> Stashed changes
                 User user = userService.getUserByUserId(sup.getId());
 
                 ma.put("supplyorder", s);
@@ -556,7 +512,7 @@ public class SupplyOrderService implements ISupplyOrderService {
                 Map<String, Object> ma = new HashMap<>();
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-                Supplier sup = supplierService.getSupplierById(s.getSupplier_id());
+                Supplier sup = supplierService.getSupplierById(s.getSupplierId());
                 User user = userService.getUserByUserId(sup.getId());
 
                 ma.put("supplyorder", s);
