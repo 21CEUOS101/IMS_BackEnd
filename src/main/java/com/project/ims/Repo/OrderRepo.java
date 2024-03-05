@@ -16,4 +16,7 @@ public interface OrderRepo extends MongoRepository<Order, String>{
     // get top 10 orders by date which are delivered
     @Query("{ 'status' : 'delivered' }")
     public List<Order> findTop10DeliveredOrders(Pageable pageable);
+
+    // get orders list by warehouse id
+    public List<Order> findByWarehouseId(String wareHouseId);
 }

@@ -76,14 +76,14 @@ public class RSOController {
         }
 
         returnSupplyOrder.setOrder_id(data.getOrder_id());
-        returnSupplyOrder.setWarehouse_id(order.getWarehouse_id());
+        returnSupplyOrder.setWarehouse_id(order.getWarehouseId());
         returnSupplyOrder.setProduct_id(order.getProduct_id());
         returnSupplyOrder.setQuantity(order.getQuantity());
         returnSupplyOrder.setRefund_amount(order.getTotal_amount());
         returnSupplyOrder.setDelivery_address(data.getDelivery_address());
         returnSupplyOrder.setReturn_reason(data.getReturn_reason());
         returnSupplyOrder.setStatus("shipped");
-        returnSupplyOrder.setSupplier_id(data.getSupplier_id());
+        returnSupplyOrder.setSupplierId(data.getSupplier_id());
         
         try{
             returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
@@ -128,7 +128,7 @@ public class RSOController {
         returnSupplyOrder.setWarehouse_id(data.getWarehouse_id());
         returnSupplyOrder.setDelivery_address(data.getDelivery_address());
         returnSupplyOrder.setReturn_reason(data.getReturn_reason());
-        returnSupplyOrder.setSupplier_id(data.getSupplier_id());
+        returnSupplyOrder.setSupplierId(data.getSupplier_id());
         
         try{
             returnSupplyOrderService.updateReturnSupplyOrder(returnSupplyOrder);

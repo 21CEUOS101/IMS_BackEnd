@@ -22,7 +22,7 @@ public class W2WOrder {
 
     private String s_warehouse_id;
 
-    private String r_warehouse_id;
+    private String warehouseId;
 
     private String total_amount;
 

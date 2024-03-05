@@ -228,7 +228,7 @@ public class ReturnOrderService implements IReturnOrderService {
         }
 
         returnSupplyOrder.setOrder_id(order.getId());
-        returnSupplyOrder.setWarehouse_id(order.getWarehouse_id());
+        returnSupplyOrder.setWarehouse_id(order.getWarehouseId());
         returnSupplyOrder.setProduct_id(order.getProduct_id());
         returnSupplyOrder.setQuantity(order.getQuantity());
         returnSupplyOrder.setRefund_amount(order.getTotal_amount());
@@ -240,7 +240,7 @@ public class ReturnOrderService implements IReturnOrderService {
         returnSupplyOrder.setDelivery_address(supplier.getAddress());
         returnSupplyOrder.setReturn_reason(returnOrder.getReturn_reason());
         returnSupplyOrder.setStatus("shipped");
-        returnSupplyOrder.setSupplier_id(product.getSupplierId());
+        returnSupplyOrder.setSupplierId(product.getSupplierId());
         returnSupplyOrder.setDelivery_man_id(order.getDelivery_man_id());
 
         try{
@@ -270,7 +270,7 @@ public class ReturnOrderService implements IReturnOrderService {
 
                 User user = userService.getUserByUserId(o.getCustomerId());
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
-                WareHouse wareHouse = wareHouseService.getWareHouseById(o.getWarehouse_id());
+                WareHouse wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
                 Product product = productService.getProductById(o.getProduct_id());
                 // System.out.println(user);
                 if (user != null) {

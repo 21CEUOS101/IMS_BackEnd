@@ -10,4 +10,5 @@ import com.project.ims.Models.W2WOrder;
 @Repository
 public interface W2WOrderRepo extends MongoRepository<W2WOrder, String>{
     public List<W2WOrder> findByOrderId(String orderId);
+    public List<W2WOrder> findByWarehouseId(String warehouseId);
 }

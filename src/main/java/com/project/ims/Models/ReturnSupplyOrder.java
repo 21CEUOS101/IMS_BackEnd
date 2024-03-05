@@ -21,7 +21,7 @@ public class ReturnSupplyOrder {
 
     private String warehouse_id;
 
-    private String supplier_id;
+    private String supplierId;
 
     private String refund_amount;
 

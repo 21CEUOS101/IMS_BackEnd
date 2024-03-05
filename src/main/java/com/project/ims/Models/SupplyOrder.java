@@ -22,7 +22,7 @@ public class SupplyOrder {
 
     private String warehouse_id;
 
-    private String supplier_id;
+    private String supplierId;
 
     private String total_amount;
 

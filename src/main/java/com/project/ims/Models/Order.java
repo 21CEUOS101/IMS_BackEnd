@@ -20,7 +20,7 @@ public class Order {
 
     private String quantity;
 
-    private String warehouse_id;
+    private String warehouseId;
 
     private String customerId;
 

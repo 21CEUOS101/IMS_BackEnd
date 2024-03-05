@@ -71,7 +71,7 @@ public class W2WOrderController {
         w2wOrder.setId(id);
         w2wOrder.setProduct_id(data.getProduct_id());
         w2wOrder.setQuantity(data.getQuantity());
-        w2wOrder.setR_warehouse_id(data.getR_warehouse_id());
+        w2wOrder.setWarehouseId(data.getR_warehouse_id());
         w2wOrder.setS_warehouse_id(data.getS_warehouse_id());
         w2wOrder.setOrderId(data.getOrderId());
         w2wOrder.setStatus("shipped");
@@ -104,7 +104,7 @@ public class W2WOrderController {
         W2WOrder w2wOrder = w2wOrderService.getW2WOrderById(id);
         w2wOrder.setProduct_id(data.getProduct_id());
         w2wOrder.setQuantity(data.getQuantity());
-        w2wOrder.setR_warehouse_id(data.getR_warehouse_id());
+        w2wOrder.setWarehouseId(data.getR_warehouse_id());
         w2wOrder.setS_warehouse_id(data.getS_warehouse_id());
         w2wOrder.setTotal_amount(data.getTotal_amount());
         w2wOrder.setStatus(data.getStatus());

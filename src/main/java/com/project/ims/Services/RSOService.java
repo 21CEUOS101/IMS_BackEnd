@@ -204,8 +204,8 @@ public class RSOService implements IRSOService {
 
         for (ReturnSupplyOrder o : orders) {
             if (o.getStatus().equals("shipped") && o.getDelivery_man_id().equals(id)) {                
-                Supplier s = supplierService.getSupplierById(o.getSupplier_id());
-                User user = userService.getUserByUserId(o.getSupplier_id());
+                Supplier s = supplierService.getSupplierById(o.getSupplierId());
+                User user = userService.getUserByUserId(o.getSupplierId());
                 Product product = productService.getProductById(o.getProduct_id());
                    
                 Filterorders.put("rso", o);                   
@@ -242,8 +242,8 @@ public class RSOService implements IRSOService {
 
        for (ReturnSupplyOrder o : orders) {
            if (o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)) {                
-               Supplier s = supplierService.getSupplierById(o.getSupplier_id());
-               User user = userService.getUserByUserId(o.getSupplier_id());
+               Supplier s = supplierService.getSupplierById(o.getSupplierId());
+               User user = userService.getUserByUserId(o.getSupplierId());
                Product product = productService.getProductById(o.getProduct_id());
                Map<String, Object> Filterorders = new HashMap<>();
                   

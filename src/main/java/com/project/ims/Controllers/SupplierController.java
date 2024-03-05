@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.project.ims.Models.Supplier;
 
+import com.project.ims.Models.ReturnSupplyOrder;
+import com.project.ims.Models.Supplier;
+import com.project.ims.Models.SupplyOrder;
 import com.project.ims.Models.User;
 import com.project.ims.Requests.Supplier.SupplierAddRequest;
 import com.project.ims.Requests.Supplier.SupplierUpdateRequest;
@@ -231,5 +233,29 @@ public class SupplierController {
             System.out.println(e.getMessage());
         }
     }
-  
+    
+    // get all supply orders by supplier
+    @GetMapping("/supplier/{id}/supply-orders")
+    public List<SupplyOrder> getSupplyOrdersBySupplier(@PathVariable String id) {
+        try {
+            List<SupplyOrder> orders = supplierService.getSupplyOrdersBySupplier(id);
+            return orders;
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
+    // get all return supply orders by supplier
+    @GetMapping("/supplier/{id}/return-supply-orders")
+    public List<ReturnSupplyOrder> getReturnSupplyOrdersBySupplier(@PathVariable String id) {
+        try {
+            List<ReturnSupplyOrder> orders = supplierService.getReturnSupplyOrdersBySupplier(id);
+            return orders;
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
 }

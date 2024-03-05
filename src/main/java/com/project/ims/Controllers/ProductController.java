@@ -97,7 +97,7 @@ public class ProductController {
         product.setName(data.getName());
         product.setPrice(prString);
         product.setExpiry_date(data.getExpiry_date());
-        product.setSupplierId(data.getSupplier_id());
+        product.setSupplierId(data.getSupplierId());
         product.setTax(data.getTax());
         product.setWhole_sale_price(data.getWhole_sale_price());
         product.setProfit(data.getProfit());
@@ -121,7 +121,7 @@ public class ProductController {
         String prString = String.valueOf(pr);
         product.setPrice(prString);
         product.setExpiry_date(data.getExpiry_date());
-        product.setSupplierId(data.getSupplier_id());
+        product.setSupplierId(data.getSupplierId());
         product.setTax(data.getTax());
         product.setWhole_sale_price(data.getWhole_sale_price());
         product.setProfit(data.getProfit());

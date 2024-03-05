@@ -64,7 +64,7 @@ public class SupplyOrderController {
         supplyOrder.setId(id);
         supplyOrder.setProduct_id(data.getProduct_id());
         supplyOrder.setQuantity(data.getQuantity());
-        supplyOrder.setSupplier_id(data.getSupplier_id());
+        supplyOrder.setSupplierId(data.getSupplier_id());
         supplyOrder.setWarehouse_id(data.getWarehouse_id());
         supplyOrder.setPayment_method(data.getPayment_method());
         supplyOrder.setIsdelivery_man_Available(false);
@@ -113,7 +113,7 @@ public class SupplyOrderController {
         supplyOrder.setProduct_id(data.getProduct_id());
         supplyOrder.setQuantity(data.getQuantity());
         supplyOrder.setStatus(data.getStatus());
-        supplyOrder.setSupplier_id(data.getSupplier_id());
+        supplyOrder.setSupplierId(data.getSupplier_id());
         supplyOrder.setTotal_amount(data.getTotal_amount());
         supplyOrder.setTransaction_id(data.getTransaction_id());
         supplyOrder.setWarehouse_id(data.getWarehouse_id());
@@ -318,6 +318,5 @@ public class SupplyOrderController {
         String id = "so" + random;
         return id;
     }
-
     
 }

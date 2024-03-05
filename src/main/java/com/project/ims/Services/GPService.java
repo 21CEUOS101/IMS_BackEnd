@@ -129,7 +129,9 @@ public class GPService {
             int index = warehouses.indexOf(warehouseId);
             quantities.set(index, String.valueOf(quantity));
         } else {
-            throw new RuntimeException("Warehouse with id " + warehouseId + " does not exist");
+            // add that warehouse to the list
+            warehouses.add(warehouseId);
+            quantities.add(String.valueOf(quantity));
         }
 
         globalProducts.setWarehouses(warehouses);

@@ -7,9 +7,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.GlobalProducts;
+import com.project.ims.Models.Order;
+import com.project.ims.Models.ReturnOrder;
+import com.project.ims.Models.W2WOrder;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Models.WareHouse_Manager;
 import com.project.ims.Repo.GlobalProductsRepo;
+import com.project.ims.Repo.OrderRepo;
+import com.project.ims.Repo.ReturnOrderRepo;
+import com.project.ims.Repo.W2WOrderRepo;
 import com.project.ims.Repo.WManagerRepo;
 import com.project.ims.Repo.WareHouseRepo;
 
@@ -26,6 +32,15 @@ public class WareHouseService implements IWareHouseService {
 
     @Autowired
     private GPService gpService;
+
+    @Autowired
+    private OrderRepo orderRepo;
+
+    @Autowired
+    private ReturnOrderRepo returnOrderRepo;
+
+    @Autowired
+    private W2WOrderRepo w2wOrderRepo;
 
     // Services
 
@@ -190,6 +205,52 @@ public class WareHouseService implements IWareHouseService {
     @Override
     public List<WareHouse> getAllWareHouse() {
         return wareHouseRepo.findAll();
+    }
+
+    @Override
+    public List<Order> getOrdersByWareHouse(String id) {
+        
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+        else if (!wareHouseRepo.existsById(id))
+        {
+            throw new RuntimeException("WareHouse ID does not exist");
+        }
+
+        return orderRepo.findByWarehouseId(id);
+
+    }
+
+    @Override
+    public List<ReturnOrder> getReturnOrdersByWareHouse(String id) {
+            
+            if (id == null)
+            {
+                throw new RuntimeException("Id shouldn't be null");
+            }
+            else if (!wareHouseRepo.existsById(id))
+            {
+                throw new RuntimeException("WareHouse ID does not exist");
+            }
+            
+            return returnOrderRepo.findAllByWarehouseId(id);
+    }
+
+    @Override
+    public List<W2WOrder> getW2WOrdersByWareHouse(String id) {
+            
+            if (id == null)
+            {
+                throw new RuntimeException("Id shouldn't be null");
+            }
+            else if (!wareHouseRepo.existsById(id))
+            {
+                throw new RuntimeException("WareHouse ID does not exist");
+            }
+    
+            return w2wOrderRepo.findByWarehouseId(id);
     }
     
 }

@@ -89,7 +89,9 @@ public class OrderService implements IOrderService {
             throw new RuntimeException("Order ID must start with 'o'");
         }
 
-        String warehouse_id = order.getWarehouse_id();
+        System.out.println("Inside add order service");
+
+        String warehouse_id = order.getWarehouseId();
 
         // set time and date
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -115,6 +117,7 @@ public class OrderService implements IOrderService {
         // warehouse order
 
         if (!checkStock(product_id, quantity, warehouse_id)) {
+            System.out.println("Product not available in assigned warehouse");
             handleStock(product_id, quantity, warehouse_id, order.getId());
         } else {
             // removing products from warehouse
@@ -193,7 +196,7 @@ public class OrderService implements IOrderService {
 
                 String product_id = order.getProduct_id();
                 String quantity = order.getQuantity();
-                String warehouse_id = order.getWarehouse_id();
+                String warehouse_id = order.getWarehouseId();
 
                 WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
 
@@ -229,7 +232,7 @@ public class OrderService implements IOrderService {
 
                 String product_id = order.getProduct_id();
                 String quantity = order.getQuantity();
-                String warehouse_id = order.getWarehouse_id();
+                String warehouse_id = order.getWarehouseId();
 
                 WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
 
@@ -352,6 +355,8 @@ public class OrderService implements IOrderService {
 
         int needed_quantity = Integer.parseInt(quantity) - available_quantity;
 
+        System.out.println("needed quantity: " + needed_quantity + " available quantity: " + available_quantity);
+
         // checking if product is available in other warehouses or not
 
         // checking which warehouses has highest quantity of that product then create
@@ -410,13 +415,15 @@ public class OrderService implements IOrderService {
     public void createW2WOrder(String product_id, String quantity, String r_warehouse_id, String s_warehouse_id,
             String orderId) {
 
+        System.out.println("Inside create w2w order");
+
         W2WOrder w2wOrder = new W2WOrder();
         Random rand = new Random();
         String id = "w2w" + rand.nextInt(1000000);
         w2wOrder.setId(id);
         w2wOrder.setProduct_id(product_id);
         w2wOrder.setQuantity(quantity);
-        w2wOrder.setR_warehouse_id(r_warehouse_id);
+        w2wOrder.setWarehouseId(r_warehouse_id);
         w2wOrder.setS_warehouse_id(s_warehouse_id);
         w2wOrder.setOrderId(orderId);
         w2wOrder.setStatus("shipped");
@@ -430,7 +437,7 @@ public class OrderService implements IOrderService {
 
     public String assignDeliveryMan(Order order) {
         String assigned_deliveryMan = null;
-        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
+        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouseId());
 
         for (DeliveryMan d : deliveryMen) {
             if (d.getStatus().equals("available")) {
@@ -466,7 +473,7 @@ public class OrderService implements IOrderService {
 
                 User user = userService.getUserByUserId(o.getCustomerId());
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
-                WareHouse wareHouse = wareHouseService.getWareHouseById(o.getWarehouse_id());
+                WareHouse wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
                 Product product = productService.getProductById(o.getProduct_id());
                 // System.out.println(user);
                 if (user != null) {
@@ -510,7 +517,7 @@ public class OrderService implements IOrderService {
         List<Map<String, Object>> statusCorder = new ArrayList<>();
 
         for (Order o : orders) {
-            if (o.getStatus().equals("pending") && o.getWarehouse_id().equals(wareHouse.getId())) {                
+            if (o.getStatus().equals("pending") && o.getWarehouseId().equals(wareHouse.getId())) {                
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
                 User user = userService.getUserByUserId(o.getCustomerId());
                 Product product = productService.getProductById(o.getProduct_id());

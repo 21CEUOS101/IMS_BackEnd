@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Customer;
 import com.project.ims.Models.Order;
+import com.project.ims.Models.ReturnOrder;
 import com.project.ims.Models.User;
 import com.project.ims.Requests.Customer.CustomerAddRequest;
 import com.project.ims.Requests.Customer.CustomerUpdateRequest;
 import com.project.ims.Responses.CustomerOutput;
 import com.project.ims.Services.CustomerService;
 import com.project.ims.Services.OrderService;
+import com.project.ims.Services.ReturnOrderService;
 import com.project.ims.Services.UserService;
 
 @RestController
@@ -39,6 +41,9 @@ public class CustomerController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private ReturnOrderService returnOrderService;
 
     // controllers
 
@@ -232,6 +237,17 @@ public class CustomerController {
     public List<Order> getCustomerOrders(@PathVariable("id") String id) {
         try {
             return orderService.getAllOrderByCustomerId(id);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    // get all return orders of a customer
+    @GetMapping("/customer/{id}/return-orders")
+    public List<ReturnOrder> getCustomerReturnOrders(@PathVariable("id") String id) {
+        try {
+            return returnOrderService.getAllReturnOrderByCustomerId(id);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;

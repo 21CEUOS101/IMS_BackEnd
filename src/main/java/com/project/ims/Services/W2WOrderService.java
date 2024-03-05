@@ -113,6 +113,8 @@ public class W2WOrderService implements IW2WOrderService {
             w2wOrder.setStatus("pending");
         }
 
+        System.out.println("Inside addW2WOrder");
+
         try{
             wareHouseService.updateWareHouse(s_warehouse);
         }
@@ -328,7 +330,7 @@ public class W2WOrderService implements IW2WOrderService {
     public String assignDeliveryMan(Order order)
     {
         String assigned_deliveryMan = null;
-        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouse_id());
+        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(order.getWarehouseId());
             
         for (DeliveryMan d : deliveryMen) {
             if (d.getStatus().equals("available")) {
@@ -363,7 +365,7 @@ public class W2WOrderService implements IW2WOrderService {
         for (W2WOrder o : w2worders) {
             if (o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)) {     
                 WareHouse S_wareHouse = wareHouseService.getWareHouseById(o.getS_warehouse_id());
-                WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getR_warehouse_id());
+                WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
                 Product product = productService.getProductById(o.getProduct_id());
                     Map<String, Object> orderwithWarehouse = new HashMap<>();
                     orderwithWarehouse.put("w2worder", o);                    
@@ -400,7 +402,7 @@ public class W2WOrderService implements IW2WOrderService {
 
         for (W2WOrder o : w2worders) {
             if (o.getStatus().equals("pending") && o.getS_warehouse_id().equals(S_wareHouse.getId())) {     
-                WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getR_warehouse_id());
+                WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
                 Product product = productService.getProductById(o.getProduct_id());
                     Map<String, Object> orderwithWarehouse = new HashMap<>();
                     orderwithWarehouse.put("w2worder", o);                    
@@ -427,7 +429,7 @@ public class W2WOrderService implements IW2WOrderService {
         for (W2WOrder o : w2worders) {
             if (o.getStatus().equals("shipped") && o.getDelivery_man_id().equals(id)) {     
                 WareHouse S_wareHouse = wareHouseService.getWareHouseById(o.getS_warehouse_id());
-                WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getR_warehouse_id());
+                WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
                 Product product = productService.getProductById(o.getProduct_id());
                     
                 statusSw2worder.put("w2worder", o);                    
@@ -451,7 +453,7 @@ public class W2WOrderService implements IW2WOrderService {
         HashSet<WareHouse> allwarehouse = new HashSet<>();
         for(W2WOrder o : w2worders){
             if(o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)){
-                WareHouse ware = wareHouseService.getWareHouseById(o.getR_warehouse_id());
+                WareHouse ware = wareHouseService.getWareHouseById(o.getWarehouseId());
                 if (ware == null) {
                     System.out.println("donot have warehouse id");
                     break;

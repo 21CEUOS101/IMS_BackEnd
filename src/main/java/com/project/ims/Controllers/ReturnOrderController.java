@@ -96,7 +96,7 @@ public class ReturnOrderController {
         Order order = orderRepo.findById(data.getOrder_id()).orElse(null);
         returnOrder.setProduct_id(order.getProduct_id());
         returnOrder.setQuantity(order.getQuantity());
-        returnOrder.setWarehouseId(order.getWarehouse_id());
+        returnOrder.setWarehouseId(order.getWarehouseId());
         returnOrder.setRefund_amount(order.getTotal_amount());
         returnOrder.setOrder_id(order.getId());
 
@@ -140,7 +140,7 @@ public class ReturnOrderController {
         Order order = orderRepo.findById(returnOrder.getOrder_id()).orElse(null);
         returnOrder.setProduct_id(order.getProduct_id());
         returnOrder.setQuantity(order.getQuantity());
-        returnOrder.setWarehouseId(order.getWarehouse_id());
+        returnOrder.setWarehouseId(order.getWarehouseId());
         returnOrder.setRefund_amount(order.getTotal_amount());
         returnOrder.setOrder_id(order.getId());
         returnOrder.setCustomerId(order.getCustomerId());

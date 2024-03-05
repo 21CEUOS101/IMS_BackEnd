@@ -142,7 +142,7 @@ public class OrderController {
         order.setCustomerId(data.getCustomer_id());
         order.setProduct_id(data.getProduct_id());
         order.setQuantity(data.getQuantity());
-        order.setWarehouse_id(data.getWarehouse_id());
+        order.setWarehouseId(data.getWarehouse_id());
         order.setTotal_amount(data.getTotal_amount());
         order.setDate_time(data.getDate_time());
         order.setPayment_method(data.getPayment_method());
@@ -288,7 +288,7 @@ public class OrderController {
     public void createOrder(List<String> product_ids, List<String> quantities, String warehouse_id, OrderAddRequest data,
             List<Order> orders, int i) 
     {
-
+        System.out.println("Inside Create Order");
         String id = generateOrderId();
         Order order = new Order();
         order.setId(id);
@@ -301,7 +301,7 @@ public class OrderController {
         }
         order.setDelivery_address(data.getDelivery_address());
         order.setStatus("pending");
-        order.setWarehouse_id(warehouse_id);
+        order.setWarehouseId(warehouse_id);
         orderService.addOrder(order);
         orders.add(order);
     }

@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.ISupplierService;
-
+import com.project.ims.Models.ReturnSupplyOrder;
 import com.project.ims.Models.Supplier;
-
+import com.project.ims.Models.SupplyOrder;
+import com.project.ims.Repo.RSORepo;
 import com.project.ims.Repo.SupplierRepo;
+import com.project.ims.Repo.SupplyOrderRepo;
 
 
 @Service
@@ -23,9 +25,11 @@ public class SupplierService implements ISupplierService {
     @Autowired
     private SupplierRepo supplierRepo;
 
+    @Autowired
+    private SupplyOrderRepo supplyOrderRepo;
 
-
-
+    @Autowired
+    private RSORepo returnSupplyOrderRepo;
 
     
    
@@ -89,6 +93,34 @@ public class SupplierService implements ISupplierService {
     @Override
     public List<Supplier> getAllSupplier() {
         return supplierRepo.findAll();
+    }
+
+    @Override
+    public List<SupplyOrder> getSupplyOrdersBySupplier(String id) {
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+        else if (!supplierRepo.existsById(id))
+        {
+            throw new RuntimeException("Supplier with id " + id + " does not exist");
+        }
+
+        return supplyOrderRepo.findBySupplierId(id);
+    }
+
+    @Override
+    public List<ReturnSupplyOrder> getReturnSupplyOrdersBySupplier(String id) {
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+        else if (!supplierRepo.existsById(id))
+        {
+            throw new RuntimeException("Supplier with id " + id + " does not exist");
+        }
+
+        return returnSupplyOrderRepo.findBySupplierId(id);
     }
   
 }

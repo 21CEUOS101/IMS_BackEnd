@@ -2,6 +2,10 @@ package com.project.ims.Controllers;
 
 // imports
 import org.springframework.web.bind.annotation.RestController;
+
+import com.project.ims.Models.Order;
+import com.project.ims.Models.ReturnOrder;
+import com.project.ims.Models.W2WOrder;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.WareHouseAddRequest;
 import com.project.ims.Services.WareHouseService;
@@ -123,6 +127,42 @@ public class WarehouseController {
         String id = 'w' + String.valueOf(rand.nextInt(1000000));
 
         return id;
+    }
+
+    // get all orders by warehouse
+    @GetMapping("/warehouse/{id}/orders")
+    public List<Order> getOrdersByWarehouse(@PathVariable String id) {
+        try {
+            List<Order> orders = wareHouseService.getOrdersByWareHouse(id);
+            return orders;
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
+    // get all return orders by warehouse
+    @GetMapping("/warehouse/{id}/return-orders")
+    public List<ReturnOrder> getReturnOrdersByWarehouse(@PathVariable String id) {
+        try {
+            List<ReturnOrder> orders = wareHouseService.getReturnOrdersByWareHouse(id);
+            return orders;
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
+    // get all w2w orders by warehouse
+    @GetMapping("/warehouse/{id}/w2w-orders")
+    public List<W2WOrder> getW2WOrdersByWarehouse(@PathVariable String id) {
+        try {
+            List<W2WOrder> orders = wareHouseService.getW2WOrdersByWareHouse(id);
+            return orders;
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
     }
 
     
