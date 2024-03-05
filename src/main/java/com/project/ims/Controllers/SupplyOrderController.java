@@ -284,6 +284,20 @@ public class SupplyOrderController {
             return null;
         }
     }
+    @GetMapping("/getallPendingByWId/{id}")
+    public List<Map<String ,Object>> getallPendingByWId(@PathVariable("id") String id) {
+        try {
+
+            List<Map<String ,Object>> so =  supplyOrderService.getallPendingByWId(id);
+
+            return so;
+         
+           
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 
     //from waremanager
     @GetMapping("/wmanager/checkwarehousebyWid/{id}")

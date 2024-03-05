@@ -173,7 +173,11 @@ public class SupplyOrderService implements ISupplyOrderService {
             }
 
         } else if (status.equals("cancel")) {
-            if (supplyOrder.getStatus().equals("approved") && supplyOrder.isIsdelivery_man_Available()) {
+            if(supplyOrder.getStatus().equals("pending")){
+                supplyOrder.setStatus("cancel");
+            }
+            else if (supplyOrder.getStatus().equals("approved") && supplyOrder.isIsdelivery_man_Available()) {
+
                 DeliveryMan m = deliveryManService.getDeliveryManById(supplyOrder.getDelivery_man_id());
 
                 m.setStatus("available");
@@ -185,7 +189,11 @@ public class SupplyOrderService implements ISupplyOrderService {
                     return null;
                 }
             }
+            else{
+               System.out.println("status is different from approved and pending");
+            }
         } else if (status.equals("approved")) {
+            
             String deliveryManId = assignDeliveryMan(supplyOrder);
 
             supplyOrder.setDelivery_man_id(deliveryManId);
@@ -201,7 +209,7 @@ public class SupplyOrderService implements ISupplyOrderService {
 
         // checking if status is enum of pending, delivered or cancelled
 
-        if (!(status.equals("pending") || status.equals("delivered") || status.equals("cancelled")
+        if (!(status.equals("pending") || status.equals("delivered") || status.equals("cancel")
                 || status.equals("approved"))) {
             System.out.println("Invalid status");
             return null;
@@ -252,288 +260,363 @@ public class SupplyOrderService implements ISupplyOrderService {
             if (s.getSupplierId().equals(id) && s.getStatus().equals("pending")) {
                 Map<String, Object> fi = new HashMap<>();
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-                WareHouse_Manager wm= wManagerService.getWManagerById(ware.getManager_id());
+                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
                 User user = userService.getUserByUserId(ware.getManager_id());
+                Product prod = productService.getProductById(s.getProduct_id());
                 fi.put("warehouse", ware);
-                fi.put("supplyOrder",s);
+                fi.put("supplyOrder", s);
                 fi.put("manager", wm);
                 fi.put("user", user);
+                fi.put("product",prod);
                 entries.add(fi);
             }
         }
         return entries;
 
     }
-    public List<Map<String,Object>> getallapprovedbutisDF (String id){
-        List<Map<String,Object>> so =new ArrayList<>();
+
+    public List<Map<String, Object>> getallapprovedbutisDF(String id) {
+        List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
+<<<<<<< Updated upstream
         
         for( SupplyOrder s : allSo){
             if(s.getSupplierId().equals(id) && s.getStatus().equals("approved") && !s.isIsdelivery_man_Available() ){
                 Map<String ,Object> ma = new HashMap<>();
+=======
+
+        for (SupplyOrder s : allSo) {
+            if (s.getSupplier_id().equals(id) && s.getStatus().equals("approved") && !s.isIsdelivery_man_Available()) {
+                Map<String, Object> ma = new HashMap<>();
+>>>>>>> Stashed changes
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
                 WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
-                // WareHouse_Manager wm  = .getSupplierById(id);
+                // WareHouse_Manager wm = .getSupplierById(id);
                 User user = userService.getUserByUserId(ware.getManager_id());
-                ma.put("supplyOrder",s);
+                ma.put("supplyOrder", s);
                 ma.put("product", p);
                 ma.put("warehouse", ware);
                 ma.put("Manager", wm);
-                ma.put("user",user);
-               
-                
+                ma.put("user", user);
+
                 so.add(ma);
             }
         }
         return so;
     }
-    public List<Map<String,Object>> getallapprovedbutisDT (String id){
-        List<Map<String,Object>> so =new ArrayList<>();
+
+    public List<Map<String, Object>> getallapprovedbutisDT(String id) {
+        List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
+<<<<<<< Updated upstream
         
         for( SupplyOrder s : allSo){
             if(s.getSupplierId().equals(id) && s.getStatus().equals("approved") && s.isIsdelivery_man_Available() ){
                 Map<String ,Object> ma = new HashMap<>();
+=======
+
+        for (SupplyOrder s : allSo) {
+            if (s.getSupplier_id().equals(id) && s.getStatus().equals("approved") && s.isIsdelivery_man_Available()) {
+                Map<String, Object> ma = new HashMap<>();
+>>>>>>> Stashed changes
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
                 WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
                 User user = userService.getUserByUserId(ware.getManager_id());
                 DeliveryMan d = deliveryManService.getDeliveryManById(s.getDelivery_man_id());
-                User d_user =userService.getUserByUserId(d.getId());
+                User d_user = userService.getUserByUserId(d.getId());
                 ma.put("product", p);
-                ma.put("supplyOrder",s);
+                ma.put("supplyOrder", s);
                 ma.put("warehouse", ware);
-                ma.put("manager",wm);
-                ma.put("Manager_user",user);
-                ma.put("delivery_man",d);
-                ma.put("D_user",d_user);
+                ma.put("manager", wm);
+                ma.put("Manager_user", user);
+                ma.put("delivery_man", d);
+                ma.put("D_user", d_user);
                 so.add(ma);
             }
         }
         return so;
     }
 
-    public List<Map<String,Object>> getallDeliveredorders (String id){
-        List<Map<String,Object>> so =new ArrayList<>();
+    public List<Map<String, Object>> getallDeliveredorders(String id) {
+        List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
+<<<<<<< Updated upstream
         
         for( SupplyOrder s : allSo){
             if(s.getSupplierId().equals(id) && s.getStatus().equals("delivered") && s.isIsdelivery_man_Available() ){
                 Map<String ,Object> ma = new HashMap<>();
+=======
+
+        for (SupplyOrder s : allSo) {
+            if (s.getSupplier_id().equals(id) && s.getStatus().equals("delivered") && s.isIsdelivery_man_Available()) {
+                Map<String, Object> ma = new HashMap<>();
+>>>>>>> Stashed changes
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
                 WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
                 User user = userService.getUserByUserId(ware.getManager_id());
                 DeliveryMan d = deliveryManService.getDeliveryManById(s.getDelivery_man_id());
-                User d_user =userService.getUserByUserId(d.getId());
-                ma.put("supplyOrder",s);
+                User d_user = userService.getUserByUserId(d.getId());
+                ma.put("supplyOrder", s);
                 ma.put("product", p);
                 ma.put("warehouse", ware);
-                ma.put("manager",wm);
-                ma.put("Manager_user",user);
-                ma.put("delivery_man",d);
-                ma.put("D_user",d_user);
+                ma.put("manager", wm);
+                ma.put("Manager_user", user);
+                ma.put("delivery_man", d);
+                ma.put("D_user", d_user);
                 so.add(ma);
             }
         }
         return so;
     }
-    public List<Map<String,Object>> getallcancelledBySid (String id){
-        List<Map<String,Object>> so =new ArrayList<>();
+
+    public List<Map<String, Object>> getallcancelledBySid(String id) {
+        List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
+<<<<<<< Updated upstream
         
         for( SupplyOrder s : allSo){
             if(s.getSupplierId().equals(id) && s.getStatus().equals("cancel") ){
                 Map<String ,Object> ma = new HashMap<>();
+=======
+
+        for (SupplyOrder s : allSo) {
+            if (s.getSupplier_id().equals(id) && s.getStatus().equals("cancel")) {
+                Map<String, Object> ma = new HashMap<>();
+>>>>>>> Stashed changes
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
                 WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
                 User user = userService.getUserByUserId(ware.getManager_id());
-               ma.put("supplyorder",s);
+                ma.put("supplyorder", s);
                 ma.put("product", p);
                 ma.put("warehouse", ware);
-                ma.put("manager",wm);
-                ma.put("Manager_user",user);
-               
+                ma.put("manager", wm);
+                ma.put("Manager_user", user);
+
                 so.add(ma);
             }
         }
         return so;
     }
-    //manager
-    public List<Map<String,Object>> getallDeliveredordersByMid(String id){
-        List<Map<String,Object>> so =new ArrayList<>();
+
+    // manager
+    public List<Map<String, Object>> getallDeliveredordersByMid(String id) {
+        List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
-        for( SupplyOrder s : allSo){
+        for (SupplyOrder s : allSo) {
             WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouse_id());
-            if(wareHouse == null)
-            {
+            if (wareHouse == null) {
                 System.out.println("No warehouse for the particular supply order");
                 return null;
             }
 
-            if(wareHouse.getManager_id().equals(id) && s.getStatus().equals("delivered") ){
-                Map<String ,Object> ma = new HashMap<>();
+            if (wareHouse.getManager_id().equals(id) && s.getStatus().equals("delivered")) {
+                Map<String, Object> ma = new HashMap<>();
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
+<<<<<<< Updated upstream
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
+=======
+                Supplier sup = supplierService.getSupplierById(s.getSupplier_id());
+>>>>>>> Stashed changes
                 User user = userService.getUserByUserId(sup.getId());
                 DeliveryMan d = deliveryManService.getDeliveryManById(s.getDelivery_man_id());
-                User d_user =userService.getUserByUserId(d.getId());
-               ma.put("supplyorder",s);
+                User d_user = userService.getUserByUserId(d.getId());
+                ma.put("supplyorder", s);
                 ma.put("product", p);
                 ma.put("warehouse", ware);
-                ma.put("suppiler",sup);
-                ma.put("user",user);
-                ma.put("delivery_man",d);
-                ma.put("d_user",d_user);
-               
+                ma.put("suppiler", sup);
+                ma.put("user", user);
+                ma.put("delivery_man", d);
+                ma.put("d_user", d_user);
+
                 so.add(ma);
             }
         }
         return so;
     }
-    public List<Map<String,Object>> getallapprovedbutisDTByMid(String id){
-        List<Map<String,Object>> so =new ArrayList<>();
+
+    public List<Map<String, Object>> getallapprovedbutisDTByMid(String id) {
+        List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
-        for( SupplyOrder s : allSo){
+        for (SupplyOrder s : allSo) {
             WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouse_id());
-            if(wareHouse == null)
-            {
+            if (wareHouse == null) {
                 System.out.println("No warehouse for the particular supply order");
                 return null;
             }
 
-            if(wareHouse.getManager_id().equals(id) &&  s.getStatus().equals("approved") && s.isIsdelivery_man_Available()  ){
-                Map<String ,Object> ma = new HashMap<>();
+            if (wareHouse.getManager_id().equals(id) && s.getStatus().equals("approved")
+                    && s.isIsdelivery_man_Available()) {
+                Map<String, Object> ma = new HashMap<>();
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
+<<<<<<< Updated upstream
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
+=======
+                Supplier sup = supplierService.getSupplierById(s.getSupplier_id());
+>>>>>>> Stashed changes
                 User user = userService.getUserByUserId(sup.getId());
                 DeliveryMan d = deliveryManService.getDeliveryManById(s.getDelivery_man_id());
-                User d_user =userService.getUserByUserId(d.getId());
-               ma.put("supplyorder",s);
+                User d_user = userService.getUserByUserId(d.getId());
+                ma.put("supplyorder", s);
                 ma.put("product", p);
                 ma.put("warehouse", ware);
-                ma.put("suppiler",sup);
-                ma.put("user",user);
-                ma.put("delivery_man",d);
-                ma.put("d_user",d_user);
-               
+                ma.put("suppiler", sup);
+                ma.put("user", user);
+                ma.put("delivery_man", d);
+                ma.put("d_user", d_user);
+
                 so.add(ma);
             }
         }
         return so;
     }
-    public List<Map<String,Object>> getallapprovedbutisDFByMid(String id){
-        List<Map<String,Object>> so =new ArrayList<>();
+
+    public List<Map<String, Object>> getallapprovedbutisDFByMid(String id) {
+        List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
-        for( SupplyOrder s : allSo){
+        for (SupplyOrder s : allSo) {
             WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouse_id());
-            if(wareHouse == null)
-            {
+            if (wareHouse == null) {
                 System.out.println("No warehouse for the particular supply order");
                 return null;
             }
 
-            if(wareHouse.getManager_id().equals(id) &&  s.getStatus().equals("approved") && !s.isIsdelivery_man_Available()  ){
-                Map<String ,Object> ma = new HashMap<>();
+            if (wareHouse.getManager_id().equals(id) && s.getStatus().equals("approved")
+                    && !s.isIsdelivery_man_Available()) {
+                Map<String, Object> ma = new HashMap<>();
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
+<<<<<<< Updated upstream
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
+=======
+                Supplier sup = supplierService.getSupplierById(s.getSupplier_id());
+>>>>>>> Stashed changes
                 User user = userService.getUserByUserId(sup.getId());
-              
-               ma.put("supplyorder",s);
+
+                ma.put("supplyorder", s);
                 ma.put("product", p);
                 ma.put("warehouse", ware);
-                ma.put("suppiler",sup);
-                ma.put("user",user);
-                
-               
+                ma.put("suppiler", sup);
+                ma.put("user", user);
+
                 so.add(ma);
             }
         }
         return so;
     }
-    public List<Map<String,Object>> getallcancelledByMid(String id){
-        List<Map<String,Object>> so =new ArrayList<>();
+
+    public List<Map<String, Object>> getallcancelledByMid(String id) {
+        List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
-        for( SupplyOrder s : allSo){
+        for (SupplyOrder s : allSo) {
             WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouse_id());
-            if(wareHouse == null)
-            {
+            if (wareHouse == null) {
                 System.out.println("No warehouse for the particular supply order");
                 return null;
             }
 
-            if(wareHouse.getManager_id().equals(id) &&  s.getStatus().equals("cancel")   ){
-                Map<String ,Object> ma = new HashMap<>();
+            if (wareHouse.getManager_id().equals(id) && s.getStatus().equals("cancel")) {
+                Map<String, Object> ma = new HashMap<>();
                 Product p = productService.getProductById(s.getProduct_id());
                 WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
+<<<<<<< Updated upstream
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
+=======
+                Supplier sup = supplierService.getSupplierById(s.getSupplier_id());
+>>>>>>> Stashed changes
                 User user = userService.getUserByUserId(sup.getId());
-               
-               ma.put("supplyorder",s);
+
+                ma.put("supplyorder", s);
                 ma.put("product", p);
                 ma.put("warehouse", ware);
-                ma.put("suppiler",sup);
-                ma.put("user",user);
-               
-               
+                ma.put("suppiler", sup);
+                ma.put("user", user);
+
+                so.add(ma);
+            }
+        }
+        return so;
+    }
+    public List<Map<String, Object>> getallPendingByWId(String id) {
+        List<Map<String, Object>> so = new ArrayList<>();
+        List<SupplyOrder> allSo = getAllSupplyOrder();
+        for (SupplyOrder s : allSo) {
+            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouse_id());
+            if (wareHouse == null) {
+                System.out.println("No warehouse for the particular supply order");
+                return null;
+            }
+
+            if (wareHouse.getManager_id().equals(id) && s.getStatus().equals("pending")) {
+                Map<String, Object> ma = new HashMap<>();
+                Product p = productService.getProductById(s.getProduct_id());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
+                Supplier sup = supplierService.getSupplierById(s.getSupplier_id());
+                User user = userService.getUserByUserId(sup.getId());
+
+                ma.put("supplyorder", s);
+                ma.put("product", p);
+                ma.put("warehouse", ware);
+                ma.put("suppiler", sup);
+                ma.put("user", user);
+
                 so.add(ma);
             }
         }
         return so;
     }
 
-    //from Wmanager
-     public List<Map<String,Object>> getCheckWarehouseByWID (String id){
-       WareHouse_Manager wm = wManagerService.getWManagerById(id);
-       WareHouse wareHouse = wareHouseService.getWareHouseById(wm.getWarehouse_id());
-       List<String> p = new ArrayList<>();
-        
-       for(int i =0 ;i< wareHouse.getProduct_ids().size();i++ ){
-            if(wareHouse.getLowerLimits().get(i) >= Integer.parseInt(wareHouse.getQuantities().get(i))){
+    // from Wmanager
+    public List<Map<String, Object>> getCheckWarehouseByWID(String id) {
+        WareHouse_Manager wm = wManagerService.getWManagerById(id);
+        WareHouse wareHouse = wareHouseService.getWareHouseById(wm.getWarehouse_id());
+        List<String> p = new ArrayList<>();
+        for (int i = 0; i < wareHouse.getProduct_ids().size(); i++) {
+            if (wareHouse.getLowerLimits().get(i) > Integer.parseInt(wareHouse.getQuantities().get(i)) && !isSupplyOrderisCreated(wareHouse,wareHouse.getProduct_ids().get(i))) {
                 p.add(wareHouse.getProduct_ids().get(i));
             }
-       } 
-       List<Map<String,Object>> prodwithsupplier = new ArrayList<>();
-     
-       for(int i=0;i<p.size();i++){
-            Map<String,Object> p1= new HashMap<>();
+        }
+        List<Map<String, Object>> prodwithsupplier = new ArrayList<>();
+
+        for (int i = 0; i < p.size(); i++) {
+            Map<String, Object> p1 = new HashMap<>();
             Product pro = productService.getProductById(p.get(i));
             Supplier sup = supplierService.getSupplierById(pro.getSupplierId());
             User user = userService.getUserByUserId(pro.getSupplierId());
-            p1.put("product",pro);
-            p1.put("supplier",sup);
-            p1.put("user",user);
+            p1.put("product", pro);
+            p1.put("supplier", sup);
+            p1.put("user", user);
             prodwithsupplier.add(p1);
-       }       
+        }
 
         return prodwithsupplier;
 
     }
-    public SupplyOrder makeSupplierOrderByWId(String id,String pid){
-        SupplyOrderAddRequest data =new SupplyOrderAddRequest();
+
+    public SupplyOrder makeSupplierOrderByWId(String id, String pid) {
+        SupplyOrderAddRequest data = new SupplyOrderAddRequest();
         WareHouse_Manager wm = wManagerService.getWManagerById(id);
-    
+
         Product prod = productService.getProductById(pid);
         Supplier sup = supplierService.getSupplierById(prod.getSupplierId());
         WareHouse war = wareHouseService.getWareHouseById(wm.getWarehouse_id());
         Integer index = war.getProduct_ids().indexOf(pid);
-        Integer quan = war.getHigherLimits().get(index) - Integer.parseInt(war.getQuantities().get(index));;
+        Integer quan = war.getHigherLimits().get(index) - Integer.parseInt(war.getQuantities().get(index));
+        ;
         data.setProduct_id(pid);
-        data.setSupplier_id(id);
+        data.setSupplier_id(prod.getSupplierId());
         data.setWarehouse_id(wm.getWarehouse_id());
         data.setPayment_method("cash");
         data.setTransaction_id(null);
         data.setPickup_address(sup.getAddress());
         data.setIsdelivery_man_Available(false);
-        data.setQuantity( String.valueOf(quan));
-        
+        data.setQuantity(String.valueOf(quan));
 
-      
         String rsid = generateId();
         SupplyOrder supplyOrder = new SupplyOrder();
         supplyOrder.setId(rsid);
@@ -549,21 +632,29 @@ public class SupplyOrderService implements ISupplyOrderService {
 
         supplyOrder.setPickup_address(data.getPickup_address());
 
-        try{
+        try {
             addSupplyOrder(supplyOrder);
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
 
         return supplyOrder;
 
-
-
     }
-     public String generateId() {
+    public boolean isSupplyOrderisCreated( WareHouse w ,String Productid){
+        List<SupplyOrder> so = getAllSupplyOrder();
+        for(SupplyOrder s : so){
+            if(s.getWarehouse_id().equals(w.getId()) && s.getProduct_id().equals(Productid)){
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+
+    public String generateId() {
         Random rand = new Random();
         int random = rand.nextInt(1000000);
         String id = "so" + random;
