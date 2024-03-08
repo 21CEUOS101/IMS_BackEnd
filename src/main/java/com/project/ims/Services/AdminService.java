@@ -134,7 +134,7 @@ public class AdminService implements IAdminService {
             Product product = productRepo.findById(orders.get(i).getProduct_id()).orElse(null);
 
             Integer profitPercentage = product.getProfit();
-            Integer priceOfProduct = Integer.parseInt(product.getPrice());
+            Integer priceOfProduct = product.getWhole_sale_price();
 
             Integer profitPerProduct = (profitPercentage * priceOfProduct) / 100;
 

@@ -117,8 +117,8 @@ public class WManagerController {
     @PostMapping("/wmanager/{id}")
     public WareHouse_Manager updateWManager(@PathVariable String id, @RequestBody WManagerUpdateRequest data) {
         WareHouse_Manager wManager = wManagerService.getWManagerById(id);
-        wManager.setWarehouse_id(data.getWarehouse_id());
-
+        wManager.setWarehouse_id(data.getWarehouseId());
+        System.out.println(wManager.getWarehouse_id());
         try {
             // updating user
             updateUser(data.getName(), data.getEmail(), "wmanager", data.getPhone(), id);

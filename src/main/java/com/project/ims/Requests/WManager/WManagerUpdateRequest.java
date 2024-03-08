@@ -13,5 +13,5 @@ public class WManagerUpdateRequest {
 
     private String phone;
 
-    private String warehouse_id;
+    private String warehouseId;
 }
