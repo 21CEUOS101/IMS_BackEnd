@@ -175,12 +175,7 @@ public class WManagerController {
         user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
-
-        try {
-            userService.addUser(user);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        userService.addUser(user);
     }
 
     public void updateUser(String name, String email, String role, String phone, String userId) {
@@ -190,20 +185,11 @@ public class WManagerController {
         user.setPhone(phone);
         user.setRole(role);
         user.setUserId(userId);
-
-        try {
-            userService.updateUser(user);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        userService.updateUser(user);
     }
 
     public void deleteUser(String userId) {
-        try {
-            userService.deleteUserByUserId(userId);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        userService.deleteUserByUserId(userId);
     }
     
 }

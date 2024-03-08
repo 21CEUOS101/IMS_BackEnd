@@ -94,13 +94,8 @@ public class UserService {
             throw new RuntimeException("User already exists");
         }
 
-        try {
-            User newUser = userRepo.save(user);
-            return newUser;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+        User newUser = userRepo.save(user);
+        return newUser;
     }
 
     // update User
@@ -119,13 +114,8 @@ public class UserService {
         // {
         //     throw new RuntimeException("User Email Already Exists");
         // }
-        try {
-            User newUser = userRepo.save(user);
-            return newUser;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+        User newUser = userRepo.save(user);
+        return newUser;
     }
     
     // delete User
@@ -137,11 +127,7 @@ public class UserService {
             throw new RuntimeException("User ID does not exist");
         }
 
-        try {
-            userRepo.deleteById(id);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        userRepo.deleteById(id);
     }
 
     // delete User by email
@@ -153,11 +139,7 @@ public class UserService {
             throw new RuntimeException("User with email " + email + " does not exist");
         }
 
-        try {
-            userRepo.deleteByEmail(email);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        userRepo.deleteByEmail(email);
     }
 
     // delete User by userId
@@ -169,11 +151,7 @@ public class UserService {
             throw new RuntimeException("User with userId " + userId + " does not exist");
         }
 
-        try {
-            userRepo.deleteByUserId(userId);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        userRepo.deleteByUserId(userId);
     }
     
 }
