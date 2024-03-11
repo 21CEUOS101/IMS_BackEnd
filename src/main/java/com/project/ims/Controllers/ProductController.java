@@ -22,7 +22,7 @@ import com.project.ims.Services.ProductService;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000"}, allowedHeaders = "*", allowCredentials = "true")
 public class ProductController {
 
     // necessary dependency injections

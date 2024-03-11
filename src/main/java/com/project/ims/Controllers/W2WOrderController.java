@@ -27,7 +27,7 @@ import com.project.ims.Services.W2WOrderService;
 import java.util.Map;
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000"}, allowedHeaders = "*", allowCredentials = "true")
 public class W2WOrderController {
 
     // necessary dependency injections

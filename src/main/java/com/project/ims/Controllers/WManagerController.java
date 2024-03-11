@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000"}, allowedHeaders = "*", allowCredentials = "true")
 public class WManagerController {
 
     // necessary dependency injections

@@ -26,7 +26,7 @@ import com.project.ims.Services.ReturnOrderService;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000"}, allowedHeaders = "*", allowCredentials = "true")
 public class ReturnOrderController {
 
     // necessary dependency injections

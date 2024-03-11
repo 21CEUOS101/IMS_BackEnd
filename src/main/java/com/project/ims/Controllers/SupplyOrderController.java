@@ -21,7 +21,7 @@ import com.project.ims.Services.SupplyOrderService;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000"}, allowedHeaders = "*", allowCredentials = "true")
 public class SupplyOrderController {
 
     // necessary dependency injections
