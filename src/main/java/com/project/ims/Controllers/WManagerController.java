@@ -16,6 +16,8 @@ import com.project.ims.Requests.WManager.WManagerUpdateRequest;
 import com.project.ims.Responses.WManagerOutput;
 import com.project.ims.Services.UserService;
 import com.project.ims.Services.WManagerService;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
 public class WManagerController {
 
     // necessary dependency injections

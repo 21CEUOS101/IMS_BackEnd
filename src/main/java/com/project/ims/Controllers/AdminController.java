@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000" , allowedHeaders = "*" , allowCredentials = "true")
+@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
 public class AdminController {
 
     // necessary dependency injections

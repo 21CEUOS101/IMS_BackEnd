@@ -26,7 +26,7 @@ import com.project.ims.Services.CustomUserDetailService;
 
 import org.slf4j.Logger;
 
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true", allowedHeaders = "*", exposedHeaders = "Authorization" , methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
