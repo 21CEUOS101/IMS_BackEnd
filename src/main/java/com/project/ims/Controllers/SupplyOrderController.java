@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.SupplyOrder;
+import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.SupplyOrderAddRequest;
 import com.project.ims.Requests.SupplyOrderUpdateRequest;
 import com.project.ims.Services.SupplyOrderService;
@@ -326,7 +327,74 @@ public class SupplyOrderController {
             return null;
         }
     }
+       @GetMapping("/warehouseDetails/{id}")
+    public WareHouse warehouseDetails(@PathVariable String id) {
+        try{
+            WareHouse wareHouse = supplyOrderService.warehouseDetails(id);
+            return wareHouse;
+        }
+        catch(Exception e){
+            System.out.println(e);
+            return null;
+        }
+    }
+    @GetMapping("/warehouse/getallproduct/{id}")
+    public List<Map<String ,Object>> AllProduct (@PathVariable String id){
+        try{
+            List<Map<String ,Object>>  Details = supplyOrderService.AllProduct(id);
+            return Details;
 
+        }catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+    @GetMapping("/supply-order/getsupplyorderstatusABDFbyDId/{id}")
+    public List<Map<String ,Object>> getsupplyorderstatusABDFbyDId (@PathVariable String id){
+        try{
+            List<Map<String ,Object>>  Details = supplyOrderService.getsupplyorderstatusABDFbyDId(id);
+            System.out.println(Details);
+            return Details;
+
+        }catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+    @GetMapping("/supply-order/getsupplyorderstatusABDTbyDId/{id}")
+    public Map<String ,Object> getsupplyorderstatusABDTbyDId (@PathVariable String id){
+        try{
+            Map<String ,Object>  Details = supplyOrderService.getsupplyorderstatusABDTbyDId(id);
+            System.out.println(Details);
+            return Details;
+
+        }catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+    @GetMapping("/supply-order/getsupplyorderstatusDbyDId/{id}")
+    public List<Map<String ,Object>> getsupplyorderstatusDbyDId (@PathVariable String id){
+        try{
+            List<Map<String ,Object>>  Details = supplyOrderService.getsupplyorderstatusDbyDId(id);
+            return Details;
+
+        }catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+    @PostMapping("/supply-order/UpdatestatusDTByDid/{id}/data")
+    public SupplyOrder UpdatestatusDTByDid (@PathVariable String id,@RequestParam("data") String data){
+        try{
+            SupplyOrder  Details = supplyOrderService.UpdatestatusDTByDid(id,data);
+            return Details;
+
+        }catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
     // generate id
     public String generateId() {
         Random rand = new Random();

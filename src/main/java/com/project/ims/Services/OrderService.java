@@ -459,7 +459,9 @@ public class OrderService implements IOrderService {
     public List<Map<String, Object>> orderstatusCByDeliverymanId(String id) {
 
         // Checking if the DelivereyMan data is null or not
+        // System.out.println(id);
         if (id.equals("")) {
+           
             throw new RuntimeException("Id shouldn't be null");
         } else if (!deliveryManRepo.existsById(id)) {
             throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");

@@ -1,14 +1,21 @@
 package com.project.ims.Services;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 // imports
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.IWareHouseService;
 import com.project.ims.Models.GlobalProducts;
 import com.project.ims.Models.Order;
+import com.project.ims.Models.Product;
 import com.project.ims.Models.ReturnOrder;
+import com.project.ims.Models.Supplier;
+import com.project.ims.Models.User;
 import com.project.ims.Models.W2WOrder;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Models.WareHouse_Manager;
@@ -42,6 +49,16 @@ public class WareHouseService implements IWareHouseService {
     @Autowired
     private W2WOrderRepo w2wOrderRepo;
 
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private SupplierService supplierService;
+
+ 
     // Services
 
 
@@ -252,5 +269,6 @@ public class WareHouseService implements IWareHouseService {
     
             return w2wOrderRepo.findByWarehouseId(id);
     }
+    
     
 }

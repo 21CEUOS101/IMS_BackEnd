@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import com.project.ims.IServices.ISupplyOrderService;
 import com.project.ims.Models.DeliveryMan;
+import com.project.ims.Models.Order;
 import com.project.ims.Models.Product;
 import com.project.ims.Models.Supplier;
 import com.project.ims.Models.SupplyOrder;
@@ -533,7 +534,7 @@ public class SupplyOrderService implements ISupplyOrderService {
         WareHouse wareHouse = wareHouseService.getWareHouseById(wm.getWarehouse_id());
         List<String> p = new ArrayList<>();
         for (int i = 0; i < wareHouse.getProduct_ids().size(); i++) {
-            if (wareHouse.getLowerLimits().get(i) > Integer.parseInt(wareHouse.getQuantities().get(i)) && !isSupplyOrderisCreated(wareHouse,wareHouse.getProduct_ids().get(i))) {
+            if (wareHouse.getLowerLimits().get(i) > Integer.parseInt(wareHouse.getQuantities().get(i)) && !isNotSupplyOrderisCreated(wareHouse, wareHouse.getProduct_ids().get(i),wareHouse.getHigherLimits().get(i) - Integer.parseInt(wareHouse.getQuantities().get(i)))) {
                 p.add(wareHouse.getProduct_ids().get(i));
             }
         }
@@ -563,7 +564,6 @@ public class SupplyOrderService implements ISupplyOrderService {
         WareHouse war = wareHouseService.getWareHouseById(wm.getWarehouse_id());
         Integer index = war.getProduct_ids().indexOf(pid);
         Integer quan = war.getHigherLimits().get(index) - Integer.parseInt(war.getQuantities().get(index));
-        ;
         data.setProduct_id(pid);
         data.setSupplier_id(prod.getSupplierId());
         data.setWarehouse_id(wm.getWarehouse_id());
@@ -598,7 +598,7 @@ public class SupplyOrderService implements ISupplyOrderService {
         return supplyOrder;
 
     }
-    public boolean isSupplyOrderisCreated( WareHouse w ,String Productid){
+    public boolean isNotSupplyOrderisCreated( WareHouse w ,String Productid,Integer quan){
         List<SupplyOrder> so = getAllSupplyOrder();
         for(SupplyOrder s : so){
             if(s.getWarehouse_id().equals(w.getId()) && s.getProduct_id().equals(Productid)){
@@ -607,6 +607,169 @@ public class SupplyOrderService implements ISupplyOrderService {
         }
         
         return false;
+    }
+
+    public WareHouse warehouseDetails(String id) {
+        
+        if (id == null)
+        {
+            throw new RuntimeException("Id shouldn't be null");
+        }
+        WareHouse_Manager wareManager = wManagerService.getWManagerById(id); 
+        WareHouse  ware  = wareHouseService.getWareHouseById(wareManager.getWarehouse_id());
+        return ware;
+        // return wareHouseRepo.findById(id).orElse(null);
+    }
+
+    public List<Map<String ,Object>> AllProduct(String id){
+        List<Map<String ,Object>> details = new ArrayList<>();
+
+        WareHouse_Manager wm = wManagerService.getWManagerById(id);
+        WareHouse w = wareHouseService.getWareHouseById(wm.getWarehouse_id());
+        for(int i =0;i<w.getProduct_ids().size();i++){
+            Map<String, Object> prod_details = new HashMap<>();
+            Product product  =productService.getProductById(w.getProduct_ids().get(i));
+            User user =userService.getUserByUserId(product.getSupplierId());
+            Supplier supplier = supplierService.getSupplierById(product.getSupplierId());
+            prod_details.put("highlimits" , w.getHigherLimits().get(i));
+            prod_details.put("lowlimits" , w.getLowerLimits().get(i));
+            prod_details.put("product" , product);
+            prod_details.put("user", user);
+            prod_details.put("wareQ",w.getQuantities().get(i));
+            prod_details.put("supplier", supplier);
+            details.add(prod_details);
+
+        }
+        return details;
+
+    }
+    public List<Map<String,Object>> getsupplyorderstatusABDFbyDId(String id){
+        List<Map<String ,Object>> orders = new ArrayList<>();
+        List<SupplyOrder> so = supplyOrderRepo.findAll();
+        DeliveryMan d = deliveryManService.getDeliveryManById(id);
+        if(d == null ){
+            System.out.println("delivery is not exist");
+            return null;
+        }
+        for(SupplyOrder s : so ){
+            if(s.getWarehouse_id().equals(d.getWarehouseId()) && s.getStatus().equals("approved") && !s.isIsdelivery_man_Available()){
+                Map<String ,Object> AllDetails = new HashMap<>();
+                Product po = productService.getProductById(s.getProduct_id());
+                Supplier sup = supplierService.getSupplierById(s.getSupplierId());
+                User user = userService.getUserByUserId(sup.getId());
+                WareHouse ware  =  wareHouseService.getWareHouseById(s.getWarehouse_id());
+                User wm = userService.getUserByUserId(ware.getManager_id());
+                AllDetails.put("warehouse",ware);
+                AllDetails.put("Manager",wm);
+
+                AllDetails.put("user",user);
+                AllDetails.put("product" ,po);
+                AllDetails.put("suppiler",sup);
+                AllDetails.put("supplyorder", s);
+                orders.add(AllDetails);
+            }
+        }
+        return orders;
+    }
+    public Map<String,Object> getsupplyorderstatusABDTbyDId(String id){
+        Map<String ,Object> AllDetails = new HashMap<>();
+        List<SupplyOrder> so = supplyOrderRepo.findAll();
+        DeliveryMan d = deliveryManService.getDeliveryManById(id);
+        if(d == null ){
+            System.out.println("delivery is not exist");
+            return null;
+        }
+        for(SupplyOrder s : so ){
+            if(s.getDelivery_man_id() == null ){
+                System.out.println("delivery man id is not null");
+                break;
+            }
+            if(s.getWarehouse_id().equals(d.getWarehouseId()) && s.getStatus().equals("approved") && s.isIsdelivery_man_Available() && s.getDelivery_man_id().equals(id)){
+               
+                Product po = productService.getProductById(s.getProduct_id());
+                Supplier sup = supplierService.getSupplierById(s.getSupplierId());
+                AllDetails.put("product" ,po);
+                User user = userService.getUserByUserId(sup.getId());
+                WareHouse ware  =  wareHouseService.getWareHouseById(s.getWarehouse_id());
+                User wm = userService.getUserByUserId(ware.getManager_id());
+                AllDetails.put("warehouse",ware);
+                AllDetails.put("Manager",wm);
+                AllDetails.put("user",user);
+                AllDetails.put("suppiler",sup);
+                AllDetails.put("supplyorder", s);
+               
+                break;
+            }
+        }
+        return AllDetails;
+    }
+    public List<Map<String,Object>> getsupplyorderstatusDbyDId(String id){
+        List<Map<String ,Object>> orders = new ArrayList<>();
+        List<SupplyOrder> so = supplyOrderRepo.findAll();
+        DeliveryMan d = deliveryManService.getDeliveryManById(id);
+        if(d == null ){
+            System.out.println("delivery is not exist");
+            return null;
+        }
+        for(SupplyOrder s : so ){
+            if(s.getDelivery_man_id() == null ){
+                System.out.println("delivery man id is not null");
+                break;
+            }
+            if(s.getStatus().equals("delivered")    && s.getDelivery_man_id().equals(id)){
+                Map<String ,Object> AllDetails = new HashMap<>();
+                Product po = productService.getProductById(s.getProduct_id());
+                Supplier sup = supplierService.getSupplierById(s.getSupplierId());
+                User user = userService.getUserByUserId(sup.getId());
+                WareHouse ware  =  wareHouseService.getWareHouseById(s.getWarehouse_id());
+                User wm = userService.getUserByUserId(ware.getManager_id());
+                AllDetails.put("warehouse",ware);
+                AllDetails.put("Manager",wm);
+                AllDetails.put("user",user);
+                AllDetails.put("product" ,po);
+                AllDetails.put("suppiler",sup);
+                AllDetails.put("supplyorder", s);
+                orders.add(AllDetails);
+                // break;
+            }
+        }
+        return orders;
+    }
+    public SupplyOrder UpdatestatusDTByDid(String id , String data ){
+         try {
+            System.out.println("hello" +data+" " + id);
+           SupplyOrder order = getSupplyOrderById(data);
+           if(order == null){
+            System.out.println("Order Doesnot exists");
+            return null;
+           }
+           DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
+           if(deliveryMan == null){
+            System.out.println("Delivery man doesnot exists ");
+            return null;
+           }
+          
+
+           if(order.getStatus().equals("approved") &&  deliveryMan.getStatus().equals("available") && !order.isIsdelivery_man_Available()){
+
+                order.setDelivery_man_id(id);
+                order.setStatus("approved");
+               order.setIsdelivery_man_Available(true);
+               updateSupplyOrder(order);
+               deliveryMan.setStatus("unavailable");
+               deliveryManService.updateDeliveryMan(deliveryMan);
+               return order;
+           }
+           else{
+            System.out.println("delivery man is not available");
+            return null;
+
+           }
+           
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
 
