@@ -509,7 +509,8 @@ public class OrderService implements IOrderService {
             System.out.println("Delivery man not exists");
             return null;
         }
-        WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
+        WareHouse wareHouse = wareHouseService.getWareHouseById(deliveryMan.getWarehouseId());
+        System.out.println("Warehouse Orders pending : " + wareHouse.getId());
         if(wareHouse == null)
         {
             System.out.println("delivery man warehouse donot exists");
@@ -519,7 +520,9 @@ public class OrderService implements IOrderService {
         List<Map<String, Object>> statusCorder = new ArrayList<>();
 
         for (Order o : orders) {
-            if (o.getStatus().equals("pending") && o.getWarehouseId().equals(wareHouse.getId())) {                
+            String warehouseId = o.getWarehouseId();
+            System.out.println(warehouseId);
+            if (o.getStatus().equals("pending") && o.getWarehouseId().equals(warehouseId)) {                
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
                 User user = userService.getUserByUserId(o.getCustomerId());
                 Product product = productService.getProductById(o.getProduct_id());

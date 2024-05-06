@@ -26,7 +26,7 @@ import com.project.ims.Services.CustomUserDetailService;
 
 import org.slf4j.Logger;
 
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001"}, allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {

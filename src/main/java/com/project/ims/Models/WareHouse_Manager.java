@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Document(collection = "ware_house_managers")
+@Document(collection = "w_managers")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

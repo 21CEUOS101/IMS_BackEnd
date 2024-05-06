@@ -61,7 +61,7 @@ public class WManagerController {
                 wManagerOutput.setWarehouse_id(wareHouse_Managers.get(i).getWarehouse_id());
                 output.add(wManagerOutput);
             }
-
+            System.out.println(output.size());
             return output;
         } catch (Exception e) {
             System.out.println(e);

@@ -23,7 +23,7 @@ import com.project.ims.Services.RSOService;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001"}, allowedHeaders = "*", allowCredentials = "true")
 public class RSOController {
 
     // necessary dependency injections

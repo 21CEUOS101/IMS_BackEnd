@@ -391,7 +391,7 @@ public class W2WOrderService implements IW2WOrderService {
             System.out.println("Delivery man not exists");
             return null;
         }
-        WareHouse S_wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
+        WareHouse S_wareHouse = wareHouseService.getWareHouseById(deliveryMan.getWarehouseId());
         if(S_wareHouse == null)
         {
             System.out.println("delivery man warehouse donot exists");
@@ -401,6 +401,8 @@ public class W2WOrderService implements IW2WOrderService {
         List<Map<String, Object>> statusCw2worder = new ArrayList<>();
 
         for (W2WOrder o : w2worders) {
+            String warehouseId = S_wareHouse.getId();
+            System.out.println(warehouseId + " " + o.getS_warehouse_id());
             if (o.getStatus().equals("pending") && o.getS_warehouse_id().equals(S_wareHouse.getId())) {     
                 WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
                 Product product = productService.getProductById(o.getProduct_id());
