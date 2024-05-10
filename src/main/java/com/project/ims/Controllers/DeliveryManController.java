@@ -24,7 +24,7 @@ import com.project.ims.Services.UserService;
 import java.util.Map;
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class DeliveryManController {
 
     // necessary dependencies are injected here

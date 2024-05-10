@@ -1,9 +1,7 @@
 package com.project.ims.Controllers;
 
 import java.util.ArrayList;
-// imports
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.project.ims.Models.ReturnSupplyOrder;
 import com.project.ims.Models.Supplier;
 import com.project.ims.Models.SupplyOrder;
@@ -28,7 +25,7 @@ import com.project.ims.Services.UserService;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class SupplierController {
 
     // necessary dependency injections
