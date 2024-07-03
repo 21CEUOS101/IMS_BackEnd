@@ -4,11 +4,8 @@ package com.project.ims.Controllers;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.project.ims.Models.Customer;
 import com.project.ims.Models.DeliveryMan;
 import com.project.ims.Models.Order;
-import com.project.ims.Models.W2WOrder;
 import com.project.ims.Objects.CustomerUserPair;
 import com.project.ims.Requests.OrderAddRequest;
 import com.project.ims.Requests.OrderUpdateRequest;
@@ -24,9 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-
-
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
@@ -291,7 +285,6 @@ public class OrderController {
     public void createOrder(List<String> product_ids, List<String> quantities, String warehouse_id, OrderAddRequest data,
             List<Order> orders, int i) 
     {
-        System.out.println("Inside Create Order");
         String id = generateOrderId();
         Order order = new Order();
         order.setId(id);

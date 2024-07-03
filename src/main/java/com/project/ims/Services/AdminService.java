@@ -36,10 +36,7 @@ public class AdminService implements IAdminService {
     @Autowired
     private ProductRepo productRepo;
 
-
     // Services
-
-
     @Override
     public Admin getAdminById(String id) {
 
@@ -49,7 +46,6 @@ public class AdminService implements IAdminService {
 
         return adminRepo.findById(id).orElse(null);
     }
-    
 
     @Override
     public Admin addAdmin(Admin admin) {
@@ -99,7 +95,6 @@ public class AdminService implements IAdminService {
             throw new RuntimeException("Admin doesn't exist");
         }
     }
-
 
     // get all admins
     @Override

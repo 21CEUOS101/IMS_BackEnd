@@ -1,7 +1,7 @@
 package com.project.ims.Controllers;
 
-import java.util.HashSet;
 // imports
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.project.ims.Models.DeliveryMan;
-import com.project.ims.Models.Order;
 import com.project.ims.Models.W2WOrder;
 import com.project.ims.Models.WareHouse;
-import com.project.ims.Repo.W2WOrderRepo;
 import com.project.ims.Requests.W2WOrderAddRequest;
 import com.project.ims.Requests.W2WOrderUpdateRequest;
 import com.project.ims.Services.DeliveryManService;
@@ -38,7 +35,6 @@ public class W2WOrderController {
   
 
     // controllers
-
     @GetMapping("/w2worder")
     public List<W2WOrder> getAllW2WOrders() {
         

@@ -1,0 +1,37 @@
+# git ignore for java spring boot project
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# IntelliJ project files
+.idea/
+
+# Eclipse project files
+.classpath
+
+.project
+
+.settings/
+
+# Maven project files
+target/
+
+# Gradle project files
+build/
+
+# Package file
+*.jar
+
+# Other
+*.iml
+
+# Local configuration file
+application.properties
+
+# Spring Boot DevTools
+.restart
+
+# End of .gitignore

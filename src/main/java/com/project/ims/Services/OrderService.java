@@ -1,6 +1,7 @@
 package com.project.ims.Services;
 
 // imports
+import org.springframework.http.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -8,11 +9,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import com.project.ims.IServices.IOrderService;
 import com.project.ims.Models.Customer;
 import com.project.ims.Models.DeliveryMan;
+import com.project.ims.Models.GlobalDistances;
 import com.project.ims.Models.GlobalProducts;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.Product;
@@ -22,6 +29,7 @@ import com.project.ims.Models.WareHouse;
 import com.project.ims.Objects.CustomerUserPair;
 import com.project.ims.Repo.CustomerRepo;
 import com.project.ims.Repo.DeliveryManRepo;
+import com.project.ims.Repo.GlobalDistancesRepo;
 import com.project.ims.Repo.GlobalProductsRepo;
 import com.project.ims.Repo.OrderRepo;
 import com.project.ims.Repo.ProductRepo;
@@ -62,9 +70,11 @@ public class OrderService implements IOrderService {
     private CustomerService customerService;
     @Autowired
     private UserService userService;
-   
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private GlobalDistancesRepo globalDistancesRepo; 
     // Services
 
     @Override
@@ -117,7 +127,7 @@ public class OrderService implements IOrderService {
         // warehouse order
 
         if (!checkStock(product_id, quantity, warehouse_id)) {
-            System.out.println("Product not available in assigned warehouse");
+//            System.out.println("Product not available in assigned warehouse");
             handleStock(product_id, quantity, warehouse_id, order.getId());
         } else {
             // removing products from warehouse
@@ -363,16 +373,30 @@ public class OrderService implements IOrderService {
         // w2w order
 
         while (needed_quantity > 0) {
+            
             int max = 0;
+            double maxRatio = 0;
             String max_warehouse_id = null;
+
             for (String key : warehouses) {
 
                 int quantity1 = quantities.get(warehouses.indexOf(key)).equals("null") ? 0
                         : Integer.parseInt(quantities.get(warehouses.indexOf(key)));
 
-                if (quantity1 > max && !key.equals(r_warehouse_id)) {
-                    max = quantity1;
-                    max_warehouse_id = key;
+                if (!key.equals(r_warehouse_id)) {
+
+                    int distance = calculateDistance(r_warehouse_id, key);
+
+                    // Calculate ratio: quantity / distance
+                    double ratio = (double) quantity1 / distance;
+
+                    // Update selected warehouse if current ratio is higher
+                    if (ratio > maxRatio) {
+                        maxRatio = ratio;
+                        max = quantity1;
+                        max_warehouse_id = key;
+                    }
+
                 }
             }
 
@@ -604,45 +628,76 @@ public class OrderService implements IOrderService {
         return uniquePairs;
     }
     
-    public List<Map<String, Object>> numberofCancelorders(String id){
+    public List<Map<String, Object>> numberofCancelorders(String id) {
         if (id.equals("")) {
             throw new RuntimeException("Id shouldn't be null");
         } else if (!deliveryManRepo.existsById(id)) {
             throw new RuntimeException("DeliveryMan  with id " + id + " does not exist");
         }
-       
-        
-        DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
-        if(deliveryMan == null)
-        {
+
+        DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
+        if (deliveryMan == null) {
             System.out.println("Delivery man not exists");
             return null;
         }
-        WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
-        if(wareHouse == null)
-        {
+        WareHouse wareHouse = wareHouseService.getWareHouseById(deliveryMan.getWarehouseId());
+        if (wareHouse == null) {
             System.out.println("delivery man warehouse donot exists");
             return null;
         }
         List<Map<String, Object>> cancel = new ArrayList<>();
         List<Order> orders = orderRepo.findAll();
-      
-        for(Order o : orders){
+
+        for (Order o : orders) {
             Map<String, Object> Filterorders = new HashMap<>();
-            if(o.getStatus().equals("cancel") && o.getDelivery_man_id().equals(id)){
+            if (o.getStatus().equals("cancel") && o.getDelivery_man_id().equals(id)) {
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
                 User user = userService.getUserByUserId(o.getCustomerId());
                 Product product = productService.getProductById(o.getProduct_id());
-                   
-                Filterorders.put("order", o);                   
+
+                Filterorders.put("order", o);
                 Filterorders.put("customer", customer);
                 Filterorders.put("warehouse", wareHouse);
-                Filterorders.put("product",product);
-                Filterorders.put("user",user);
+                Filterorders.put("product", product);
+                Filterorders.put("user", user);
                 cancel.add(Filterorders);
             }
         }
         return cancel;
+    }
+
+    private final String distanceApiUrl = "https://inventory-navigatorapi.onrender.com/api/get-distance";
+    
+    public int calculateDistance(String from, String to) {
+        GlobalDistances globalDistances = globalDistancesRepo.findByFromAndTo(from, to);
+        if (globalDistances == null) {
+            // call to api to get distance api is : https://inventory-navigatorapi.onrender.com/api/get-distance and send from and to in body with POST request
+            
+            // If distance is not found in database, fetch from API
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Create request body with "from" and "to"
+            String requestBody = "{\"from\": \"" + from + "\", \"to\": \"" + to + "\"}";
+
+            // Create HTTP entity with headers and body
+            HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+            // Send POST request to API and parse response
+            ResponseEntity<String> response = restTemplate.exchange(distanceApiUrl, HttpMethod.POST, entity, String.class);
+
+            // System.out.println(response);
+            // Assuming response is JSON with distance field
+            String responseBody = response.getBody();
+
+            // Parse JSON response
+            int distance = Integer.parseInt(responseBody.split(":")[1].split("}")[0].trim());
+
+            return distance;
+
+        }
+        return globalDistances.getDistance().intValue();
     }
 
 }
