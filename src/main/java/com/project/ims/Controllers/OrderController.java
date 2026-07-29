@@ -148,7 +148,7 @@ public class OrderController {
         order.setDelivery_man_id(data.getDelivery_man_id());
         order.setDelivered_date_time(data.getDelivered_date_time());
         
-        if(order.getPayment_method().equals("online"))
+        if("online".equals(order.getPayment_method()))
         {
             order.setTransaction_id(data.getTransaction_id());
         }
@@ -292,7 +292,7 @@ public class OrderController {
         order.setQuantity(quantities.get(i));
         order.setCustomerId(data.getCustomer_id());
         order.setPayment_method(data.getPayment_method());
-        if (data.getPayment_method().equals("online")) {
+        if ("online".equals(data.getPayment_method())) {
             order.setTransaction_id(data.getTransaction_id());
         }
         order.setDelivery_address(data.getDelivery_address());

@@ -71,7 +71,7 @@ public class SupplyOrderController {
         supplyOrder.setWarehouse_id(data.getWarehouse_id());
         supplyOrder.setPayment_method(data.getPayment_method());
         supplyOrder.setIsdelivery_man_Available(false);
-        if (data.getPayment_method().equals("online")) {
+        if ("online".equals(data.getPayment_method())) {
             supplyOrder.setTransaction_id(data.getTransaction_id());
         }
 

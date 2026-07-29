@@ -95,7 +95,7 @@ public class WareHouseService implements IWareHouseService {
 
         // check if manager id exists
 
-        if(wareHouse.getManager_id() == null)
+        if(wareHouse.getManager_id() == null || wareHouse.getManager_id().isEmpty())
         {
             throw new RuntimeException("WareHouse Manager ID cannot be empty");
         }
