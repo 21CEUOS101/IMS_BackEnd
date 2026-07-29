@@ -15,11 +15,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import com.project.ims.IServices.IOrderService;
 import com.project.ims.Models.Customer;
 import com.project.ims.Models.DeliveryMan;
-import com.project.ims.Models.GlobalDistances;
 import com.project.ims.Models.GlobalProducts;
 import com.project.ims.Models.Order;
 import com.project.ims.Models.Product;
@@ -29,7 +27,6 @@ import com.project.ims.Models.WareHouse;
 import com.project.ims.Objects.CustomerUserPair;
 import com.project.ims.Repo.CustomerRepo;
 import com.project.ims.Repo.DeliveryManRepo;
-import com.project.ims.Repo.GlobalDistancesRepo;
 import com.project.ims.Repo.GlobalProductsRepo;
 import com.project.ims.Repo.OrderRepo;
 import com.project.ims.Repo.ProductRepo;
@@ -74,7 +71,7 @@ public class OrderService implements IOrderService {
     private ProductService productService;
 
     @Autowired
-    private GlobalDistancesRepo globalDistancesRepo; 
+    private DistanceService distanceService;
     // Services
 
     @Override
@@ -666,38 +663,8 @@ public class OrderService implements IOrderService {
         return cancel;
     }
 
-    private final String distanceApiUrl = "https://inventory-navigatorapi.onrender.com/api/get-distance";
-    
     public int calculateDistance(String from, String to) {
-        GlobalDistances globalDistances = globalDistancesRepo.findByFromAndTo(from, to);
-        if (globalDistances == null) {
-            // call to api to get distance api is : https://inventory-navigatorapi.onrender.com/api/get-distance and send from and to in body with POST request
-            
-            // If distance is not found in database, fetch from API
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            // Create request body with "from" and "to"
-            String requestBody = "{\"from\": \"" + from + "\", \"to\": \"" + to + "\"}";
-
-            // Create HTTP entity with headers and body
-            HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-
-            // Send POST request to API and parse response
-            ResponseEntity<String> response = restTemplate.exchange(distanceApiUrl, HttpMethod.POST, entity, String.class);
-
-            // System.out.println(response);
-            // Assuming response is JSON with distance field
-            String responseBody = response.getBody();
-
-            // Parse JSON response
-            int distance = Integer.parseInt(responseBody.split(":")[1].split("}")[0].trim());
-
-            return distance;
-
-        }
-        return globalDistances.getDistance().intValue();
+        return distanceService.calculateDistance(from, to);
     }
 
 }
