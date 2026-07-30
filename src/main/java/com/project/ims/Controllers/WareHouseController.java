@@ -1,5 +1,8 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // imports
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,8 +12,8 @@ import com.project.ims.Models.W2WOrder;
 import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.WareHouseAddRequest;
 import com.project.ims.Services.WareHouseService;
+import com.project.ims.Utils.IdGenerator;
 import java.util.List;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,8 +25,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
-public class WarehouseController {
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+public class WareHouseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(WareHouseController.class);
 
     // necessary dependency injections
     @Autowired
@@ -39,7 +44,7 @@ public class WarehouseController {
             return wareHouse;
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -51,7 +56,7 @@ public class WarehouseController {
             return wareHouses;
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -59,16 +64,16 @@ public class WarehouseController {
     @PostMapping("/warehouse")
     public WareHouse createWarehouse(@RequestBody WareHouseAddRequest data) {
 
-        String id = generateId();
+        String id = IdGenerator.generate("w");
 
         WareHouse wareHouse = new WareHouse();
         wareHouse.setId(id);
         wareHouse.setName(data.getName());
         wareHouse.setAddress(data.getAddress());
         wareHouse.setPincode(data.getPincode());
-        wareHouse.setManager_id(data.getManager_id());
+        wareHouse.setManagerId(data.getManagerId());
         wareHouse.setStatus(data.getStatus());
-        wareHouse.setProduct_ids(data.getProduct_ids());
+        wareHouse.setProductIds(data.getProductIds());
         wareHouse.setQuantities(data.getQuantities());
         wareHouse.setHigherLimits(data.getHigherLimits());
         wareHouse.setLowerLimits(data.getLowerLimits());
@@ -77,7 +82,7 @@ public class WarehouseController {
             wareHouseService.addWareHouse(wareHouse);
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -92,9 +97,9 @@ public class WarehouseController {
         wareHouse.setName(data.getName());
         wareHouse.setAddress(data.getAddress());
         wareHouse.setPincode(data.getPincode());
-        wareHouse.setManager_id(data.getManager_id());
+        wareHouse.setManagerId(data.getManagerId());
         wareHouse.setStatus(data.getStatus());
-        wareHouse.setProduct_ids(data.getProduct_ids());
+        wareHouse.setProductIds(data.getProductIds());
         wareHouse.setQuantities(data.getQuantities());
         wareHouse.setHigherLimits(data.getHigherLimits());
         wareHouse.setLowerLimits(data.getLowerLimits());
@@ -103,7 +108,7 @@ public class WarehouseController {
             wareHouseService.updateWareHouse(wareHouse);
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -117,16 +122,8 @@ public class WarehouseController {
             wareHouseService.deleteWareHouse(id);
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
         }
-    }
-
-    public String generateId() {
-        // id generation
-        Random rand = new Random();
-        String id = 'w' + String.valueOf(rand.nextInt(1000000));
-
-        return id;
     }
 
     // get all orders by warehouse
@@ -136,7 +133,7 @@ public class WarehouseController {
             List<Order> orders = wareHouseService.getOrdersByWareHouse(id);
             return orders;
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -148,7 +145,7 @@ public class WarehouseController {
             List<ReturnOrder> orders = wareHouseService.getReturnOrdersByWareHouse(id);
             return orders;
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -160,7 +157,7 @@ public class WarehouseController {
             List<W2WOrder> orders = wareHouseService.getW2WOrdersByWareHouse(id);
             return orders;
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }

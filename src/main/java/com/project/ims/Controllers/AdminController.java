@@ -1,13 +1,16 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 // imports
 import java.util.List;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.Admin;
+import com.project.ims.Utils.IdGenerator;
 import com.project.ims.Models.User;
 import com.project.ims.Requests.Admin.AdminAddRequest;
 import com.project.ims.Requests.Admin.AdminUpdateRequest;
@@ -25,8 +28,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class AdminController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     // necessary dependency injections
     @Autowired
@@ -55,7 +60,6 @@ public class AdminController {
                 adminOutput.setId(admin.get(i).getId());
                 adminOutput.setName(user.getName());
                 adminOutput.setEmail(user.getEmail());
-                adminOutput.setPassword(user.getPassword());
                 adminOutput.setPhone(user.getPhone());
                 admins.add(adminOutput);
             }
@@ -64,7 +68,7 @@ public class AdminController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -80,12 +84,11 @@ public class AdminController {
             adminOutput.setId(admin.getId());
             adminOutput.setName(user.getName());
             adminOutput.setEmail(user.getEmail());
-            adminOutput.setPassword(user.getPassword());
             adminOutput.setPhone(user.getPhone());
 
             return adminOutput;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -96,7 +99,7 @@ public class AdminController {
         try {
             return adminService.getRecentSales();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -105,7 +108,7 @@ public class AdminController {
     @PostMapping("/admin")
     public Admin createAdmin(@RequestBody AdminAddRequest data) {
 
-        String id = generateId();
+        String id = IdGenerator.generate("a");
 
         Admin admin = new Admin();
         admin.setId(id);
@@ -116,7 +119,7 @@ public class AdminController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -126,7 +129,7 @@ public class AdminController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
 
         return admin;
@@ -143,7 +146,7 @@ public class AdminController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -153,7 +156,7 @@ public class AdminController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
 
         return admin;
@@ -169,7 +172,7 @@ public class AdminController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return;
         }
 
@@ -177,16 +180,8 @@ public class AdminController {
             adminService.deleteAdmin(id);
         }
         catch(Exception e){
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
-    }
-
-    public String generateId() {
-        // id generation
-        Random rand = new Random();
-        String id = 'a' + String.valueOf(rand.nextInt(1000000));
-
-        return id;
     }
 
     public void createUser(String name, String email, String password, String role, String phone, String userId) {

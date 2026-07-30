@@ -1,9 +1,11 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // imports
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,11 +22,14 @@ import com.project.ims.Repo.OrderRepo;
 import com.project.ims.Requests.RSOAddRequest;
 import com.project.ims.Requests.RSOUpdateRequest;
 import com.project.ims.Services.RSOService;
+import com.project.ims.Utils.IdGenerator;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class RSOController {
+
+    private static final Logger logger = LoggerFactory.getLogger(RSOController.class);
 
     // necessary dependency injections
 
@@ -44,7 +49,7 @@ public class RSOController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -57,7 +62,7 @@ public class RSOController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -65,34 +70,34 @@ public class RSOController {
     @PostMapping("/return-supply-order")
     public ReturnSupplyOrder addReturnSupplyOrder(@RequestBody RSOAddRequest data) {
 
-        String id = generateId();
+        String id = IdGenerator.generate("rso");
         ReturnSupplyOrder returnSupplyOrder = new ReturnSupplyOrder();
         returnSupplyOrder.setId(id);
 
         
-        Order order = orderRepo.findById(data.getOrder_id()).orElse(null);
+        Order order = orderRepo.findById(data.getOrderId()).orElse(null);
         
         if (order == null) {
-            System.out.println("Order not found");
+            logger.debug("Order not found");
             return null;
         }
 
-        returnSupplyOrder.setOrder_id(data.getOrder_id());
-        returnSupplyOrder.setWarehouse_id(order.getWarehouseId());
-        returnSupplyOrder.setProduct_id(order.getProduct_id());
+        returnSupplyOrder.setOrderId(data.getOrderId());
+        returnSupplyOrder.setWarehouseId(order.getWarehouseId());
+        returnSupplyOrder.setProductId(order.getProductId());
         returnSupplyOrder.setQuantity(order.getQuantity());
-        returnSupplyOrder.setRefund_amount(order.getTotal_amount());
-        returnSupplyOrder.setDelivery_address(data.getDelivery_address());
-        returnSupplyOrder.setReturn_reason(data.getReturn_reason());
+        returnSupplyOrder.setRefundAmount(order.getTotalAmount());
+        returnSupplyOrder.setDeliveryAddress(data.getDeliveryAddress());
+        returnSupplyOrder.setReturnReason(data.getReturnReason());
         returnSupplyOrder.setStatus("shipped");
-        returnSupplyOrder.setSupplierId(data.getSupplier_id());
+        returnSupplyOrder.setSupplierId(data.getSupplierId());
         
         try{
             returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -109,7 +114,7 @@ public class RSOController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -120,24 +125,24 @@ public class RSOController {
             @RequestBody RSOUpdateRequest data) {
         ReturnSupplyOrder returnSupplyOrder = returnSupplyOrderService.getReturnSupplyOrderById(id);
         returnSupplyOrder.setStatus(data.getStatus());
-        returnSupplyOrder.setDate_time(data.getDate_time());
-        returnSupplyOrder.setDelivered_date_time(data.getDelivered_date_time());
-        returnSupplyOrder.setDelivery_man_id(data.getDelivery_man_id());
-        returnSupplyOrder.setOrder_id(data.getOrder_id());
-        returnSupplyOrder.setProduct_id(data.getProduct_id());
+        returnSupplyOrder.setDateTime(data.getDateTime());
+        returnSupplyOrder.setDeliveredDateTime(data.getDeliveredDateTime());
+        returnSupplyOrder.setDeliveryManId(data.getDeliveryManId());
+        returnSupplyOrder.setOrderId(data.getOrderId());
+        returnSupplyOrder.setProductId(data.getProductId());
         returnSupplyOrder.setQuantity(data.getQuantity());
-        returnSupplyOrder.setRefund_amount(data.getRefund_amount());
-        returnSupplyOrder.setWarehouse_id(data.getWarehouse_id());
-        returnSupplyOrder.setDelivery_address(data.getDelivery_address());
-        returnSupplyOrder.setReturn_reason(data.getReturn_reason());
-        returnSupplyOrder.setSupplierId(data.getSupplier_id());
+        returnSupplyOrder.setRefundAmount(data.getRefundAmount());
+        returnSupplyOrder.setWarehouseId(data.getWarehouseId());
+        returnSupplyOrder.setDeliveryAddress(data.getDeliveryAddress());
+        returnSupplyOrder.setReturnReason(data.getReturnReason());
+        returnSupplyOrder.setSupplierId(data.getSupplierId());
         
         try{
             returnSupplyOrderService.updateReturnSupplyOrder(returnSupplyOrder);
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -151,11 +156,11 @@ public class RSOController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
 
-    @GetMapping("/return-supply-orderstatusSByDid/{id}")
+    @GetMapping("/return-supply-order/statusSByDid/{id}")
     public Map<String,Object> getReturnSupplyOrderStatusSByDid(@PathVariable("id") String id) {
         try{
             Map<String,Object> returnSupplyOrder = returnSupplyOrderService.getReturnSupplyOrderStatusSByDid(id);
@@ -163,11 +168,11 @@ public class RSOController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/return-supply-orderstatusCByDid/{id}")
+    @GetMapping("/return-supply-order/statusCByDid/{id}")
     public List<Map<String,Object>> getReturnSupplyOrderStatusCByDid(@PathVariable("id") String id) {
         try{
             List<Map<String,Object>> returnSupplyOrder = returnSupplyOrderService.getReturnSupplyOrderStatusCByDid(id);
@@ -175,15 +180,8 @@ public class RSOController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
-    }
-
-    public String generateId() {
-        // id generation
-        Random rand = new Random();
-        String id = "rso" + String.valueOf(rand.nextInt(1000000));
-        return id;
     }
 }

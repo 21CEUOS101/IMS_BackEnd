@@ -1,5 +1,8 @@
 package com.project.ims.Services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,6 +29,8 @@ import com.project.ims.Repo.W2WOrderRepo;
 
 @Service
 public class W2WOrderService implements IW2WOrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(W2WOrderService.class);
 
     // necessary dependency injections
     @Autowired
@@ -83,20 +88,20 @@ public class W2WOrderService implements IW2WOrderService {
         }
 
         // set total amount
-        Product product = productService.getProductById(w2wOrder.getProduct_id());
+        Product product = productService.getProductById(w2wOrder.getProductId());
 
         int total_amount = Integer.parseInt(product.getPrice()) * Integer.parseInt(w2wOrder.getQuantity());
 
-        w2wOrder.setTotal_amount(Integer.toString(total_amount));
+        w2wOrder.setTotalAmount(Integer.toString(total_amount));
 
         // ----------------------------------------------
 
         // reduce quantity from source warehouse
 
-        WareHouse s_warehouse = wareHouseService.getWareHouseById(w2wOrder.getS_warehouse_id());
+        WareHouse s_warehouse = wareHouseService.getWareHouseById(w2wOrder.getSWarehouseId());
 
-        for (int i = 0; i < s_warehouse.getProduct_ids().size(); i++) {
-            if (s_warehouse.getProduct_ids().get(i).equals(w2wOrder.getProduct_id())) {
+        for (int i = 0; i < s_warehouse.getProductIds().size(); i++) {
+            if (s_warehouse.getProductIds().get(i).equals(w2wOrder.getProductId())) {
                 int quantity = Integer.parseInt(s_warehouse.getQuantities().get(i));
                 quantity = quantity - Integer.parseInt(w2wOrder.getQuantity());
                 s_warehouse.getQuantities().set(i, Integer.toString(quantity));
@@ -106,27 +111,27 @@ public class W2WOrderService implements IW2WOrderService {
 
         String deliveryMan = assignDeliveryMan(w2wOrder);
 
-        w2wOrder.setDelivery_man_id(deliveryMan);
+        w2wOrder.setDeliveryManId(deliveryMan);
 
         if (deliveryMan == null) {
-            System.out.println("Deliveryman not currently available");
+            logger.debug("Deliveryman not currently available");
             w2wOrder.setStatus("pending");
         }
 
-        System.out.println("Inside addW2WOrder");
+        logger.debug("Inside addW2WOrder");
 
         try{
             wareHouseService.updateWareHouse(s_warehouse);
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = currentDateTime.format(formatter);
-        w2wOrder.setDate_time(formattedDateTime);
+        w2wOrder.setDateTime(formattedDateTime);
 
         return w2wOrderRepo.save(w2wOrder);
     }
@@ -182,9 +187,9 @@ public class W2WOrderService implements IW2WOrderService {
             LocalDateTime currentDateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = currentDateTime.format(formatter);
-            w2wOrder.setDelivered_date_time(formattedDateTime);
+            w2wOrder.setDeliveredDateTime(formattedDateTime);
 
-            DeliveryMan m = deliveryManService.getDeliveryManById(w2wOrder.getDelivery_man_id());
+            DeliveryMan m = deliveryManService.getDeliveryManById(w2wOrder.getDeliveryManId());
 
             m.setStatus("available");
 
@@ -192,7 +197,7 @@ public class W2WOrderService implements IW2WOrderService {
                 deliveryManService.updateDeliveryMan(m);
             }
             catch (Exception e) {
-                System.out.println(e);
+                logger.error(e.getMessage(), e);
                 return null;
             }
             
@@ -216,10 +221,10 @@ public class W2WOrderService implements IW2WOrderService {
 
                 String deliveryMan = assignDeliveryMan(order);
 
-                order.setDelivery_man_id(deliveryMan);
+                order.setDeliveryManId(deliveryMan);
 
                 if (deliveryMan == null) {
-                    System.out.println("Deliveryman not currently available");
+                    logger.debug("Deliveryman not currently available");
                     order.setStatus("pending");
                 }
 
@@ -227,7 +232,7 @@ public class W2WOrderService implements IW2WOrderService {
                     orderRepo.save(order);
                 }
                 catch(Exception e){
-                    System.out.println(e);
+                    logger.error(e.getMessage(), e);
                     return null;
                 }
             }
@@ -240,10 +245,10 @@ public class W2WOrderService implements IW2WOrderService {
                 throw new RuntimeException("W2W Order with id " + id + " has already been delivered");
             }
             
-            WareHouse s_warehouse = wareHouseService.getWareHouseById(w2wOrder.getS_warehouse_id());
+            WareHouse s_warehouse = wareHouseService.getWareHouseById(w2wOrder.getSWarehouseId());
 
-            for (int i = 0; i < s_warehouse.getProduct_ids().size(); i++) {
-                if (s_warehouse.getProduct_ids().get(i).equals(w2wOrder.getProduct_id())) {
+            for (int i = 0; i < s_warehouse.getProductIds().size(); i++) {
+                if (s_warehouse.getProductIds().get(i).equals(w2wOrder.getProductId())) {
                     int quantity = Integer.parseInt(s_warehouse.getQuantities().get(i));
                     quantity = quantity + Integer.parseInt(w2wOrder.getQuantity());
                     s_warehouse.getQuantities().set(i, Integer.toString(quantity));
@@ -254,13 +259,13 @@ public class W2WOrderService implements IW2WOrderService {
             try {
                 wareHouseService.updateWareHouse(s_warehouse);
             } catch (Exception e) {
-                System.out.println(e);
+                logger.error(e.getMessage(), e);
                 return null;
             }
 
             if(w2wOrder.getStatus().equals("shipped"))
             {
-                DeliveryMan m = deliveryManService.getDeliveryManById(w2wOrder.getDelivery_man_id());
+                DeliveryMan m = deliveryManService.getDeliveryManById(w2wOrder.getDeliveryManId());
 
                 m.setStatus("available");
 
@@ -268,7 +273,7 @@ public class W2WOrderService implements IW2WOrderService {
                     deliveryManService.updateDeliveryMan(m);
                 }
                 catch (Exception e) {
-                    System.out.println(e);
+                    logger.error(e.getMessage(), e);
                     return null;
                 }
             }
@@ -280,13 +285,13 @@ public class W2WOrderService implements IW2WOrderService {
         else if (status.equals("shipped"))
         {
 
-            System.out.println(id);
+            logger.debug(id);
             String Delivery_man_id = assignDeliveryMan(w2wOrder);
 
 
-            w2wOrder.setDelivery_man_id(Delivery_man_id);
+            w2wOrder.setDeliveryManId(Delivery_man_id);
             if(Delivery_man_id == null){
-                System.out.println("delivery man is not avaliable");
+                logger.debug("delivery man is not avaliable");
                 w2wOrder.setStatus("pending");
                 return w2wOrderRepo.save(w2wOrder);
             }
@@ -305,10 +310,10 @@ public class W2WOrderService implements IW2WOrderService {
     public String assignDeliveryMan(W2WOrder w2wOrder)
     {
         String assigned_deliveryMan = null;
-        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(w2wOrder.getS_warehouse_id());
+        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(w2wOrder.getSWarehouseId());
 
         // testing
-        System.out.println("Deliverymen in warehouse " + w2wOrder.getS_warehouse_id() + " are: ");
+        logger.debug("Deliverymen in warehouse " + w2wOrder.getSWarehouseId() + " are: ");
 
         for (DeliveryMan d : deliveryMen) {
             if (d.getStatus().equals("available")) {
@@ -317,7 +322,7 @@ public class W2WOrderService implements IW2WOrderService {
                 try {
                     deliveryManService.updateDeliveryMan(d);
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    logger.error(e.getMessage(), e);
                 }
 
                 break;
@@ -341,7 +346,7 @@ public class W2WOrderService implements IW2WOrderService {
                 }
                 catch(Exception e)
                 {
-                    System.out.println(e.getMessage());
+                    logger.error(e.getMessage(), e);
                 }
                 
                 break;
@@ -363,10 +368,10 @@ public class W2WOrderService implements IW2WOrderService {
         List<Map<String, Object>> statusCw2worder = new ArrayList<>();
 
         for (W2WOrder o : w2worders) {
-            if (o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)) {     
-                WareHouse S_wareHouse = wareHouseService.getWareHouseById(o.getS_warehouse_id());
+            if (o.getStatus().equals("delivered") && o.getDeliveryManId().equals(id)) {     
+                WareHouse S_wareHouse = wareHouseService.getWareHouseById(o.getSWarehouseId());
                 WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
-                Product product = productService.getProductById(o.getProduct_id());
+                Product product = productService.getProductById(o.getProductId());
                     Map<String, Object> orderwithWarehouse = new HashMap<>();
                     orderwithWarehouse.put("w2worder", o);                    
                     orderwithWarehouse.put("s_warehouse", S_wareHouse);
@@ -388,13 +393,13 @@ public class W2WOrderService implements IW2WOrderService {
         DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
         if(deliveryMan == null)
         {
-            System.out.println("Delivery man not exists");
+            logger.debug("Delivery man not exists");
             return null;
         }
         WareHouse S_wareHouse = wareHouseService.getWareHouseById(deliveryMan.getWarehouseId());
         if(S_wareHouse == null)
         {
-            System.out.println("delivery man warehouse donot exists");
+            logger.debug("delivery man warehouse donot exists");
             return null;
         }
         List<W2WOrder> w2worders = w2wOrderRepo.findAll();
@@ -402,10 +407,10 @@ public class W2WOrderService implements IW2WOrderService {
 
         for (W2WOrder o : w2worders) {
             String warehouseId = S_wareHouse.getId();
-            System.out.println(warehouseId + " " + o.getS_warehouse_id());
-            if (o.getStatus().equals("pending") && o.getS_warehouse_id().equals(S_wareHouse.getId())) {     
+            logger.debug(warehouseId + " " + o.getSWarehouseId());
+            if (o.getStatus().equals("pending") && o.getSWarehouseId().equals(S_wareHouse.getId())) {     
                 WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
-                Product product = productService.getProductById(o.getProduct_id());
+                Product product = productService.getProductById(o.getProductId());
                     Map<String, Object> orderwithWarehouse = new HashMap<>();
                     orderwithWarehouse.put("w2worder", o);                    
                     orderwithWarehouse.put("s_warehouse", S_wareHouse);
@@ -429,10 +434,10 @@ public class W2WOrderService implements IW2WOrderService {
         Map<String, Object> statusSw2worder = new HashMap<>();
 
         for (W2WOrder o : w2worders) {
-            if (o.getStatus().equals("shipped") && o.getDelivery_man_id().equals(id)) {     
-                WareHouse S_wareHouse = wareHouseService.getWareHouseById(o.getS_warehouse_id());
+            if (o.getStatus().equals("shipped") && o.getDeliveryManId().equals(id)) {     
+                WareHouse S_wareHouse = wareHouseService.getWareHouseById(o.getSWarehouseId());
                 WareHouse R_wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
-                Product product = productService.getProductById(o.getProduct_id());
+                Product product = productService.getProductById(o.getProductId());
                     
                 statusSw2worder.put("w2worder", o);                    
                     statusSw2worder.put("s_warehouse", S_wareHouse);
@@ -454,10 +459,10 @@ public class W2WOrderService implements IW2WOrderService {
         List<W2WOrder> w2worders = w2wOrderRepo.findAll();
         HashSet<WareHouse> allwarehouse = new HashSet<>();
         for(W2WOrder o : w2worders){
-            if(o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)){
+            if(o.getStatus().equals("delivered") && o.getDeliveryManId().equals(id)){
                 WareHouse ware = wareHouseService.getWareHouseById(o.getWarehouseId());
                 if (ware == null) {
-                    System.out.println("donot have warehouse id");
+                    logger.debug("donot have warehouse id");
                     break;
                 }
                 allwarehouse.add(ware);

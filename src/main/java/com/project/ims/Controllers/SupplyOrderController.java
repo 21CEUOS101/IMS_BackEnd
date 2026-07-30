@@ -1,9 +1,11 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // imports
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,11 +21,14 @@ import com.project.ims.Models.WareHouse;
 import com.project.ims.Requests.SupplyOrderAddRequest;
 import com.project.ims.Requests.SupplyOrderUpdateRequest;
 import com.project.ims.Services.SupplyOrderService;
+import com.project.ims.Utils.IdGenerator;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class SupplyOrderController {
+
+    private static final Logger logger = LoggerFactory.getLogger(SupplyOrderController.class);
 
     // necessary dependency injections
 
@@ -41,7 +46,7 @@ public class SupplyOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -54,7 +59,7 @@ public class SupplyOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -62,27 +67,27 @@ public class SupplyOrderController {
     @PostMapping("/supply-order")
     public SupplyOrder addSupplyOrder(@RequestBody SupplyOrderAddRequest data) {
 
-        String id = generateId();
+        String id = IdGenerator.generate("so");
         SupplyOrder supplyOrder = new SupplyOrder();
         supplyOrder.setId(id);
-        supplyOrder.setProduct_id(data.getProduct_id());
+        supplyOrder.setProductId(data.getProductId());
         supplyOrder.setQuantity(data.getQuantity());
-        supplyOrder.setSupplierId(data.getSupplier_id());
-        supplyOrder.setWarehouse_id(data.getWarehouse_id());
-        supplyOrder.setPayment_method(data.getPayment_method());
-        supplyOrder.setIsdelivery_man_Available(false);
-        if ("online".equals(data.getPayment_method())) {
-            supplyOrder.setTransaction_id(data.getTransaction_id());
+        supplyOrder.setSupplierId(data.getSupplierId());
+        supplyOrder.setWarehouseId(data.getWarehouseId());
+        supplyOrder.setPaymentMethod(data.getPaymentMethod());
+        supplyOrder.setDeliveryManAvailable(false);
+        if ("online".equals(data.getPaymentMethod())) {
+            supplyOrder.setTransactionId(data.getTransactionId());
         }
 
-        supplyOrder.setPickup_address(data.getPickup_address());
+        supplyOrder.setPickupAddress(data.getPickupAddress());
 
         try{
             supplyOrderService.addSupplyOrder(supplyOrder);
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -98,7 +103,7 @@ public class SupplyOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -108,19 +113,19 @@ public class SupplyOrderController {
     @PostMapping("/supply-order/{id}")
     public SupplyOrder updateSupplyOrder(@PathVariable("id") String id, @RequestBody SupplyOrderUpdateRequest data) {
         SupplyOrder supplyOrder = supplyOrderService.getSupplyOrderById(id);
-        supplyOrder.setDate_time(data.getDate_time());
-        supplyOrder.setDelivered_date_time(data.getDelivered_date_time());
-        supplyOrder.setDelivery_man_id(data.getDelivery_man_id());
-        supplyOrder.setPayment_method(data.getPayment_method());
-        supplyOrder.setPickup_address(data.getPickup_address());
-        supplyOrder.setProduct_id(data.getProduct_id());
+        supplyOrder.setDateTime(data.getDateTime());
+        supplyOrder.setDeliveredDateTime(data.getDeliveredDateTime());
+        supplyOrder.setDeliveryManId(data.getDeliveryManId());
+        supplyOrder.setPaymentMethod(data.getPaymentMethod());
+        supplyOrder.setPickupAddress(data.getPickupAddress());
+        supplyOrder.setProductId(data.getProductId());
         supplyOrder.setQuantity(data.getQuantity());
         supplyOrder.setStatus(data.getStatus());
-        supplyOrder.setSupplierId(data.getSupplier_id());
-        supplyOrder.setTotal_amount(data.getTotal_amount());
-        supplyOrder.setTransaction_id(data.getTransaction_id());
-        supplyOrder.setWarehouse_id(data.getWarehouse_id());
-        supplyOrder.setIsdelivery_man_Available(data.isIsdelivery_man_Available());
+        supplyOrder.setSupplierId(data.getSupplierId());
+        supplyOrder.setTotalAmount(data.getTotalAmount());
+        supplyOrder.setTransactionId(data.getTransactionId());
+        supplyOrder.setWarehouseId(data.getWarehouseId());
+        supplyOrder.setDeliveryManAvailable(data.isDeliveryManAvailable());
     
         
         try{
@@ -128,13 +133,13 @@ public class SupplyOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
         return supplyOrder;
     }
-    @PostMapping("/SetSupplyorderByDeliverymanid/{id}/data")
+    @PostMapping("/supply-order/SetSupplyorderByDeliverymanid/{id}/data")
     public SupplyOrder SetIsDelivery_manAvailableByDid(@PathVariable String id, @RequestParam("data") String data) {
         try{
             SupplyOrder supplyOrder = supplyOrderService.SetIsDelivery_manAvailableByDid(id,data);
@@ -142,7 +147,7 @@ public class SupplyOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -155,7 +160,7 @@ public class SupplyOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
     // All Supplier
@@ -167,11 +172,11 @@ public class SupplyOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/getallapprovedbutisDFBySid/{id}")
+    @GetMapping("/supply-order/getallapprovedbutisDFBySid/{id}")
     public List<Map<String ,Object>> getallapprovedbutisDFBySid(@PathVariable("id") String id) {
         try {
 
@@ -181,11 +186,11 @@ public class SupplyOrderController {
          
            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/getallapprovedbutisDTBySid/{id}")
+    @GetMapping("/supply-order/getallapprovedbutisDTBySid/{id}")
     public List<Map<String ,Object>> getallapprovedbutisDTBySid(@PathVariable("id") String id) {
         try {
 
@@ -195,11 +200,11 @@ public class SupplyOrderController {
          
            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/getallDeliveredordersBySid/{id}")
+    @GetMapping("/supply-order/getallDeliveredordersBySid/{id}")
     public List<Map<String ,Object>> getallDeliveredordersBySid(@PathVariable("id") String id) {
         try {
 
@@ -209,11 +214,11 @@ public class SupplyOrderController {
          
            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/getallcancelledBySid/{id}")
+    @GetMapping("/supply-order/getallcancelledBySid/{id}")
     public List<Map<String ,Object>> getallcancelledBySid(@PathVariable("id") String id) {
         try {
 
@@ -223,7 +228,7 @@ public class SupplyOrderController {
          
            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -231,7 +236,7 @@ public class SupplyOrderController {
 
 
     // All Manager
-  @GetMapping("/getallDeliveredordersByMid/{id}")
+  @GetMapping("/supply-order/getallDeliveredordersByMid/{id}")
     public List<Map<String ,Object>> getallDeliveredordersByMid(@PathVariable("id") String id) {
         try {
 
@@ -241,11 +246,11 @@ public class SupplyOrderController {
          
            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/getallapprovedbutisDFByMid/{id}")
+    @GetMapping("/supply-order/getallapprovedbutisDFByMid/{id}")
     public List<Map<String ,Object>> getallapprovedbutisDFByMid(@PathVariable("id") String id) {
         try {
 
@@ -255,11 +260,11 @@ public class SupplyOrderController {
          
            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/getallapprovedbutisDTByMid/{id}")
+    @GetMapping("/supply-order/getallapprovedbutisDTByMid/{id}")
     public List<Map<String ,Object>> getallapprovedbutisDTByMid(@PathVariable("id") String id) {
         try {
 
@@ -269,11 +274,11 @@ public class SupplyOrderController {
          
            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/getallcancelledByMid/{id}")
+    @GetMapping("/supply-order/getallcancelledByMid/{id}")
     public List<Map<String ,Object>> getallcancelledByMid(@PathVariable("id") String id) {
         try {
 
@@ -283,11 +288,11 @@ public class SupplyOrderController {
          
            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/getallPendingByWId/{id}")
+    @GetMapping("/supply-order/getallPendingByWId/{id}")
     public List<Map<String ,Object>> getallPendingByWId(@PathVariable("id") String id) {
         try {
 
@@ -297,13 +302,13 @@ public class SupplyOrderController {
          
            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
 
     //from waremanager
-    @GetMapping("/wmanager/checkwarehousebyWid/{id}")
+    @GetMapping("/supply-order/wmanager/checkwarehousebyWid/{id}")
     public List<Map<String,Object>> getCheckWarehouse(@PathVariable String id) {
 
         try {
@@ -311,11 +316,11 @@ public class SupplyOrderController {
           
             return wareHouse_Manager;
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @PostMapping("/wmanager/makeSupplierOrderByWId/{id}/data")
+    @PostMapping("/supply-order/wmanager/makeSupplierOrderByWId/{id}/data")
     public SupplyOrder makeSupplierOrderByWId(@PathVariable String id,@RequestParam("data") String data) {
 
         try {
@@ -323,29 +328,29 @@ public class SupplyOrderController {
           
             return so;
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-       @GetMapping("/warehouseDetails/{id}")
+       @GetMapping("/supply-order/warehouseDetails/{id}")
     public WareHouse warehouseDetails(@PathVariable String id) {
         try{
             WareHouse wareHouse = supplyOrderService.warehouseDetails(id);
             return wareHouse;
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/warehouse/getallproduct/{id}")
+    @GetMapping("/supply-order/warehouse/getallproduct/{id}")
     public List<Map<String ,Object>> AllProduct (@PathVariable String id){
         try{
             List<Map<String ,Object>>  Details = supplyOrderService.AllProduct(id);
             return Details;
 
         }catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -353,11 +358,11 @@ public class SupplyOrderController {
     public List<Map<String ,Object>> getsupplyorderstatusABDFbyDId (@PathVariable String id){
         try{
             List<Map<String ,Object>>  Details = supplyOrderService.getsupplyorderstatusABDFbyDId(id);
-            System.out.println(Details);
+            logger.debug("Details: {}", Details);
             return Details;
 
         }catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -365,11 +370,11 @@ public class SupplyOrderController {
     public Map<String ,Object> getsupplyorderstatusABDTbyDId (@PathVariable String id){
         try{
             Map<String ,Object>  Details = supplyOrderService.getsupplyorderstatusABDTbyDId(id);
-            System.out.println(Details);
+            logger.debug("Details: {}", Details);
             return Details;
 
         }catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -380,27 +385,21 @@ public class SupplyOrderController {
             return Details;
 
         }catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
     @PostMapping("/supply-order/UpdatestatusDTByDid/{id}/data")
-    public SupplyOrder UpdatestatusDTByDid (@PathVariable String id,@RequestParam("data") String data){
+    public SupplyOrder updateStatusDTByDid (@PathVariable String id,@RequestParam("data") String data){
         try{
-            SupplyOrder  Details = supplyOrderService.UpdatestatusDTByDid(id,data);
+            SupplyOrder  Details = supplyOrderService.updateStatusDTByDid(id,data);
             return Details;
 
         }catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
     // generate id
-    public String generateId() {
-        Random rand = new Random();
-        int random = rand.nextInt(1000000);
-        String id = "so" + random;
-        return id;
-    }
     
 }

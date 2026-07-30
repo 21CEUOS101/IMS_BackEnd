@@ -1,9 +1,11 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 // imports
 import java.util.List;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,11 +23,14 @@ import com.project.ims.Requests.DeliveryMan.DeliveryManUpdateRequest;
 import com.project.ims.Responses.DeliveryManOutput;
 import com.project.ims.Services.DeliveryManService;
 import com.project.ims.Services.UserService;
+import com.project.ims.Utils.IdGenerator;
 import java.util.Map;
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class DeliveryManController {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeliveryManController.class);
 
     // necessary dependencies are injected here
     @Autowired
@@ -56,7 +61,6 @@ public class DeliveryManController {
                 deliveryManOutput.setId(deliveryMans.get(i).getId());
                 deliveryManOutput.setName(user.getName());
                 deliveryManOutput.setEmail(user.getEmail());
-                deliveryManOutput.setPassword(user.getPassword());
                 deliveryManOutput.setPhone(user.getPhone());
                 deliveryManOutput.setWarehouseId(deliveryMans.get(i).getWarehouseId());
                 deliveryManOutput.setStatus(deliveryMans.get(i).getStatus());
@@ -65,7 +69,7 @@ public class DeliveryManController {
             return output;
         }
         catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
         
@@ -84,14 +88,13 @@ public class DeliveryManController {
             deliveryManOutput.setId(deliveryMan.getId());
             deliveryManOutput.setName(user.getName());
             deliveryManOutput.setEmail(user.getEmail());
-            deliveryManOutput.setPassword(user.getPassword());
             deliveryManOutput.setPhone(user.getPhone());
             deliveryManOutput.setWarehouseId(deliveryMan.getWarehouseId());
             deliveryManOutput.setStatus(deliveryMan.getStatus());
 
             return deliveryManOutput;
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -100,7 +103,7 @@ public class DeliveryManController {
     @PostMapping("/deliveryman")
     public DeliveryMan addDeliveryMan(@RequestBody DeliveryManAddRequest data) {
 
-        String id = generateId();
+        String id = IdGenerator.generate("d");
 
         DeliveryMan deliveryMan = new DeliveryMan();
         deliveryMan.setId(id);
@@ -113,7 +116,7 @@ public class DeliveryManController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -121,7 +124,7 @@ public class DeliveryManController {
             deliveryManService.addDeliveryMan(deliveryMan);
         }
         catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
         }
 
         return deliveryMan;
@@ -140,7 +143,7 @@ public class DeliveryManController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -148,7 +151,7 @@ public class DeliveryManController {
             deliveryManService.updateDeliveryMan(deliveryMan);
         }
         catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
         }
 
         return deliveryMan;
@@ -164,7 +167,7 @@ public class DeliveryManController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return;
         }
 
@@ -172,7 +175,7 @@ public class DeliveryManController {
             deliveryManService.deleteDeliveryMan(id);
         }
         catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
         }
     }
     //custom
@@ -180,26 +183,18 @@ public class DeliveryManController {
     @GetMapping("/deliveryman/profile/{id}")
     public Map<String,Object> getDeliveryManProfileById(@PathVariable("id") String id) {
         
-       System.out.println(id);
+       logger.debug(id);
         try{
-           Map<String, Object> Dprofile = deliveryManService.Dprofile(id);
-            return Dprofile;
+           Map<String, Object> profile = deliveryManService.getDeliveryManProfile(id);
+            return profile;
         }
         catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
 
     }
     
-
-    public String generateId() {
-        // id generation
-        Random rand = new Random();
-        String id = 'd' + String.valueOf(rand.nextInt(1000000));
-
-        return id;
-    }
 
     public void createUser(String name, String email, String password, String role, String phone, String userId) {
         User user = new User();
@@ -213,7 +208,7 @@ public class DeliveryManController {
     }
     
     public void updateUser(String name, String email, String role, String phone, String userId) {
-        System.out.println(userId);
+        logger.debug(userId);
         User user = userService.getUserByUserId(userId);
         user.setName(name);
         user.setEmail(email);

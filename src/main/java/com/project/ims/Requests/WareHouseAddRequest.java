@@ -4,6 +4,7 @@ package com.project.ims.Requests;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -16,7 +17,8 @@ public class WareHouseAddRequest {
 
     private String pincode;
 
-    private List<String> product_ids;
+    @JsonProperty("product_ids")
+    private List<String> productIds;
 
     private List<String> quantities;
 
@@ -24,7 +26,8 @@ public class WareHouseAddRequest {
 
     private List<Integer> lowerLimits;
 
-    private String manager_id;
+    @JsonProperty("manager_id")
+    private String managerId;
 
     private String status;
 }

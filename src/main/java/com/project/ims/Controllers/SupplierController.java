@@ -1,8 +1,10 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,11 +24,14 @@ import com.project.ims.Requests.Supplier.SupplierUpdateRequest;
 import com.project.ims.Responses.SupplierOutput;
 import com.project.ims.Services.SupplierService;
 import com.project.ims.Services.UserService;
+import com.project.ims.Utils.IdGenerator;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class SupplierController {
+
+    private static final Logger logger = LoggerFactory.getLogger(SupplierController.class);
 
     // necessary dependency injections
     @Autowired
@@ -56,7 +61,6 @@ public class SupplierController {
                 supplierOutput.setId(suppliers.get(i).getId());
                 supplierOutput.setName(user.getName());
                 supplierOutput.setEmail(user.getEmail());
-                supplierOutput.setPassword(user.getPassword());
                 supplierOutput.setPhone(user.getPhone());
                 supplierOutput.setAddress(suppliers.get(i).getAddress());
                 supplierOutput.setPincode(suppliers.get(i).getPincode());
@@ -67,7 +71,7 @@ public class SupplierController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -86,14 +90,13 @@ public class SupplierController {
             supplierOutput.setId(supplier.getId());
             supplierOutput.setName(user.getName());
             supplierOutput.setEmail(user.getEmail());
-            supplierOutput.setPassword(user.getPassword());
             supplierOutput.setPhone(user.getPhone());
             supplierOutput.setAddress(supplier.getAddress());
             supplierOutput.setPincode(supplier.getPincode());
 
             return supplierOutput;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -103,7 +106,7 @@ public class SupplierController {
     @PostMapping("/supplier")
     public Supplier addSupplier(@RequestBody SupplierAddRequest data) {
 
-        String id = generateId();
+        String id = IdGenerator.generate("s");
 
         Supplier supplier = new Supplier();
         supplier.setId(id);
@@ -116,7 +119,7 @@ public class SupplierController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
         
@@ -126,7 +129,7 @@ public class SupplierController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -146,7 +149,7 @@ public class SupplierController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -156,7 +159,7 @@ public class SupplierController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -173,7 +176,7 @@ public class SupplierController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return;
         }
 
@@ -182,16 +185,8 @@ public class SupplierController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
-    }
-
-    public String generateId() {
-        // id generation
-        Random rand = new Random();
-        String id = 's' + String.valueOf(rand.nextInt(1000000));
-
-        return id;
     }
 
     public void createUser(String name, String email, String password, String role, String phone, String userId) {
@@ -226,7 +221,7 @@ public class SupplierController {
             List<SupplyOrder> orders = supplierService.getSupplyOrdersBySupplier(id);
             return orders;
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -238,7 +233,7 @@ public class SupplierController {
             List<ReturnSupplyOrder> orders = supplierService.getReturnSupplyOrdersBySupplier(id);
             return orders;
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }

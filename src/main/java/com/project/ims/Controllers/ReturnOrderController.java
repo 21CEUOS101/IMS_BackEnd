@@ -1,9 +1,11 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // imports
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,11 +25,14 @@ import com.project.ims.Requests.ReturnOrderAddRequest;
 import com.project.ims.Requests.ReturnOrderUpdateRequest;
 import com.project.ims.Services.DeliveryManService;
 import com.project.ims.Services.ReturnOrderService;
+import com.project.ims.Utils.IdGenerator;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class ReturnOrderController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReturnOrderController.class);
 
     // necessary dependency injections
 
@@ -50,7 +55,7 @@ public class ReturnOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -64,7 +69,7 @@ public class ReturnOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -78,7 +83,7 @@ public class ReturnOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -87,27 +92,27 @@ public class ReturnOrderController {
     @PostMapping("/return-order")
     public ReturnOrder createReturnOrder(@RequestBody ReturnOrderAddRequest data) {
 
-        String id = generateId();
+        String id = IdGenerator.generate("r");
         ReturnOrder returnOrder = new ReturnOrder();
         returnOrder.setId(id);
-        returnOrder.setCustomerId(data.getCustomer_id());
-        returnOrder.setPickup_address(data.getPickup_address());
-        returnOrder.setReturn_reason(data.getReturn_reason());
+        returnOrder.setCustomerId(data.getCustomerId());
+        returnOrder.setPickupAddress(data.getPickupAddress());
+        returnOrder.setReturnReason(data.getReturnReason());
         returnOrder.setStatus("shipped");
 
-        Order order = orderRepo.findById(data.getOrder_id()).orElse(null);
-        returnOrder.setProduct_id(order.getProduct_id());
+        Order order = orderRepo.findById(data.getOrderId()).orElse(null);
+        returnOrder.setProductId(order.getProductId());
         returnOrder.setQuantity(order.getQuantity());
         returnOrder.setWarehouseId(order.getWarehouseId());
-        returnOrder.setRefund_amount(order.getTotal_amount());
-        returnOrder.setOrder_id(order.getId());
+        returnOrder.setRefundAmount(order.getTotalAmount());
+        returnOrder.setOrderId(order.getId());
 
         try{
             returnOrderService.addReturnOrder(returnOrder);
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
 
         return returnOrder;
@@ -123,7 +128,7 @@ public class ReturnOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -135,28 +140,28 @@ public class ReturnOrderController {
     public ReturnOrder updateReturnOrder(@PathVariable("id") String id, @RequestBody ReturnOrderUpdateRequest data) {
 
         ReturnOrder returnOrder = returnOrderService.getReturnOrderById(id);
-        returnOrder.setPickup_address(data.getPickup_address());
-        returnOrder.setReturn_reason(data.getReturn_reason());
+        returnOrder.setPickupAddress(data.getPickupAddress());
+        returnOrder.setReturnReason(data.getReturnReason());
         returnOrder.setStatus(data.getStatus());
 
-        Order order = orderRepo.findById(returnOrder.getOrder_id()).orElse(null);
-        returnOrder.setProduct_id(order.getProduct_id());
+        Order order = orderRepo.findById(returnOrder.getOrderId()).orElse(null);
+        returnOrder.setProductId(order.getProductId());
         returnOrder.setQuantity(order.getQuantity());
         returnOrder.setWarehouseId(order.getWarehouseId());
-        returnOrder.setRefund_amount(order.getTotal_amount());
-        returnOrder.setOrder_id(order.getId());
+        returnOrder.setRefundAmount(order.getTotalAmount());
+        returnOrder.setOrderId(order.getId());
         returnOrder.setCustomerId(order.getCustomerId());
 
-        returnOrder.setDate_time(data.getDate_time());
-        returnOrder.setDelivered_date_time(data.getDelivered_date_time());
-        returnOrder.setDelivery_man_id(data.getDelivery_man_id());
+        returnOrder.setDateTime(data.getDateTime());
+        returnOrder.setDeliveredDateTime(data.getDeliveredDateTime());
+        returnOrder.setDeliveryManId(data.getDeliveryManId());
 
         try{
             returnOrderService.updateReturnOrder(returnOrder);
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -164,7 +169,7 @@ public class ReturnOrderController {
     }
 
     // get return orders by warehouse id
-    @GetMapping("/return-orders/warehouse/{id}")
+    @GetMapping("/return-order/warehouse/{id}")
     public List<ReturnOrder> getReturnOrdersByWarehouseId(@PathVariable String id) {
         try{
             List<ReturnOrder> returnOrders = returnOrderService.findByWarehouseId(id);
@@ -172,7 +177,7 @@ public class ReturnOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -186,11 +191,11 @@ public class ReturnOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
     //custom
-    @PostMapping("/return-orders/updateOrderStatusSByDid/{id}/data")
+    @PostMapping("/return-order/updateOrderStatusSByDid/{id}/data")
     public ReturnOrder getReturnOrdersByAbyDid(@PathVariable String id , @RequestParam("data") String data ) {
         try{
             ReturnOrder returnOrders = returnOrderService.updateOrderStatusSByDid(data,id);
@@ -198,11 +203,11 @@ public class ReturnOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/return-orders/orderstatusPbyDid/{id}")
+    @GetMapping("/return-order/orderstatusPbyDid/{id}")
     public List<Map<String,Object>> orderstatusPbyDid(@PathVariable String id ) {
         try{
             List<Map<String,Object>> returnOrders = returnOrderService.orderStatusP(id);
@@ -210,11 +215,11 @@ public class ReturnOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @GetMapping("/return-orders/orderstatusSbyDid/{id}")
+    @GetMapping("/return-order/orderstatusSbyDid/{id}")
     public Map<String,Object> orderstatusSbyDid(@PathVariable String id ) {
         try{
             Map<String,Object> returnOrders = returnOrderService.orderStatusS(id);
@@ -222,25 +227,25 @@ public class ReturnOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    @PostMapping("/return-orders/assignBydeliveryman/{id}/data")
+    @PostMapping("/return-order/assignBydeliveryman/{id}/data")
     public ReturnOrder assignDeliverymanById(@PathVariable("id") String id,@RequestParam("data") String data) {
     //    System.out.println(data);
         try {
            ReturnOrder order = returnOrderService.getReturnOrderById(data);
            DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
            if(order == null || deliveryMan ==null){
-            System.out.println("order doesnot exist or delivery doesnot exist");
+            logger.debug("order doesnot exist or delivery doesnot exist");
             return null;
            }
            
 
            if(order.getStatus().equals("pending") && deliveryMan.getStatus().equals("available")){
 
-            order.setDelivery_man_id(id);
+            order.setDeliveryManId(id);
                order.setStatus("shipped");
                
                returnOrderService.updateReturnOrder(order);
@@ -250,17 +255,17 @@ public class ReturnOrderController {
                return order;
            }
            else{
-            System.out.println("delivery man is not available");
+            logger.debug("delivery man is not available");
             return null;
             
            }
            
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     } 
-    @GetMapping("/order/orderstatusRbyDid/{id}")
+    @GetMapping("/return-order/orderstatusRbyDid/{id}")
     public List<Map<String,Object>> getReturnOrdersByRbyDid(@PathVariable String id ) {
         try{
             List<Map<String,Object>> returnOrders = returnOrderService.getReturnOrdersByRbyDid(id);
@@ -268,14 +273,8 @@ public class ReturnOrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
-    }
-    
-    public String generateId() {
-        Random rand = new Random();
-        String id = "r" + rand.nextInt(1000000);
-        return id;
     }
 }

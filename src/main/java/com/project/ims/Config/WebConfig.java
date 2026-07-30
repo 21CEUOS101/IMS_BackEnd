@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "http://localhost:3001") // ims_frontend and IMS_Admin dev servers
+                .allowedOrigins("http://localhost:3000", "http://localhost:3001", "http://localhost:5173") // ims_frontend, IMS_Admin, and new unified frontend dev servers
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("Origin", "Content-Type", "Accept", "Authorization")
                 .allowCredentials(true);

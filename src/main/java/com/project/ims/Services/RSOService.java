@@ -1,5 +1,8 @@
 package com.project.ims.Services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -28,6 +31,8 @@ import com.project.ims.Repo.SupplyOrderRepo;
 
 @Service
 public class RSOService implements IRSOService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RSOService.class);
 
     // necessary dependency Injections
     @Autowired
@@ -97,7 +102,7 @@ public class RSOService implements IRSOService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = currentDateTime.format(formatter);
-        returnSupplyOrder.setDate_time(formattedDateTime);
+        returnSupplyOrder.setDateTime(formattedDateTime);
         
         // assign deliveryman to return supply order if deliveryman not available then rso status will be pending
         // String deliveryManId = assignDeliveryMan(returnSupplyOrder);
@@ -106,7 +111,7 @@ public class RSOService implements IRSOService {
         //     returnSupplyOrder.setStatus("pending");
         // }
 
-        // returnSupplyOrder.setDelivery_man_id(deliveryManId);
+        // returnSupplyOrder.setDeliveryManId(deliveryManId);
         
 
         return returnSupplyOrderRepo.save(returnSupplyOrder);
@@ -130,9 +135,9 @@ public class RSOService implements IRSOService {
             LocalDateTime currentDateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = currentDateTime.format(formatter);
-            returnSupplyOrder.setDelivered_date_time(formattedDateTime);
+            returnSupplyOrder.setDeliveredDateTime(formattedDateTime);
 
-            DeliveryMan m = deliveryManService.getDeliveryManById(returnSupplyOrder.getDelivery_man_id());
+            DeliveryMan m = deliveryManService.getDeliveryManById(returnSupplyOrder.getDeliveryManId());
 
             m.setStatus("available");
 
@@ -141,7 +146,7 @@ public class RSOService implements IRSOService {
             }
             catch(Exception e)
             {
-                System.out.println(e.getMessage());
+                logger.error(e.getMessage(), e);
                 return null;
             }
         }
@@ -162,7 +167,7 @@ public class RSOService implements IRSOService {
     }
     
     public String assignDeliveryMan(ReturnSupplyOrder returnSupplyOrder) {
-        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(returnSupplyOrder.getWarehouse_id());
+        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(returnSupplyOrder.getWarehouseId());
         String deliveryManId = null;
         for (DeliveryMan deliveryMan : deliveryMen) {
             if (deliveryMan.getStatus().equals("available")) {
@@ -173,7 +178,7 @@ public class RSOService implements IRSOService {
                 }
                 catch(Exception e)
                 {
-                    System.out.println(e.getMessage());
+                    logger.error(e.getMessage(), e);
                     return null;
                 }
                 break;
@@ -190,23 +195,23 @@ public class RSOService implements IRSOService {
         DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
         if(deliveryMan == null)
         {
-            System.out.println("Delivery man not exists");
+            logger.debug("Delivery man not exists");
             return null;
         }
         WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
         if(wareHouse == null)
         {
-            System.out.println("delivery man warehouse donot exists");
+            logger.debug("delivery man warehouse donot exists");
             return null;
         }
         List<ReturnSupplyOrder> orders = returnSupplyOrderRepo.findAll();
         Map<String, Object> Filterorders = new HashMap<>();
 
         for (ReturnSupplyOrder o : orders) {
-            if (o.getStatus().equals("shipped") && o.getDelivery_man_id().equals(id)) {                
+            if (o.getStatus().equals("shipped") && o.getDeliveryManId().equals(id)) {                
                 Supplier s = supplierService.getSupplierById(o.getSupplierId());
                 User user = userService.getUserByUserId(o.getSupplierId());
-                Product product = productService.getProductById(o.getProduct_id());
+                Product product = productService.getProductById(o.getProductId());
                    
                 Filterorders.put("rso", o);                   
                 Filterorders.put("supplier", s);
@@ -228,23 +233,23 @@ public class RSOService implements IRSOService {
        DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
        if(deliveryMan == null)
        {
-           System.out.println("Delivery man not exists");
+           logger.debug("Delivery man not exists");
            return null;
        }
        WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
        if(wareHouse == null)
        {
-           System.out.println("delivery man warehouse donot exists");
+           logger.debug("delivery man warehouse donot exists");
            return null;
        }
        List<ReturnSupplyOrder> orders = returnSupplyOrderRepo.findAll();
        List<Map<String ,Object>> ord = new ArrayList<>();
 
        for (ReturnSupplyOrder o : orders) {
-           if (o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)) {                
+           if (o.getStatus().equals("delivered") && o.getDeliveryManId().equals(id)) {                
                Supplier s = supplierService.getSupplierById(o.getSupplierId());
                User user = userService.getUserByUserId(o.getSupplierId());
-               Product product = productService.getProductById(o.getProduct_id());
+               Product product = productService.getProductById(o.getProductId());
                Map<String, Object> Filterorders = new HashMap<>();
                   
                Filterorders.put("rso", o);                   

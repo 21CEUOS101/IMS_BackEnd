@@ -3,6 +3,7 @@ package com.project.ims.Requests.WManager;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 @AllArgsConstructor
@@ -16,5 +17,6 @@ public class WManagerAddRequest {
 
     private String phone;
 
-    private String warehouse_id;
+    @JsonProperty("warehouse_id")
+    private String warehouseId;
 }

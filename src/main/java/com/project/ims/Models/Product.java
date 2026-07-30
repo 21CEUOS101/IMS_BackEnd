@@ -1,6 +1,8 @@
 package com.project.ims.Models;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -18,7 +20,9 @@ public class Product {
 
     private String name;
 
-    private String expiry_date;
+    @Field("expiry_date")
+    @JsonProperty("expiry_date")
+    private String expiryDate;
 
     private String price;
 
@@ -26,7 +30,9 @@ public class Product {
 
     private Integer tax;
 
-    private Integer whole_sale_price;
+    @Field("whole_sale_price")
+    @JsonProperty("whole_sale_price")
+    private Integer wholeSalePrice;
 
     private Integer profit;
     

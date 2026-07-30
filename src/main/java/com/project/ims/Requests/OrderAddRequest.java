@@ -3,6 +3,7 @@ package com.project.ims.Requests;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -10,17 +11,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderAddRequest {
 
-    private List<String> product_ids;
+    @JsonProperty("product_ids")
+    private List<String> productIds;
 
     private List<String> quantities;
 
-    private String warehouse_id;
+    @JsonProperty("warehouse_id")
+    private String warehouseId;
 
-    private String customer_id;
+    @JsonProperty("customer_id")
+    private String customerId;
 
-    private String payment_method;
+    @JsonProperty("payment_method")
+    private String paymentMethod;
 
-    private String transaction_id;
+    @JsonProperty("transaction_id")
+    private String transactionId;
 
-    private String delivery_address;
+    @JsonProperty("delivery_address")
+    private String deliveryAddress;
 }

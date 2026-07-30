@@ -1,6 +1,7 @@
 package com.project.ims.Requests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -8,20 +9,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SupplyOrderAddRequest {
 
-    private String product_id;
+    @JsonProperty("product_id")
+    private String productId;
 
     private String quantity;
 
-    private String supplier_id;
+    @JsonProperty("supplier_id")
+    private String supplierId;
 
-    private String warehouse_id;
+    @JsonProperty("warehouse_id")
+    private String warehouseId;
 
-    private String payment_method;
+    @JsonProperty("payment_method")
+    private String paymentMethod;
 
-    private String transaction_id;
+    @JsonProperty("transaction_id")
+    private String transactionId;
 
-    private String pickup_address;
+    @JsonProperty("pickup_address")
+    private String pickupAddress;
     
-    private boolean isdelivery_man_Available;
+    @JsonProperty("isdelivery_man_Available")
+    private boolean deliveryManAvailable;
     
 }

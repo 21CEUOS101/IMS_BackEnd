@@ -1,29 +1,37 @@
 package com.project.ims.Requests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class W2WOrderUpdateRequest {
-    private String product_id;
+    @JsonProperty("product_id")
+    private String productId;
 
     private String quantity;
 
-    private String s_warehouse_id;
+    @JsonProperty("s_warehouse_id")
+    private String sWarehouseId;
 
-    private String r_warehouse_id;
+    @JsonProperty("r_warehouse_id")
+    private String rWarehouseId;
 
-    private String total_amount;
+    @JsonProperty("total_amount")
+    private String totalAmount;
 
     private String status;
 
-    private String date_time;
+    @JsonProperty("date_time")
+    private String dateTime;
 
-    private String delivery_man_id;
+    @JsonProperty("delivery_man_id")
+    private String deliveryManId;
 
-    private String delivered_date_time;
+    @JsonProperty("delivered_date_time")
+    private String deliveredDateTime;
 
     private String orderId;
 }

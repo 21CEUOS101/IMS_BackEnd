@@ -1,6 +1,8 @@
 package com.project.ims.Models;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -16,5 +18,7 @@ public class WareHouse_Manager {
     @Id
     private String id;
 
-    private String warehouse_id;
+    @Field("warehouse_id")
+    @JsonProperty("warehouse_id")
+    private String warehouseId;
 }

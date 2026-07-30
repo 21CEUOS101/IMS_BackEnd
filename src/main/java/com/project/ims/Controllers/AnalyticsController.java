@@ -1,5 +1,8 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +18,10 @@ import com.project.ims.Services.AnalyticsService;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class AnalyticsController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AnalyticsController.class);
 
     @Autowired
     private AnalyticsService analyticsService;
@@ -28,7 +33,7 @@ public class AnalyticsController {
         try {
             return analyticsService.getOverview();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -40,7 +45,7 @@ public class AnalyticsController {
         try {
             return analyticsService.getCurrentOrdersForDeliveryMan(id);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }

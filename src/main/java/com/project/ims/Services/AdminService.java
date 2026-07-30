@@ -115,9 +115,9 @@ public class AdminService implements IAdminService {
             RecentSales recentSale = new RecentSales();
             recentSale.setOrderId(orders.get(i).getId());
             recentSale.setCustomerId(orders.get(i).getCustomerId());
-            recentSale.setDate(orders.get(i).getDelivered_date_time());
+            recentSale.setDate(orders.get(i).getDeliveredDateTime());
 
-            Integer totalAmount = Integer.parseInt(orders.get(i).getTotal_amount());
+            Integer totalAmount = Integer.parseInt(orders.get(i).getTotalAmount());
             recentSale.setTotalAmount(totalAmount);
 
             // calculate profit for each order
@@ -126,10 +126,10 @@ public class AdminService implements IAdminService {
 
             // take one product profit percentage because all products are same in one order
 
-            Product product = productRepo.findById(orders.get(i).getProduct_id()).orElse(null);
+            Product product = productRepo.findById(orders.get(i).getProductId()).orElse(null);
 
             Integer profitPercentage = product.getProfit();
-            Integer priceOfProduct = product.getWhole_sale_price();
+            Integer priceOfProduct = product.getWholeSalePrice();
 
             Integer profitPerProduct = (profitPercentage * priceOfProduct) / 100;
 

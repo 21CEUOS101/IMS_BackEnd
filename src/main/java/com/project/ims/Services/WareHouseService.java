@@ -95,23 +95,23 @@ public class WareHouseService implements IWareHouseService {
 
         // check if manager id exists
 
-        if(wareHouse.getManager_id() == null || wareHouse.getManager_id().isEmpty())
+        if(wareHouse.getManagerId() == null || wareHouse.getManagerId().isEmpty())
         {
             throw new RuntimeException("WareHouse Manager ID cannot be empty");
         }
-        else if (wareHouse.getManager_id().charAt(0) != 'm')
+        else if (wareHouse.getManagerId().charAt(0) != 'm')
         {
             throw new RuntimeException("WareHouse Manager ID must start with 'm'");
         }
 
-        WareHouse_Manager wManager = wManagerRepo.findById(wareHouse.getManager_id()).orElse(null);
+        WareHouse_Manager wManager = wManagerRepo.findById(wareHouse.getManagerId()).orElse(null);
 
         if (wManager == null)
         {
             throw new RuntimeException("WareHouse Manager ID does not exist");
         }
 
-        wManager.setWarehouse_id(wareHouse.getId());
+        wManager.setWarehouseId(wareHouse.getId());
 
         try{
             wManagerRepo.save(wManager);
@@ -124,9 +124,9 @@ public class WareHouseService implements IWareHouseService {
         String id = wareHouse.getId();
 
         // add to global products
-        for(int i=0;i<wareHouse.getProduct_ids().size();i++)
+        for(int i=0;i<wareHouse.getProductIds().size();i++)
         {
-            String productId = wareHouse.getProduct_ids().get(i);
+            String productId = wareHouse.getProductIds().get(i);
             Integer quantity = Integer.parseInt(wareHouse.getQuantities().get(i));
 
             GlobalProducts globalProducts = gpService.getById(productId);
@@ -158,9 +158,9 @@ public class WareHouseService implements IWareHouseService {
         String id = wareHouse.getId();
 
         // update global products
-        for(int i=0;i<wareHouse.getProduct_ids().size();i++)
+        for(int i=0;i<wareHouse.getProductIds().size();i++)
         {
-            String productId = wareHouse.getProduct_ids().get(i);
+            String productId = wareHouse.getProductIds().get(i);
             Integer quantity = Integer.parseInt(wareHouse.getQuantities().get(i));
 
             GlobalProducts globalProducts = gpService.getById(productId);
@@ -197,9 +197,9 @@ public class WareHouseService implements IWareHouseService {
 
         // update global products
 
-        for(int i=0;i<wareHouse.getProduct_ids().size();i++)
+        for(int i=0;i<wareHouse.getProductIds().size();i++)
         {
-            String productId = wareHouse.getProduct_ids().get(i);
+            String productId = wareHouse.getProductIds().get(i);
 
             GlobalProducts globalProducts = gpService.getById(productId);
 

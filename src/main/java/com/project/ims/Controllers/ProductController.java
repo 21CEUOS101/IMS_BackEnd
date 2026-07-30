@@ -1,9 +1,11 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 // imports
 import java.util.List;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,11 +21,14 @@ import com.project.ims.Models.Product;
 import com.project.ims.Requests.ProductAddRequest;
 import com.project.ims.Services.GPService;
 import com.project.ims.Services.ProductService;
+import com.project.ims.Utils.IdGenerator;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class ProductController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     // necessary dependency injections
     @Autowired
@@ -51,7 +56,7 @@ public class ProductController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -63,7 +68,7 @@ public class ProductController {
             GlobalProducts product = gpService.getById(id);
             return product;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -73,7 +78,7 @@ public class ProductController {
         try {
             return productService.getAllProduct();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -83,7 +88,7 @@ public class ProductController {
         try {
             return productService.getProductById(id);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -91,24 +96,24 @@ public class ProductController {
     @PostMapping("/product")
     public Product addProduct(@RequestBody ProductAddRequest data) {
 
-        String id = generateId();
+        String id = IdGenerator.generate("p");
         Product product = new Product();
-        Integer pr = data.getWhole_sale_price() +( data.getWhole_sale_price()*data.getProfit() )/100+ (data.getWhole_sale_price()*data.getTax())/100;
+        Integer pr = data.getWholeSalePrice() +( data.getWholeSalePrice()*data.getProfit() )/100+ (data.getWholeSalePrice()*data.getTax())/100;
         String prString = String.valueOf(pr);
         product.setId(id);
         product.setName(data.getName());
         product.setPrice(prString);
-        product.setExpiry_date(data.getExpiry_date());
+        product.setExpiryDate(data.getExpiryDate());
         product.setSupplierId(data.getSupplierId());
         product.setTax(data.getTax());
-        product.setWhole_sale_price(data.getWhole_sale_price());
+        product.setWholeSalePrice(data.getWholeSalePrice());
         product.setProfit(data.getProfit());
         try{
             productService.addProduct(product);
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -119,20 +124,20 @@ public class ProductController {
     public Product updateProduct(@PathVariable String id, @RequestBody ProductAddRequest data) {
         Product product = productService.getProductById(id);
         product.setName(data.getName());
-        Integer pr = data.getWhole_sale_price() +( data.getWhole_sale_price()*data.getProfit() )/100+ (data.getWhole_sale_price()*data.getTax())/100;
+        Integer pr = data.getWholeSalePrice() +( data.getWholeSalePrice()*data.getProfit() )/100+ (data.getWholeSalePrice()*data.getTax())/100;
         String prString = String.valueOf(pr);
         product.setPrice(prString);
-        product.setExpiry_date(data.getExpiry_date());
+        product.setExpiryDate(data.getExpiryDate());
         product.setSupplierId(data.getSupplierId());
         product.setTax(data.getTax());
-        product.setWhole_sale_price(data.getWhole_sale_price());
+        product.setWholeSalePrice(data.getWholeSalePrice());
         product.setProfit(data.getProfit());
         try{
             productService.updateProduct(product);
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -146,15 +151,8 @@ public class ProductController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
-    }
-
-    public String generateId()
-    {
-        Random rand = new Random();
-        String id = "p" + rand.nextInt(100000);
-        return id;
     }
 
 }

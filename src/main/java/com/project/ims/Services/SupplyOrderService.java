@@ -1,5 +1,8 @@
 package com.project.ims.Services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,6 +29,8 @@ import com.project.ims.Requests.SupplyOrderAddRequest;
 
 @Service
 public class SupplyOrderService implements ISupplyOrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SupplyOrderService.class);
 
     // necessary dependency Injections
     @Autowired
@@ -76,20 +81,20 @@ public class SupplyOrderService implements ISupplyOrderService {
             throw new RuntimeException("Supply Order ID must start with 's'");
         }
 
-        Product product = productService.getProductById(supplyOrder.getProduct_id());
+        Product product = productService.getProductById(supplyOrder.getProductId());
 
-        int price = product.getWhole_sale_price();
+        int price = product.getWholeSalePrice();
 
         int quantity = Integer.parseInt(supplyOrder.getQuantity());
         int total_amount = price * quantity;
-        supplyOrder.setTotal_amount(Integer.toString(total_amount));
+        supplyOrder.setTotalAmount(Integer.toString(total_amount));
 
         supplyOrder.setStatus("pending");
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = currentDateTime.format(formatter);
-        supplyOrder.setDate_time(formattedDateTime);
+        supplyOrder.setDateTime(formattedDateTime);
 
         return supplyOrderRepo.save(supplyOrder);
     }
@@ -117,7 +122,7 @@ public class SupplyOrderService implements ISupplyOrderService {
     }
 
     public String assignDeliveryMan(SupplyOrder supplyOrder) {
-        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(supplyOrder.getWarehouse_id());
+        List<DeliveryMan> deliveryMen = deliveryManService.getAllDeliveryManByWarehouse(supplyOrder.getWarehouseId());
         String deliveryManId = null;
         for (DeliveryMan d : deliveryMen) {
             if (d.getStatus().equals("available")) {
@@ -126,7 +131,7 @@ public class SupplyOrderService implements ISupplyOrderService {
                 try {
                     deliveryManService.updateDeliveryMan(d);
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    logger.error(e.getMessage(), e);
                     return null;
                 }
 
@@ -141,12 +146,12 @@ public class SupplyOrderService implements ISupplyOrderService {
     public SupplyOrder updateSupplyOrderStatus(String id, String status) {
         SupplyOrder supplyOrder = getSupplyOrderById(id);
 
-        if (status.equals("delivered") && supplyOrder.isIsdelivery_man_Available()) {
+        if (status.equals("delivered") && supplyOrder.isDeliveryManAvailable()) {
 
-            WareHouse wareHouse = wareHouseService.getWareHouseById(supplyOrder.getWarehouse_id());
+            WareHouse wareHouse = wareHouseService.getWareHouseById(supplyOrder.getWarehouseId());
 
-            for (int i = 0; i < wareHouse.getProduct_ids().size(); i++) {
-                if (wareHouse.getProduct_ids().get(i).equals(supplyOrder.getProduct_id())) {
+            for (int i = 0; i < wareHouse.getProductIds().size(); i++) {
+                if (wareHouse.getProductIds().get(i).equals(supplyOrder.getProductId())) {
                     int quantity = Integer.parseInt(wareHouse.getQuantities().get(i));
                     quantity = quantity + Integer.parseInt(supplyOrder.getQuantity());
                     wareHouse.getQuantities().set(i, Integer.toString(quantity));
@@ -156,20 +161,20 @@ public class SupplyOrderService implements ISupplyOrderService {
             try {
                 wareHouseService.updateWareHouse(wareHouse);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                logger.error(e.getMessage(), e);
                 return null;
             }
 
-            supplyOrder.setDelivered_date_time(LocalDateTime.now().toString());
+            supplyOrder.setDeliveredDateTime(LocalDateTime.now().toString());
 
-            DeliveryMan m = deliveryManService.getDeliveryManById(supplyOrder.getDelivery_man_id());
+            DeliveryMan m = deliveryManService.getDeliveryManById(supplyOrder.getDeliveryManId());
 
             m.setStatus("available");
             supplyOrder.setStatus("delivered");
             try {
                 deliveryManService.updateDeliveryMan(m);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                logger.error(e.getMessage(), e);
                 return null;
             }
 
@@ -177,32 +182,32 @@ public class SupplyOrderService implements ISupplyOrderService {
             if(supplyOrder.getStatus().equals("pending")){
                 supplyOrder.setStatus("cancel");
             }
-            else if (supplyOrder.getStatus().equals("approved") && supplyOrder.isIsdelivery_man_Available()) {
+            else if (supplyOrder.getStatus().equals("approved") && supplyOrder.isDeliveryManAvailable()) {
 
-                DeliveryMan m = deliveryManService.getDeliveryManById(supplyOrder.getDelivery_man_id());
+                DeliveryMan m = deliveryManService.getDeliveryManById(supplyOrder.getDeliveryManId());
 
                 m.setStatus("available");
                 supplyOrder.setStatus("cancel");
                 try {
                     deliveryManService.updateDeliveryMan(m);
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    logger.error(e.getMessage(), e);
                     return null;
                 }
             }
             else{
-               System.out.println("status is different from approved and pending");
+               logger.debug("status is different from approved and pending");
             }
         } else if (status.equals("approved")) {
             
             String deliveryManId = assignDeliveryMan(supplyOrder);
 
-            supplyOrder.setDelivery_man_id(deliveryManId);
+            supplyOrder.setDeliveryManId(deliveryManId);
 
             if (deliveryManId == null) {
 
             } else {
-                supplyOrder.setIsdelivery_man_Available(true);
+                supplyOrder.setDeliveryManAvailable(true);
 
             }
             supplyOrder.setStatus("approved");
@@ -212,7 +217,7 @@ public class SupplyOrderService implements ISupplyOrderService {
 
         if (!(status.equals("pending") || status.equals("delivered") || status.equals("cancel")
                 || status.equals("approved"))) {
-            System.out.println("Invalid status");
+            logger.debug("Invalid status");
             return null;
         }
 
@@ -225,27 +230,27 @@ public class SupplyOrderService implements ISupplyOrderService {
         SupplyOrder so = getSupplyOrderById(order);
         DeliveryMan d = deliveryManService.getDeliveryManById(id);
         if (d == null) {
-            System.out.println("delivery donot exist");
+            logger.debug("delivery donot exist");
             return null;
         }
         if (d.getStatus().equals("unavailable")) {
-            System.out.println("delivery man is not free");
+            logger.debug("delivery man is not free");
             return null;
         }
         if (so == null) {
-            System.out.println("supply order is not there");
+            logger.debug("supply order is not there");
             return null;
         }
 
         if (so.getStatus().equals("approved")) {
 
-            so.setDelivery_man_id(id);
-            so.setIsdelivery_man_Available(true);
+            so.setDeliveryManId(id);
+            so.setDeliveryManAvailable(true);
             d.setStatus("unavailable");
             deliveryManService.updateDeliveryMan(d);
             updateSupplyOrder(so);
         } else {
-            System.out.println("supply orders status is not approved");
+            logger.debug("supply orders status is not approved");
             return null;
         }
         return so;
@@ -260,10 +265,10 @@ public class SupplyOrderService implements ISupplyOrderService {
         for (SupplyOrder s : so) {
             if (s.getSupplierId().equals(id) && s.getStatus().equals("pending")) {
                 Map<String, Object> fi = new HashMap<>();
-                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
-                User user = userService.getUserByUserId(ware.getManager_id());
-                Product prod = productService.getProductById(s.getProduct_id());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouseId());
+                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManagerId());
+                User user = userService.getUserByUserId(ware.getManagerId());
+                Product prod = productService.getProductById(s.getProductId());
                 fi.put("warehouse", ware);
                 fi.put("supplyOrder", s);
                 fi.put("manager", wm);
@@ -281,13 +286,13 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<SupplyOrder> allSo = getAllSupplyOrder();
         
         for( SupplyOrder s : allSo){
-            if(s.getSupplierId().equals(id) && s.getStatus().equals("approved") && !s.isIsdelivery_man_Available() ){
+            if(s.getSupplierId().equals(id) && s.getStatus().equals("approved") && !s.isDeliveryManAvailable() ){
                 Map<String ,Object> ma = new HashMap<>();
-                Product p = productService.getProductById(s.getProduct_id());
-                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
+                Product p = productService.getProductById(s.getProductId());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouseId());
+                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManagerId());
                 // WareHouse_Manager wm = .getSupplierById(id);
-                User user = userService.getUserByUserId(ware.getManager_id());
+                User user = userService.getUserByUserId(ware.getManagerId());
                 ma.put("supplyOrder", s);
                 ma.put("product", p);
                 ma.put("warehouse", ware);
@@ -305,13 +310,13 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<SupplyOrder> allSo = getAllSupplyOrder();
         
         for( SupplyOrder s : allSo){
-            if(s.getSupplierId().equals(id) && s.getStatus().equals("approved") && s.isIsdelivery_man_Available() ){
+            if(s.getSupplierId().equals(id) && s.getStatus().equals("approved") && s.isDeliveryManAvailable() ){
                 Map<String ,Object> ma = new HashMap<>();
-                Product p = productService.getProductById(s.getProduct_id());
-                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
-                User user = userService.getUserByUserId(ware.getManager_id());
-                DeliveryMan d = deliveryManService.getDeliveryManById(s.getDelivery_man_id());
+                Product p = productService.getProductById(s.getProductId());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouseId());
+                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManagerId());
+                User user = userService.getUserByUserId(ware.getManagerId());
+                DeliveryMan d = deliveryManService.getDeliveryManById(s.getDeliveryManId());
                 User d_user = userService.getUserByUserId(d.getId());
                 ma.put("product", p);
                 ma.put("supplyOrder", s);
@@ -331,13 +336,13 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<SupplyOrder> allSo = getAllSupplyOrder();
         
         for( SupplyOrder s : allSo){
-            if(s.getSupplierId().equals(id) && s.getStatus().equals("delivered") && s.isIsdelivery_man_Available() ){
+            if(s.getSupplierId().equals(id) && s.getStatus().equals("delivered") && s.isDeliveryManAvailable() ){
                 Map<String ,Object> ma = new HashMap<>();
-                Product p = productService.getProductById(s.getProduct_id());
-                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
-                User user = userService.getUserByUserId(ware.getManager_id());
-                DeliveryMan d = deliveryManService.getDeliveryManById(s.getDelivery_man_id());
+                Product p = productService.getProductById(s.getProductId());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouseId());
+                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManagerId());
+                User user = userService.getUserByUserId(ware.getManagerId());
+                DeliveryMan d = deliveryManService.getDeliveryManById(s.getDeliveryManId());
                 User d_user = userService.getUserByUserId(d.getId());
                 ma.put("supplyOrder", s);
                 ma.put("product", p);
@@ -359,10 +364,10 @@ public class SupplyOrderService implements ISupplyOrderService {
         for( SupplyOrder s : allSo){
             if(s.getSupplierId().equals(id) && s.getStatus().equals("cancel") ){
                 Map<String ,Object> ma = new HashMap<>();
-                Product p = productService.getProductById(s.getProduct_id());
-                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
-                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManager_id());
-                User user = userService.getUserByUserId(ware.getManager_id());
+                Product p = productService.getProductById(s.getProductId());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouseId());
+                WareHouse_Manager wm = wManagerService.getWManagerById(ware.getManagerId());
+                User user = userService.getUserByUserId(ware.getManagerId());
                 ma.put("supplyorder", s);
                 ma.put("product", p);
                 ma.put("warehouse", ware);
@@ -380,19 +385,19 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
         for (SupplyOrder s : allSo) {
-            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouse_id());
+            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouseId());
             if (wareHouse == null) {
-                System.out.println("No warehouse for the particular supply order");
+                logger.debug("No warehouse for the particular supply order");
                 return null;
             }
 
-            if (wareHouse.getManager_id().equals(id) && s.getStatus().equals("delivered")) {
+            if (wareHouse.getManagerId().equals(id) && s.getStatus().equals("delivered")) {
                 Map<String, Object> ma = new HashMap<>();
-                Product p = productService.getProductById(s.getProduct_id());
-                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
+                Product p = productService.getProductById(s.getProductId());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouseId());
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
                 User user = userService.getUserByUserId(sup.getId());
-                DeliveryMan d = deliveryManService.getDeliveryManById(s.getDelivery_man_id());
+                DeliveryMan d = deliveryManService.getDeliveryManById(s.getDeliveryManId());
                 User d_user = userService.getUserByUserId(d.getId());
                 ma.put("supplyorder", s);
                 ma.put("product", p);
@@ -412,20 +417,20 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
         for (SupplyOrder s : allSo) {
-            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouse_id());
+            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouseId());
             if (wareHouse == null) {
-                System.out.println("No warehouse for the particular supply order");
+                logger.debug("No warehouse for the particular supply order");
                 return null;
             }
 
-            if (wareHouse.getManager_id().equals(id) && s.getStatus().equals("approved")
-                    && s.isIsdelivery_man_Available()) {
+            if (wareHouse.getManagerId().equals(id) && s.getStatus().equals("approved")
+                    && s.isDeliveryManAvailable()) {
                 Map<String, Object> ma = new HashMap<>();
-                Product p = productService.getProductById(s.getProduct_id());
-                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
+                Product p = productService.getProductById(s.getProductId());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouseId());
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
                 User user = userService.getUserByUserId(sup.getId());
-                DeliveryMan d = deliveryManService.getDeliveryManById(s.getDelivery_man_id());
+                DeliveryMan d = deliveryManService.getDeliveryManById(s.getDeliveryManId());
                 User d_user = userService.getUserByUserId(d.getId());
                 ma.put("supplyorder", s);
                 ma.put("product", p);
@@ -445,17 +450,17 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
         for (SupplyOrder s : allSo) {
-            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouse_id());
+            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouseId());
             if (wareHouse == null) {
-                System.out.println("No warehouse for the particular supply order");
+                logger.debug("No warehouse for the particular supply order");
                 return null;
             }
 
-            if (wareHouse.getManager_id().equals(id) && s.getStatus().equals("approved")
-                    && !s.isIsdelivery_man_Available()) {
+            if (wareHouse.getManagerId().equals(id) && s.getStatus().equals("approved")
+                    && !s.isDeliveryManAvailable()) {
                 Map<String, Object> ma = new HashMap<>();
-                Product p = productService.getProductById(s.getProduct_id());
-                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
+                Product p = productService.getProductById(s.getProductId());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouseId());
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
                 User user = userService.getUserByUserId(sup.getId());
 
@@ -475,16 +480,16 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
         for (SupplyOrder s : allSo) {
-            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouse_id());
+            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouseId());
             if (wareHouse == null) {
-                System.out.println("No warehouse for the particular supply order");
+                logger.debug("No warehouse for the particular supply order");
                 return null;
             }
 
-            if (wareHouse.getManager_id().equals(id) && s.getStatus().equals("cancel")) {
+            if (wareHouse.getManagerId().equals(id) && s.getStatus().equals("cancel")) {
                 Map<String, Object> ma = new HashMap<>();
-                Product p = productService.getProductById(s.getProduct_id());
-                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
+                Product p = productService.getProductById(s.getProductId());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouseId());
                 Supplier sup= supplierService.getSupplierById(s.getSupplierId());
                 User user = userService.getUserByUserId(sup.getId());
 
@@ -503,16 +508,16 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<Map<String, Object>> so = new ArrayList<>();
         List<SupplyOrder> allSo = getAllSupplyOrder();
         for (SupplyOrder s : allSo) {
-            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouse_id());
+            WareHouse wareHouse = wareHouseService.getWareHouseById(s.getWarehouseId());
             if (wareHouse == null) {
-                System.out.println("No warehouse for the particular supply order");
+                logger.debug("No warehouse for the particular supply order");
                 return null;
             }
 
-            if (wareHouse.getManager_id().equals(id) && s.getStatus().equals("pending")) {
+            if (wareHouse.getManagerId().equals(id) && s.getStatus().equals("pending")) {
                 Map<String, Object> ma = new HashMap<>();
-                Product p = productService.getProductById(s.getProduct_id());
-                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouse_id());
+                Product p = productService.getProductById(s.getProductId());
+                WareHouse ware = wareHouseService.getWareHouseById(s.getWarehouseId());
                 Supplier sup = supplierService.getSupplierById(s.getSupplierId());
                 User user = userService.getUserByUserId(sup.getId());
 
@@ -531,11 +536,11 @@ public class SupplyOrderService implements ISupplyOrderService {
     // from Wmanager
     public List<Map<String, Object>> getCheckWarehouseByWID(String id) {
         WareHouse_Manager wm = wManagerService.getWManagerById(id);
-        WareHouse wareHouse = wareHouseService.getWareHouseById(wm.getWarehouse_id());
+        WareHouse wareHouse = wareHouseService.getWareHouseById(wm.getWarehouseId());
         List<String> p = new ArrayList<>();
-        for (int i = 0; i < wareHouse.getProduct_ids().size(); i++) {
-            if (wareHouse.getLowerLimits().get(i) > Integer.parseInt(wareHouse.getQuantities().get(i)) && !isNotSupplyOrderisCreated(wareHouse, wareHouse.getProduct_ids().get(i),wareHouse.getHigherLimits().get(i) - Integer.parseInt(wareHouse.getQuantities().get(i)))) {
-                p.add(wareHouse.getProduct_ids().get(i));
+        for (int i = 0; i < wareHouse.getProductIds().size(); i++) {
+            if (wareHouse.getLowerLimits().get(i) > Integer.parseInt(wareHouse.getQuantities().get(i)) && !isNotSupplyOrderisCreated(wareHouse, wareHouse.getProductIds().get(i),wareHouse.getHigherLimits().get(i) - Integer.parseInt(wareHouse.getQuantities().get(i)))) {
+                p.add(wareHouse.getProductIds().get(i));
             }
         }
         List<Map<String, Object>> prodwithsupplier = new ArrayList<>();
@@ -561,37 +566,37 @@ public class SupplyOrderService implements ISupplyOrderService {
 
         Product prod = productService.getProductById(pid);
         Supplier sup = supplierService.getSupplierById(prod.getSupplierId());
-        WareHouse war = wareHouseService.getWareHouseById(wm.getWarehouse_id());
-        Integer index = war.getProduct_ids().indexOf(pid);
+        WareHouse war = wareHouseService.getWareHouseById(wm.getWarehouseId());
+        Integer index = war.getProductIds().indexOf(pid);
         Integer quan = war.getHigherLimits().get(index) - Integer.parseInt(war.getQuantities().get(index));
-        data.setProduct_id(pid);
-        data.setSupplier_id(prod.getSupplierId());
-        data.setWarehouse_id(wm.getWarehouse_id());
-        data.setPayment_method("cash");
-        data.setTransaction_id(null);
-        data.setPickup_address(sup.getAddress());
-        data.setIsdelivery_man_Available(false);
+        data.setProductId(pid);
+        data.setSupplierId(prod.getSupplierId());
+        data.setWarehouseId(wm.getWarehouseId());
+        data.setPaymentMethod("cash");
+        data.setTransactionId(null);
+        data.setPickupAddress(sup.getAddress());
+        data.setDeliveryManAvailable(false);
         data.setQuantity(String.valueOf(quan));
 
         String rsid = generateId();
         SupplyOrder supplyOrder = new SupplyOrder();
         supplyOrder.setId(rsid);
-        supplyOrder.setProduct_id(data.getProduct_id());
+        supplyOrder.setProductId(data.getProductId());
         supplyOrder.setQuantity(data.getQuantity());
-        supplyOrder.setSupplierId(data.getSupplier_id());
-        supplyOrder.setWarehouse_id(data.getWarehouse_id());
-        supplyOrder.setPayment_method(data.getPayment_method());
-        supplyOrder.setIsdelivery_man_Available(false);
-        if ("online".equals(data.getPayment_method())) {
-            supplyOrder.setTransaction_id(data.getTransaction_id());
+        supplyOrder.setSupplierId(data.getSupplierId());
+        supplyOrder.setWarehouseId(data.getWarehouseId());
+        supplyOrder.setPaymentMethod(data.getPaymentMethod());
+        supplyOrder.setDeliveryManAvailable(false);
+        if ("online".equals(data.getPaymentMethod())) {
+            supplyOrder.setTransactionId(data.getTransactionId());
         }
 
-        supplyOrder.setPickup_address(data.getPickup_address());
+        supplyOrder.setPickupAddress(data.getPickupAddress());
 
         try {
             addSupplyOrder(supplyOrder);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -601,7 +606,7 @@ public class SupplyOrderService implements ISupplyOrderService {
     public boolean isNotSupplyOrderisCreated( WareHouse w ,String Productid,Integer quan){
         List<SupplyOrder> so = getAllSupplyOrder();
         for(SupplyOrder s : so){
-            if(s.getWarehouse_id().equals(w.getId()) && s.getProduct_id().equals(Productid)){
+            if(s.getWarehouseId().equals(w.getId()) && s.getProductId().equals(Productid)){
                 return true;
             }
         }
@@ -616,7 +621,7 @@ public class SupplyOrderService implements ISupplyOrderService {
             throw new RuntimeException("Id shouldn't be null");
         }
         WareHouse_Manager wareManager = wManagerService.getWManagerById(id); 
-        WareHouse  ware  = wareHouseService.getWareHouseById(wareManager.getWarehouse_id());
+        WareHouse  ware  = wareHouseService.getWareHouseById(wareManager.getWarehouseId());
         return ware;
         // return wareHouseRepo.findById(id).orElse(null);
     }
@@ -625,10 +630,10 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<Map<String ,Object>> details = new ArrayList<>();
 
         WareHouse_Manager wm = wManagerService.getWManagerById(id);
-        WareHouse w = wareHouseService.getWareHouseById(wm.getWarehouse_id());
-        for(int i =0;i<w.getProduct_ids().size();i++){
+        WareHouse w = wareHouseService.getWareHouseById(wm.getWarehouseId());
+        for(int i =0;i<w.getProductIds().size();i++){
             Map<String, Object> prod_details = new HashMap<>();
-            Product product  =productService.getProductById(w.getProduct_ids().get(i));
+            Product product  =productService.getProductById(w.getProductIds().get(i));
             User user =userService.getUserByUserId(product.getSupplierId());
             Supplier supplier = supplierService.getSupplierById(product.getSupplierId());
             prod_details.put("highlimits" , w.getHigherLimits().get(i));
@@ -648,17 +653,17 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<SupplyOrder> so = supplyOrderRepo.findAll();
         DeliveryMan d = deliveryManService.getDeliveryManById(id);
         if(d == null ){
-            System.out.println("delivery is not exist");
+            logger.debug("delivery is not exist");
             return null;
         }
         for(SupplyOrder s : so ){
-            if(s.getWarehouse_id().equals(d.getWarehouseId()) && s.getStatus().equals("approved") && !s.isIsdelivery_man_Available()){
+            if(s.getWarehouseId().equals(d.getWarehouseId()) && s.getStatus().equals("approved") && !s.isDeliveryManAvailable()){
                 Map<String ,Object> AllDetails = new HashMap<>();
-                Product po = productService.getProductById(s.getProduct_id());
+                Product po = productService.getProductById(s.getProductId());
                 Supplier sup = supplierService.getSupplierById(s.getSupplierId());
                 User user = userService.getUserByUserId(sup.getId());
-                WareHouse ware  =  wareHouseService.getWareHouseById(s.getWarehouse_id());
-                User wm = userService.getUserByUserId(ware.getManager_id());
+                WareHouse ware  =  wareHouseService.getWareHouseById(s.getWarehouseId());
+                User wm = userService.getUserByUserId(ware.getManagerId());
                 AllDetails.put("warehouse",ware);
                 AllDetails.put("Manager",wm);
 
@@ -676,22 +681,22 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<SupplyOrder> so = supplyOrderRepo.findAll();
         DeliveryMan d = deliveryManService.getDeliveryManById(id);
         if(d == null ){
-            System.out.println("delivery is not exist");
+            logger.debug("delivery is not exist");
             return null;
         }
         for(SupplyOrder s : so ){
-            if(s.getDelivery_man_id() == null ){
-                System.out.println("delivery man id is not null");
+            if(s.getDeliveryManId() == null ){
+                logger.debug("delivery man id is not null");
                 break;
             }
-            if(s.getWarehouse_id().equals(d.getWarehouseId()) && s.getStatus().equals("approved") && s.isIsdelivery_man_Available() && s.getDelivery_man_id().equals(id)){
+            if(s.getWarehouseId().equals(d.getWarehouseId()) && s.getStatus().equals("approved") && s.isDeliveryManAvailable() && s.getDeliveryManId().equals(id)){
                
-                Product po = productService.getProductById(s.getProduct_id());
+                Product po = productService.getProductById(s.getProductId());
                 Supplier sup = supplierService.getSupplierById(s.getSupplierId());
                 AllDetails.put("product" ,po);
                 User user = userService.getUserByUserId(sup.getId());
-                WareHouse ware  =  wareHouseService.getWareHouseById(s.getWarehouse_id());
-                User wm = userService.getUserByUserId(ware.getManager_id());
+                WareHouse ware  =  wareHouseService.getWareHouseById(s.getWarehouseId());
+                User wm = userService.getUserByUserId(ware.getManagerId());
                 AllDetails.put("warehouse",ware);
                 AllDetails.put("Manager",wm);
                 AllDetails.put("user",user);
@@ -708,21 +713,21 @@ public class SupplyOrderService implements ISupplyOrderService {
         List<SupplyOrder> so = supplyOrderRepo.findAll();
         DeliveryMan d = deliveryManService.getDeliveryManById(id);
         if(d == null ){
-            System.out.println("delivery is not exist");
+            logger.debug("delivery is not exist");
             return null;
         }
         for(SupplyOrder s : so ){
-            if(s.getDelivery_man_id() == null ){
-                System.out.println("delivery man id is not null");
+            if(s.getDeliveryManId() == null ){
+                logger.debug("delivery man id is not null");
                 break;
             }
-            if(s.getStatus().equals("delivered")    && s.getDelivery_man_id().equals(id)){
+            if(s.getStatus().equals("delivered")    && s.getDeliveryManId().equals(id)){
                 Map<String ,Object> AllDetails = new HashMap<>();
-                Product po = productService.getProductById(s.getProduct_id());
+                Product po = productService.getProductById(s.getProductId());
                 Supplier sup = supplierService.getSupplierById(s.getSupplierId());
                 User user = userService.getUserByUserId(sup.getId());
-                WareHouse ware  =  wareHouseService.getWareHouseById(s.getWarehouse_id());
-                User wm = userService.getUserByUserId(ware.getManager_id());
+                WareHouse ware  =  wareHouseService.getWareHouseById(s.getWarehouseId());
+                User wm = userService.getUserByUserId(ware.getManagerId());
                 AllDetails.put("warehouse",ware);
                 AllDetails.put("Manager",wm);
                 AllDetails.put("user",user);
@@ -735,39 +740,39 @@ public class SupplyOrderService implements ISupplyOrderService {
         }
         return orders;
     }
-    public SupplyOrder UpdatestatusDTByDid(String id , String data ){
+    public SupplyOrder updateStatusDTByDid(String id , String data ){
          try {
-            System.out.println("hello" +data+" " + id);
+            logger.debug("hello" +data+" " + id);
            SupplyOrder order = getSupplyOrderById(data);
            if(order == null){
-            System.out.println("Order Doesnot exists");
+            logger.debug("Order Doesnot exists");
             return null;
            }
            DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
            if(deliveryMan == null){
-            System.out.println("Delivery man doesnot exists ");
+            logger.debug("Delivery man doesnot exists ");
             return null;
            }
           
 
-           if(order.getStatus().equals("approved") &&  deliveryMan.getStatus().equals("available") && !order.isIsdelivery_man_Available()){
+           if(order.getStatus().equals("approved") &&  deliveryMan.getStatus().equals("available") && !order.isDeliveryManAvailable()){
 
-                order.setDelivery_man_id(id);
+                order.setDeliveryManId(id);
                 order.setStatus("approved");
-               order.setIsdelivery_man_Available(true);
+               order.setDeliveryManAvailable(true);
                updateSupplyOrder(order);
                deliveryMan.setStatus("unavailable");
                deliveryManService.updateDeliveryMan(deliveryMan);
                return order;
            }
            else{
-            System.out.println("delivery man is not available");
+            logger.debug("delivery man is not available");
             return null;
 
            }
            
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }

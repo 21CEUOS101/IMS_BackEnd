@@ -1,17 +1,22 @@
 package com.project.ims.Requests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReturnOrderAddRequest {
-    private String order_id;
+    @JsonProperty("order_id")
+    private String orderId;
 
-    private String customer_id;
+    @JsonProperty("customer_id")
+    private String customerId;
 
-    private String return_reason;
+    @JsonProperty("return_reason")
+    private String returnReason;
 
-    private String pickup_address;
+    @JsonProperty("pickup_address")
+    private String pickupAddress;
 }

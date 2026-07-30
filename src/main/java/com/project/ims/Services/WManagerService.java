@@ -5,7 +5,6 @@ import java.util.HashMap;
 // imports
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -87,28 +86,5 @@ public class WManagerService implements IWManagerService {
     public List<WareHouse_Manager> getAllWManager() {
         return wManagerRepo.findAll();
     }
-   
-     public String generateId() {
-        Random rand = new Random();
-        int random = rand.nextInt(1000000);
-        String id = "so" + random;
-        return id;
-    }
-    
+
 }
-/*  private String product_id;
-
-private String quantity;//
-
-private String supplier_id;
-
-private String warehouse_id;
-
-private String payment_method;
-
-private String transaction_id;
-
-private String pickup_address;
-
-private boolean isdelivery_man_Available;
-*/

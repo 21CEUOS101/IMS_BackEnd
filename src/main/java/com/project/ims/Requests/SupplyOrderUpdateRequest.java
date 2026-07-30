@@ -1,35 +1,47 @@
 package com.project.ims.Requests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SupplyOrderUpdateRequest {
-    private String product_id;
+    @JsonProperty("product_id")
+    private String productId;
 
     private String quantity;
 
-    private String warehouse_id;
+    @JsonProperty("warehouse_id")
+    private String warehouseId;
 
-    private String supplier_id;
+    @JsonProperty("supplier_id")
+    private String supplierId;
 
-    private String total_amount;
+    @JsonProperty("total_amount")
+    private String totalAmount;
 
     private String status;
 
-    private String date_time;
+    @JsonProperty("date_time")
+    private String dateTime;
 
-    private String payment_method;
+    @JsonProperty("payment_method")
+    private String paymentMethod;
 
-    private String transaction_id;
+    @JsonProperty("transaction_id")
+    private String transactionId;
 
-    private String delivery_man_id;
+    @JsonProperty("delivery_man_id")
+    private String deliveryManId;
 
-    private String delivered_date_time;
+    @JsonProperty("delivered_date_time")
+    private String deliveredDateTime;
 
-    private String pickup_address;
+    @JsonProperty("pickup_address")
+    private String pickupAddress;
 
-    private boolean isdelivery_man_Available;
+    @JsonProperty("isdelivery_man_Available")
+    private boolean deliveryManAvailable;
 }

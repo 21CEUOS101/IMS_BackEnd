@@ -2,6 +2,8 @@ package com.project.ims.Models;
 
 // imports
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +18,9 @@ public class ReturnOrder {
     @Id
     private String id;
 
-    private String product_id;
+    @Field("product_id")
+    @JsonProperty("product_id")
+    private String productId;
 
     private String quantity;
 
@@ -24,20 +28,34 @@ public class ReturnOrder {
 
     private String customerId;
 
-    private String refund_amount;
+    @Field("refund_amount")
+    @JsonProperty("refund_amount")
+    private String refundAmount;
 
-    private String return_reason;
+    @Field("return_reason")
+    @JsonProperty("return_reason")
+    private String returnReason;
 
     private String status;
 
-    private String date_time;
+    @Field("date_time")
+    @JsonProperty("date_time")
+    private String dateTime;
 
-    private String delivery_man_id;
+    @Field("delivery_man_id")
+    @JsonProperty("delivery_man_id")
+    private String deliveryManId;
 
-    private String delivered_date_time;
+    @Field("delivered_date_time")
+    @JsonProperty("delivered_date_time")
+    private String deliveredDateTime;
 
-    private String pickup_address;
+    @Field("pickup_address")
+    @JsonProperty("pickup_address")
+    private String pickupAddress;
 
-    private String order_id;
+    @Field("order_id")
+    @JsonProperty("order_id")
+    private String orderId;
     
 }

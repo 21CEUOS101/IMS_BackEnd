@@ -58,7 +58,7 @@ public class AnalyticsService implements IAnalyticsService {
 
         Map<String, Double> revenuePerUnitByProductId = products.stream()
                 .collect(Collectors.toMap(Product::getId,
-                        p -> (p.getProfit() / 100.0) * p.getWhole_sale_price()));
+                        p -> (p.getProfit() / 100.0) * p.getWholeSalePrice()));
 
         Map<String, String> productNameById = products.stream()
                 .collect(Collectors.toMap(Product::getId, Product::getName));
@@ -89,14 +89,14 @@ public class AnalyticsService implements IAnalyticsService {
         for (Order order : deliveredOrders) {
             double revenue = orderRevenue(order, revenuePerUnitByProductId);
 
-            LocalDateTime deliveredAt = parseDateTimeOrNull(order.getDelivered_date_time());
+            LocalDateTime deliveredAt = parseDateTimeOrNull(order.getDeliveredDateTime());
             if (deliveredAt != null) {
                 String monthName = deliveredAt.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
                 String key = monthName + "|" + deliveredAt.getYear();
                 revenueByMonthYear.merge(key, revenue, Double::sum);
             }
 
-            String productName = productNameById.get(order.getProduct_id());
+            String productName = productNameById.get(order.getProductId());
             if (productName != null) {
                 revenueByProductName.merge(productName, revenue, Double::sum);
             }
@@ -123,18 +123,18 @@ public class AnalyticsService implements IAnalyticsService {
 
         Map<String, List<String>> result = new LinkedHashMap<>();
 
-        result.put("order", shippedIdsFor(orderRepo.findAll(), deliveryManId, Order::getStatus, Order::getDelivery_man_id, Order::getId));
+        result.put("order", shippedIdsFor(orderRepo.findAll(), deliveryManId, Order::getStatus, Order::getDeliveryManId, Order::getId));
         result.put("return-order", shippedIdsFor(returnOrderRepo.findAll(), deliveryManId,
-                com.project.ims.Models.ReturnOrder::getStatus, com.project.ims.Models.ReturnOrder::getDelivery_man_id,
+                com.project.ims.Models.ReturnOrder::getStatus, com.project.ims.Models.ReturnOrder::getDeliveryManId,
                 com.project.ims.Models.ReturnOrder::getId));
         result.put("return-supply-order", shippedIdsFor(rsoRepo.findAll(), deliveryManId,
-                com.project.ims.Models.ReturnSupplyOrder::getStatus, com.project.ims.Models.ReturnSupplyOrder::getDelivery_man_id,
+                com.project.ims.Models.ReturnSupplyOrder::getStatus, com.project.ims.Models.ReturnSupplyOrder::getDeliveryManId,
                 com.project.ims.Models.ReturnSupplyOrder::getId));
         result.put("supply-order", shippedIdsFor(supplyOrderRepo.findAll(), deliveryManId,
-                com.project.ims.Models.SupplyOrder::getStatus, com.project.ims.Models.SupplyOrder::getDelivery_man_id,
+                com.project.ims.Models.SupplyOrder::getStatus, com.project.ims.Models.SupplyOrder::getDeliveryManId,
                 com.project.ims.Models.SupplyOrder::getId));
         result.put("w2worder", shippedIdsFor(w2wOrderRepo.findAll(), deliveryManId,
-                com.project.ims.Models.W2WOrder::getStatus, com.project.ims.Models.W2WOrder::getDelivery_man_id,
+                com.project.ims.Models.W2WOrder::getStatus, com.project.ims.Models.W2WOrder::getDeliveryManId,
                 com.project.ims.Models.W2WOrder::getId));
 
         return result;
@@ -155,7 +155,7 @@ public class AnalyticsService implements IAnalyticsService {
     }
 
     private double orderRevenue(Order order, Map<String, Double> revenuePerUnitByProductId) {
-        Double revenuePerUnit = revenuePerUnitByProductId.get(order.getProduct_id());
+        Double revenuePerUnit = revenuePerUnitByProductId.get(order.getProductId());
         if (revenuePerUnit == null) {
             return 0;
         }

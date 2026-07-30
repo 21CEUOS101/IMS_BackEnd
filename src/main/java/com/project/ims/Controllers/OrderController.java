@@ -1,5 +1,8 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // imports
 import java.util.*;
 
@@ -11,6 +14,7 @@ import com.project.ims.Requests.OrderAddRequest;
 import com.project.ims.Requests.OrderUpdateRequest;
 import com.project.ims.Services.DeliveryManService;
 import com.project.ims.Services.OrderService;
+import com.project.ims.Utils.IdGenerator;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,8 +27,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class OrderController {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     // necessary dependency injections
 
@@ -47,7 +53,7 @@ public class OrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -62,7 +68,7 @@ public class OrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -77,7 +83,7 @@ public class OrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -90,17 +96,17 @@ public class OrderController {
         List<Order> orders = new ArrayList<>();
 
         // getting product ids and quantities
-        List<String> product_ids = data.getProduct_ids();
+        List<String> product_ids = data.getProductIds();
         List<String> quantities = data.getQuantities();
 
         if(product_ids.size() != quantities.size())
         {
-            System.out.println("Product ids and quantities are not equal");
+            logger.warn("Product ids and quantities are not equal");
             return null;
         }
 
         // list of warehouse ids
-        String warehouse_id = data.getWarehouse_id();
+        String warehouse_id = data.getWarehouseId();
 
         // making all orders separate and adding them to the list of orders
         for(int i=0;i<product_ids.size();i++)
@@ -110,7 +116,7 @@ public class OrderController {
             }
             catch(Exception e)
             {
-                System.out.println(e.getMessage());
+                logger.error(e.getMessage(), e);
             }
         }
         
@@ -126,7 +132,7 @@ public class OrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -136,21 +142,21 @@ public class OrderController {
     public Order updateOrder(@PathVariable("id") String id, @RequestBody OrderUpdateRequest data) {
 
         Order order = orderService.getOrderById(id);
-        order.setCustomerId(data.getCustomer_id());
-        order.setProduct_id(data.getProduct_id());
+        order.setCustomerId(data.getCustomerId());
+        order.setProductId(data.getProductId());
         order.setQuantity(data.getQuantity());
-        order.setWarehouseId(data.getWarehouse_id());
-        order.setTotal_amount(data.getTotal_amount());
-        order.setDate_time(data.getDate_time());
-        order.setPayment_method(data.getPayment_method());
+        order.setWarehouseId(data.getWarehouseId());
+        order.setTotalAmount(data.getTotalAmount());
+        order.setDateTime(data.getDateTime());
+        order.setPaymentMethod(data.getPaymentMethod());
         order.setStatus(data.getStatus());
-        order.setDelivery_address(data.getDelivery_address());
-        order.setDelivery_man_id(data.getDelivery_man_id());
-        order.setDelivered_date_time(data.getDelivered_date_time());
+        order.setDeliveryAddress(data.getDeliveryAddress());
+        order.setDeliveryManId(data.getDeliveryManId());
+        order.setDeliveredDateTime(data.getDeliveredDateTime());
         
-        if("online".equals(order.getPayment_method()))
+        if("online".equals(order.getPaymentMethod()))
         {
-            order.setTransaction_id(data.getTransaction_id());
+            order.setTransactionId(data.getTransactionId());
         }
 
         try{
@@ -158,7 +164,7 @@ public class OrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
 
         return order;
@@ -173,7 +179,7 @@ public class OrderController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -183,7 +189,7 @@ public class OrderController {
             List<Map<String, Object>> ordersWithCustomer = orderService.orderstatusCByDeliverymanId(id);
             return ordersWithCustomer;
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -193,7 +199,7 @@ public class OrderController {
             List<Map<String, Object>> ordersWithCustomer = orderService.orderstatusPByDeliverymanId(id);
             return ordersWithCustomer;
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -203,7 +209,7 @@ public class OrderController {
             Map<String, Object> ordersWithCustomer = orderService.orderstatusSByDeliverymanId(id);
             return ordersWithCustomer;
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -213,7 +219,7 @@ public class OrderController {
         try {
            Order order = orderService.getOrderById(data);
            if(order == null){
-            System.out.println("doesnot exist delivery man or warehouse");
+            logger.debug("doesnot exist delivery man or warehouse");
             return null;
            }
            DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
@@ -221,7 +227,7 @@ public class OrderController {
 
            if(order.getStatus().equals("pending") &&  deliveryMan.getStatus().equals("available")){
 
-            order.setDelivery_man_id(id);
+            order.setDeliveryManId(id);
                order.setStatus("shipped");
                
                orderService.updateOrder(order);
@@ -230,38 +236,38 @@ public class OrderController {
                return order;
            }
            else{
-            System.out.println("delivery man is not available");
+            logger.debug("delivery man is not available");
             return null;
 
            }
            
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     } 
     @GetMapping("/order/numberofcustomer/{id}")
-    public List<CustomerUserPair> Numberofcustomer(@PathVariable("id") String id) {
+    public List<CustomerUserPair> getNumberOfCustomer(@PathVariable("id") String id) {
         try {
-           
-           List<CustomerUserPair> allCustomers = orderService.numberofcustomerByDId(id);     
-           return allCustomers;      
+
+           List<CustomerUserPair> allCustomers = orderService.numberofcustomerByDId(id);
+           return allCustomers;
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
-    } 
+    }
     @GetMapping("/order/totalordercompletedByDid/{id}")
     public String numberofCompletedorders(@PathVariable("id") String id) {
         try {
-           
+
             return String.valueOf(orderstatusCByDId(id).size());
-        
+
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return "error";
         }
-    } 
+    }
     @GetMapping("/order/totalorderCancelByDid/{id}")
     public List<Map<String, Object>> numberofCancelorders(@PathVariable("id") String id) {
         try {
@@ -269,33 +275,25 @@ public class OrderController {
             List<Map<String, Object>>  allcancel = orderService.numberofCancelorders(id);     
            return allcancel;      
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     } 
-  
-    public String generateOrderId()
-    {
-        Random rand = new Random();
-        int random = rand.nextInt(1000000);
-        String id = 'o' + String.valueOf(random);
-        return id;
-    }
 
     public void createOrder(List<String> product_ids, List<String> quantities, String warehouse_id, OrderAddRequest data,
             List<Order> orders, int i) 
     {
-        String id = generateOrderId();
+        String id = IdGenerator.generate("o");
         Order order = new Order();
         order.setId(id);
-        order.setProduct_id(product_ids.get(i));
+        order.setProductId(product_ids.get(i));
         order.setQuantity(quantities.get(i));
-        order.setCustomerId(data.getCustomer_id());
-        order.setPayment_method(data.getPayment_method());
-        if ("online".equals(data.getPayment_method())) {
-            order.setTransaction_id(data.getTransaction_id());
+        order.setCustomerId(data.getCustomerId());
+        order.setPaymentMethod(data.getPaymentMethod());
+        if ("online".equals(data.getPaymentMethod())) {
+            order.setTransactionId(data.getTransactionId());
         }
-        order.setDelivery_address(data.getDelivery_address());
+        order.setDeliveryAddress(data.getDeliveryAddress());
         order.setStatus("pending");
         order.setWarehouseId(warehouse_id);
         orderService.addOrder(order);

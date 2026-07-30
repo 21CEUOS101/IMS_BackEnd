@@ -1,5 +1,8 @@
 package com.project.ims.Services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // imports
 import java.util.Map;
 import java.time.LocalDateTime;
@@ -29,6 +32,8 @@ import com.project.ims.Repo.WareHouseRepo;
 
 @Service
 public class ReturnOrderService implements IReturnOrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReturnOrderService.class);
 
     // necessary dependency Injections
     @Autowired
@@ -100,7 +105,7 @@ public class ReturnOrderService implements IReturnOrderService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = currentDateTime.format(formatter);
-        returnOrder.setDate_time(formattedDateTime);
+        returnOrder.setDateTime(formattedDateTime);
 
         // assign deliveryMan to return order
         String deliveryManId = assignDeliveryMan(returnOrder);
@@ -109,7 +114,7 @@ public class ReturnOrderService implements IReturnOrderService {
             returnOrder.setStatus("pending");
         }
 
-        returnOrder.setDelivery_man_id(deliveryManId);
+        returnOrder.setDeliveryManId(deliveryManId);
 
         return returnOrderRepo.save(returnOrder);
     }
@@ -154,14 +159,14 @@ public class ReturnOrderService implements IReturnOrderService {
                 try {
                     deliveryManService.updateDeliveryMan(i);
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    logger.error(e.getMessage(), e);
                     return null;
                 }
                 return i.getId();
             }
         }
 
-        System.out.println("No deliveryman available");
+        logger.debug("No deliveryman available");
         return null;
     }
     
@@ -169,7 +174,7 @@ public class ReturnOrderService implements IReturnOrderService {
     public ReturnOrder updateReturnOrderStatus(String id, String status) {
 
         ReturnOrder returnOrder = getReturnOrderById(id);
-        Order order = orderRepo.findById(returnOrder.getOrder_id()).orElse(null);
+        Order order = orderRepo.findById(returnOrder.getOrderId()).orElse(null);
 
         returnOrder.setStatus(status);
       
@@ -180,7 +185,7 @@ public class ReturnOrderService implements IReturnOrderService {
             try {
                 orderRepo.save(order);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                logger.error(e.getMessage(), e);
                 return null;
             }
 
@@ -192,18 +197,18 @@ public class ReturnOrderService implements IReturnOrderService {
             try {
                 orderRepo.save(order);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                logger.error(e.getMessage(), e);
                 return null;
             }
 
-            DeliveryMan m = deliveryManService.getDeliveryManById(returnOrder.getDelivery_man_id());
+            DeliveryMan m = deliveryManService.getDeliveryManById(returnOrder.getDeliveryManId());
 
             m.setStatus("available");
 
             try {
                 deliveryManService.updateDeliveryMan(m);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                logger.error(e.getMessage(), e);
                 return null;
             }
 
@@ -220,35 +225,35 @@ public class ReturnOrderService implements IReturnOrderService {
         returnSupplyOrder.setId(returnSupplyOrderId);
 
         
-        Order order = orderRepo.findById(returnOrder.getOrder_id()).orElse(null);
+        Order order = orderRepo.findById(returnOrder.getOrderId()).orElse(null);
         
         if (order == null) {
-            System.out.println("Order not found");
+            logger.debug("Order not found");
             return null;
         }
 
-        returnSupplyOrder.setOrder_id(order.getId());
-        returnSupplyOrder.setWarehouse_id(order.getWarehouseId());
-        returnSupplyOrder.setProduct_id(order.getProduct_id());
+        returnSupplyOrder.setOrderId(order.getId());
+        returnSupplyOrder.setWarehouseId(order.getWarehouseId());
+        returnSupplyOrder.setProductId(order.getProductId());
         returnSupplyOrder.setQuantity(order.getQuantity());
-        returnSupplyOrder.setRefund_amount(order.getTotal_amount());
+        returnSupplyOrder.setRefundAmount(order.getTotalAmount());
 
-        Product product = productService.getProductById(order.getProduct_id());
+        Product product = productService.getProductById(order.getProductId());
 
         Supplier supplier = supplierService.getSupplierById(product.getSupplierId());
 
-        returnSupplyOrder.setDelivery_address(supplier.getAddress());
-        returnSupplyOrder.setReturn_reason(returnOrder.getReturn_reason());
+        returnSupplyOrder.setDeliveryAddress(supplier.getAddress());
+        returnSupplyOrder.setReturnReason(returnOrder.getReturnReason());
         returnSupplyOrder.setStatus("shipped");
         returnSupplyOrder.setSupplierId(product.getSupplierId());
-        returnSupplyOrder.setDelivery_man_id(order.getDelivery_man_id());
+        returnSupplyOrder.setDeliveryManId(order.getDeliveryManId());
 
         try{
             returnSupplyOrderService.addReturnSupplyOrder(returnSupplyOrder);
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -266,12 +271,12 @@ public class ReturnOrderService implements IReturnOrderService {
         List<Map<String, Object>> statusCorder = new ArrayList<>();
 
         for (Order o : orders) {
-            if (o.getStatus().equals("returned") && o.getDelivery_man_id().equals(id)) {
+            if (o.getStatus().equals("returned") && o.getDeliveryManId().equals(id)) {
 
                 User user = userService.getUserByUserId(o.getCustomerId());
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
                 WareHouse wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
-                Product product = productService.getProductById(o.getProduct_id());
+                Product product = productService.getProductById(o.getProductId());
                 // System.out.println(user);
                 if (user != null) {
 
@@ -291,37 +296,37 @@ public class ReturnOrderService implements IReturnOrderService {
 
     public ReturnOrder updateOrderStatusSByDid(String ordId, String id) {
         if(ordId.equals("")  ||  id.equals("")){
-            System.out.println("empty id/s");
+            logger.debug("empty id/s");
             return null;
         }
         ReturnOrder o = getReturnOrderById(ordId);
         if(o == null)
         {
-            System.out.println("no order of following order id");
+            logger.debug("no order of following order id");
             return null;
         }
         DeliveryMan d = deliveryManService.getDeliveryManById(id);
 
         if( o.getStatus().equals("pending") && d.getStatus().equals("available")){
-            o.setDelivery_man_id(id);
+            o.setDeliveryManId(id);
             o.setStatus("shipped");
             d.setStatus("unavailable");
             LocalDateTime currentDateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = currentDateTime.format(formatter);
-            o.setDelivered_date_time(formattedDateTime);
+            o.setDeliveredDateTime(formattedDateTime);
             deliveryManService.updateDeliveryMan(d);
            updateReturnOrder(o);
         }
         else{
-            System.out.println("either order status is not pending or delivery man is not free");
+            logger.debug("either order status is not pending or delivery man is not free");
             return null;
         }
         return o;
     }
     public List<Map<String,Object>> orderStatusP (String id){
         if(id.equals("")){
-            System.out.println("id is empty");
+            logger.debug("id is empty");
             return null;
         }
 
@@ -330,12 +335,12 @@ public class ReturnOrderService implements IReturnOrderService {
         DeliveryMan d = deliveryManService.getDeliveryManById(id);
         WareHouse wareHouse = wareHouseService.getWareHouseById(d.getWarehouseId());
         if(d==null || wareHouse== null){
-            System.out.println("either deliveryman is not exist or ware house is not exist");
+            logger.debug("either deliveryman is not exist or ware house is not exist");
             return null;
         }
         for(ReturnOrder o : ro){
             if(o.getStatus().equals("pending") && o.getWarehouseId().equals(wareHouse.getId())){
-                Product p = productService.getProductById(o.getProduct_id());
+                Product p = productService.getProductById(o.getProductId());
                 User user = userService.getUserByUserId(o.getCustomerId());
                 Customer cust = customerService.getCustomerById(o.getCustomerId());
                 Map<String, Object> orderWithCustomer = new HashMap<>();
@@ -361,23 +366,23 @@ public class ReturnOrderService implements IReturnOrderService {
         DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
         if(deliveryMan == null)
         {
-            System.out.println("Delivery man not exists");
+            logger.debug("Delivery man not exists");
             return null;
         }
         WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
         if(wareHouse == null)
         {
-            System.out.println("delivery man warehouse donot exists");
+            logger.debug("delivery man warehouse donot exists");
             return null;
         }
         List<ReturnOrder> orders = returnOrderRepo.findAll();
         Map<String, Object> Filterorders = new HashMap<>();
 
         for (ReturnOrder o : orders) {
-            if (o.getStatus().equals("shipped") && o.getDelivery_man_id().equals(id)) {                
+            if (o.getStatus().equals("shipped") && o.getDeliveryManId().equals(id)) {                
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
                 User user = userService.getUserByUserId(o.getCustomerId());
-                Product product = productService.getProductById(o.getProduct_id());
+                Product product = productService.getProductById(o.getProductId());
                    
                 Filterorders.put("returnorder", o);                   
                 Filterorders.put("customer", customer);

@@ -1,5 +1,8 @@
 package com.project.ims.Services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +21,8 @@ import com.project.ims.Repo.WareHouseRepo;
 
 @Service
 public class DistanceService implements IDistanceService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DistanceService.class);
 
     @Autowired
     private WareHouseRepo wareHouseRepo;
@@ -57,7 +62,7 @@ public class DistanceService implements IDistanceService {
         try {
             globalDistancesRepo.save(globalDistances);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
 
         return (int) Math.round(distanceKm);

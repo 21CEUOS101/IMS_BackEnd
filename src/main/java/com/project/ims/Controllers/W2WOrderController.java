@@ -1,9 +1,11 @@
 package com.project.ims.Controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // imports
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,11 +23,14 @@ import com.project.ims.Requests.W2WOrderAddRequest;
 import com.project.ims.Requests.W2WOrderUpdateRequest;
 import com.project.ims.Services.DeliveryManService;
 import com.project.ims.Services.W2WOrderService;
+import com.project.ims.Utils.IdGenerator;
 import java.util.Map;
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class W2WOrderController {
+
+    private static final Logger logger = LoggerFactory.getLogger(W2WOrderController.class);
 
     // necessary dependency injections
     @Autowired
@@ -43,7 +48,7 @@ public class W2WOrderController {
             return w2wOrders;
         }
         catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -56,7 +61,7 @@ public class W2WOrderController {
             return w2wOrder;
         }
         catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -64,13 +69,13 @@ public class W2WOrderController {
     @PostMapping("/w2worder")
     public W2WOrder addW2WOrder(@RequestBody W2WOrderAddRequest data) {
 
-        String id = generateId();
+        String id = IdGenerator.generate("w2w");
         W2WOrder w2wOrder = new W2WOrder();
         w2wOrder.setId(id);
-        w2wOrder.setProduct_id(data.getProduct_id());
+        w2wOrder.setProductId(data.getProductId());
         w2wOrder.setQuantity(data.getQuantity());
-        w2wOrder.setWarehouseId(data.getR_warehouse_id());
-        w2wOrder.setS_warehouse_id(data.getS_warehouse_id());
+        w2wOrder.setWarehouseId(data.getRWarehouseId());
+        w2wOrder.setSWarehouseId(data.getSWarehouseId());
         w2wOrder.setOrderId(data.getOrderId());
         w2wOrder.setStatus("shipped");
 
@@ -78,7 +83,7 @@ public class W2WOrderController {
             w2wOrderService.addW2WOrder(w2wOrder);
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
         return w2wOrder;
@@ -91,7 +96,7 @@ public class W2WOrderController {
             return w2wOrder;
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -100,22 +105,22 @@ public class W2WOrderController {
     public W2WOrder updateW2wOrder( @PathVariable("id") String id ,@RequestBody W2WOrderUpdateRequest data)
     {
         W2WOrder w2wOrder = w2wOrderService.getW2WOrderById(id);
-        w2wOrder.setProduct_id(data.getProduct_id());
+        w2wOrder.setProductId(data.getProductId());
         w2wOrder.setQuantity(data.getQuantity());
-        w2wOrder.setWarehouseId(data.getR_warehouse_id());
-        w2wOrder.setS_warehouse_id(data.getS_warehouse_id());
-        w2wOrder.setTotal_amount(data.getTotal_amount());
+        w2wOrder.setWarehouseId(data.getRWarehouseId());
+        w2wOrder.setSWarehouseId(data.getSWarehouseId());
+        w2wOrder.setTotalAmount(data.getTotalAmount());
         w2wOrder.setStatus(data.getStatus());
-        w2wOrder.setDate_time(data.getDate_time());
-        w2wOrder.setDelivered_date_time(data.getDelivered_date_time());
-        w2wOrder.setDelivery_man_id(data.getDelivery_man_id());
+        w2wOrder.setDateTime(data.getDateTime());
+        w2wOrder.setDeliveredDateTime(data.getDeliveredDateTime());
+        w2wOrder.setDeliveryManId(data.getDeliveryManId());
         w2wOrder.setOrderId(data.getOrderId());
         
         try{
             w2wOrderService.updateW2WOrder(w2wOrder);
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -128,7 +133,7 @@ public class W2WOrderController {
             w2wOrderService.deleteW2WOrder(id);
         }
         catch(Exception e){
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -138,7 +143,7 @@ public class W2WOrderController {
             List<Map<String, Object>> w2wordersWithCustomer = w2wOrderService.w2worderstatusCByDeliverymanId(id);
             return w2wordersWithCustomer;
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -148,7 +153,7 @@ public class W2WOrderController {
             List<Map<String, Object>> w2wordersWithCustomer = w2wOrderService.w2worderstatusPByDeliverymanId(id);
             return w2wordersWithCustomer;
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -158,17 +163,17 @@ public class W2WOrderController {
             Map<String, Object> w2wordersWithCustomer = w2wOrderService.w2worderstatusSByDeliverymanId(id);
             return w2wordersWithCustomer;
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
     @PostMapping("/w2worder/assignBydeliveryman/{id}/data")
     public W2WOrder assignDeliverymanById(@PathVariable("id") String id,@RequestParam("data") String data) {
-       System.out.println(data);
+       logger.debug(data);
         try {
            W2WOrder w2wOrder = w2wOrderService.getW2WOrderById(data);
            if(w2wOrder == null){
-            System.out.println("doesnot exist delivery man or warehouse");
+            logger.debug("doesnot exist delivery man or warehouse");
             return null;
            }
            DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
@@ -176,7 +181,7 @@ public class W2WOrderController {
 
            if(w2wOrder.getStatus().equals("pending")){
 
-            w2wOrder.setDelivery_man_id(id);
+            w2wOrder.setDeliveryManId(id);
                w2wOrder.setStatus("shipped");
                
                w2wOrderService.updateW2WOrder(w2wOrder);
@@ -185,13 +190,13 @@ public class W2WOrderController {
                return w2wOrder;
            }
            else{
-            System.out.println("delivery man is not available");
+            logger.debug("delivery man is not available");
             return null;
 
            }
            
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -202,7 +207,7 @@ public class W2WOrderController {
            HashSet<WareHouse> allware = w2wOrderService.numberofwarehouse(id);
            return allware;
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -212,16 +217,10 @@ public class W2WOrderController {
            
             return String.valueOf(orderstatusCByDId(id).size());
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return "error";
         }
     } 
-   
-    public String generateId() {
-        Random rand = new Random();
-        String id = "w2w" + rand.nextInt(1000000);
-        return id;
-    }
 
     
 }

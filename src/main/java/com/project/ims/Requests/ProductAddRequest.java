@@ -1,6 +1,7 @@
 package com.project.ims.Requests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -9,7 +10,8 @@ import lombok.NoArgsConstructor;
 public class ProductAddRequest {
     private String name;
 
-    private String expiry_date;
+    @JsonProperty("expiry_date")
+    private String expiryDate;
 
     private String price;
 
@@ -17,7 +19,8 @@ public class ProductAddRequest {
 
     private Integer tax;
 
-    private Integer whole_sale_price;
+    @JsonProperty("whole_sale_price")
+    private Integer wholeSalePrice;
 
     private Integer profit;
 }

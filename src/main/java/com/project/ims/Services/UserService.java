@@ -1,5 +1,8 @@
 package com.project.ims.Services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,8 @@ import com.project.ims.Repo.UserRepo;
 
 @Service
 public class UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     // necessary dependency injections
     @Autowired
@@ -23,7 +28,7 @@ public class UserService {
             List<User> users = userRepo.findAll();
             return users;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -41,7 +46,7 @@ public class UserService {
             User user = userRepo.findById(id).get();
             return user;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -59,7 +64,7 @@ public class UserService {
             User user = userRepo.findByEmail(email);
             return user;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -77,7 +82,7 @@ public class UserService {
             User user = userRepo.findByUserId(userId);
             return user;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }

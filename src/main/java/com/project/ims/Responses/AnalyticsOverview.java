@@ -5,23 +5,30 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnalyticsOverview {
 
-    private Double total_revenue;
+    @JsonProperty("total_revenue")
+    private Double totalRevenue;
 
-    private Integer total_orders;
+    @JsonProperty("total_orders")
+    private Integer totalOrders;
 
-    private Double total_quantity;
+    @JsonProperty("total_quantity")
+    private Double totalQuantity;
 
-    private Integer total_customers;
+    @JsonProperty("total_customers")
+    private Integer totalCustomers;
 
-    private List<MonthRevenue> month_wise_revenue;
+    @JsonProperty("month_wise_revenue")
+    private List<MonthRevenue> monthWiseRevenue;
 
-    private List<ProductRevenue> product_wise_revenue;
+    @JsonProperty("product_wise_revenue")
+    private List<ProductRevenue> productWiseRevenue;
 
     @Data
     @AllArgsConstructor
@@ -36,7 +43,8 @@ public class AnalyticsOverview {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ProductRevenue {
-        private String product_name;
+        @JsonProperty("product_name")
+        private String productName;
         private Double revenue;
     }
 }

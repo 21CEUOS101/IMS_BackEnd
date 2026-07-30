@@ -1,5 +1,8 @@
 package com.project.ims.Services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +21,8 @@ import com.project.ims.Repo.WareHouseRepo;
 
 @Service
 public class DeliveryManService implements IDeliveryManService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeliveryManService.class);
 
     // necessary dependency Injections
     @Autowired
@@ -119,7 +124,7 @@ public class DeliveryManService implements IDeliveryManService {
 
     //custom
 
-    public  Map<String, Object> Dprofile(String id){
+    public  Map<String, Object> getDeliveryManProfile(String id){
 
         if (id.equals("")) {
             throw new RuntimeException("Id shouldn't be null");
@@ -129,18 +134,18 @@ public class DeliveryManService implements IDeliveryManService {
         DeliveryMan deliveryMan = getDeliveryManById(id);
         if(deliveryMan == null)
         {
-            System.out.println("Delivery man not exists");
+            logger.debug("Delivery man not exists");
             return null;
         }
         WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
         if(wareHouse == null)
         {
-            System.out.println("delivery man warehouse donot exists");
+            logger.debug("delivery man warehouse donot exists");
             return null;
         }
         // System.out.println(deliveryMan);
         User user = userService.getUserByUserId(id);
-        System.out.println("hello2");
+        logger.debug("hello2");
         Map<String, Object> profile = new HashMap<>();
         profile.put("deliveryman", deliveryMan);
         profile.put("warehouse",wareHouse);

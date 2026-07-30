@@ -3,6 +3,8 @@ package com.project.ims.Models;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -24,7 +26,9 @@ public class WareHouse {
 
     private String pincode;
 
-    private List<String> product_ids;
+    @Field("product_ids")
+    @JsonProperty("product_ids")
+    private List<String> productIds;
 
     private List<String> quantities;
 
@@ -32,7 +36,9 @@ public class WareHouse {
 
     private List<Integer> lowerLimits;
 
-    private String manager_id;
+    @Field("manager_id")
+    @JsonProperty("manager_id")
+    private String managerId;
 
     private String status;
     

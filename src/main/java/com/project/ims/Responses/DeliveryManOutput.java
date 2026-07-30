@@ -18,7 +18,5 @@ public class DeliveryManOutput {
 
     private String email;
 
-    private String password;
-
     private String phone;
 }

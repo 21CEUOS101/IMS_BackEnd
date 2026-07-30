@@ -1,5 +1,8 @@
 package com.project.ims.Services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // imports
 import org.springframework.http.*;
 import java.time.LocalDateTime;
@@ -40,6 +43,8 @@ import java.util.HashMap;
 
 @Service
 public class OrderService implements IOrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     // necessary dependency Injections
     @Autowired
@@ -96,7 +101,7 @@ public class OrderService implements IOrderService {
             throw new RuntimeException("Order ID must start with 'o'");
         }
 
-        System.out.println("Inside add order service");
+        logger.debug("Inside add order service");
 
         String warehouse_id = order.getWarehouseId();
 
@@ -104,11 +109,11 @@ public class OrderService implements IOrderService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = currentDateTime.format(formatter);
-        order.setDate_time(formattedDateTime);
+        order.setDateTime(formattedDateTime);
 
         // set total amount
         Integer totalPrice = 0;
-        String product_id = order.getProduct_id();
+        String product_id = order.getProductId();
         String quantity = order.getQuantity();
         Product product = productRepo.findById(product_id).orElse(null);
         Integer p = Integer.parseInt(product.getPrice());
@@ -118,7 +123,7 @@ public class OrderService implements IOrderService {
 
         Integer q = Integer.parseInt(quantity);
         totalPrice += price * q;
-        order.setTotal_amount(totalPrice.toString());
+        order.setTotalAmount(totalPrice.toString());
 
         // checking if warehouse has the product or not otherwise create warehouse to
         // warehouse order
@@ -129,8 +134,8 @@ public class OrderService implements IOrderService {
         } else {
             // removing products from warehouse
             WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
-            for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
-                if (warehouse.getProduct_ids().get(j).equals(product_id)) {
+            for (int j = 0; j < warehouse.getProductIds().size(); j++) {
+                if (warehouse.getProductIds().get(j).equals(product_id)) {
                     String q1 = warehouse.getQuantities().get(j);
                     int p_quantity = Integer.parseInt(q1);
                     p_quantity -= Integer.parseInt(quantity);
@@ -150,12 +155,12 @@ public class OrderService implements IOrderService {
                 order.setStatus("pending");
             }
 
-            order.setDelivery_man_id(deliveryMan);
+            order.setDeliveryManId(deliveryMan);
 
             try {
                 wareHouseService.updateWareHouse(warehouse);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                logger.error(e.getMessage(), e);
             }
         }
 
@@ -186,9 +191,9 @@ public class OrderService implements IOrderService {
             LocalDateTime currentDateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = currentDateTime.format(formatter);
-            order.setDelivered_date_time(formattedDateTime);
+            order.setDeliveredDateTime(formattedDateTime);
 
-            DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(order.getDelivery_man_id());
+            DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(order.getDeliveryManId());
 
             deliveryMan.setStatus("available");
 
@@ -201,14 +206,14 @@ public class OrderService implements IOrderService {
             if (order.getStatus().equals("shipped")) {
                 // re-adding products to warehouse
 
-                String product_id = order.getProduct_id();
+                String product_id = order.getProductId();
                 String quantity = order.getQuantity();
                 String warehouse_id = order.getWarehouseId();
 
                 WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
 
-                for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
-                    if (warehouse.getProduct_ids().get(j).equals(product_id)) {
+                for (int j = 0; j < warehouse.getProductIds().size(); j++) {
+                    if (warehouse.getProductIds().get(j).equals(product_id)) {
                         String q = warehouse.getQuantities().get(j);
                         int p_quantity = Integer.parseInt(q);
                         p_quantity += Integer.parseInt(quantity);
@@ -220,7 +225,7 @@ public class OrderService implements IOrderService {
 
                 // making delivery man available again
 
-                DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(order.getDelivery_man_id());
+                DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(order.getDeliveryManId());
 
                 deliveryMan.setStatus("available");
 
@@ -237,14 +242,14 @@ public class OrderService implements IOrderService {
 
                 // re-adding products to warehouse
 
-                String product_id = order.getProduct_id();
+                String product_id = order.getProductId();
                 String quantity = order.getQuantity();
                 String warehouse_id = order.getWarehouseId();
 
                 WareHouse warehouse = wareHouseService.getWareHouseById(warehouse_id);
 
-                for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
-                    if (warehouse.getProduct_ids().get(j).equals(product_id)) {
+                for (int j = 0; j < warehouse.getProductIds().size(); j++) {
+                    if (warehouse.getProductIds().get(j).equals(product_id)) {
                         String q = warehouse.getQuantities().get(j);
                         int p_quantity = Integer.parseInt(q);
                         p_quantity += Integer.parseInt(quantity);
@@ -270,10 +275,10 @@ public class OrderService implements IOrderService {
             // assigning deliveryman to order
 
             String deliveryMan = assignDeliveryMan(order);
-            order.setDelivery_man_id(deliveryMan);
+            order.setDeliveryManId(deliveryMan);
 
             if (deliveryMan == null) {
-                System.out.println("delivery man is not avaliable");
+                logger.debug("delivery man is not avaliable");
                 order.setStatus("pending");
                 return orderRepo.save(order);
             }
@@ -362,7 +367,7 @@ public class OrderService implements IOrderService {
 
         int needed_quantity = Integer.parseInt(quantity) - available_quantity;
 
-        System.out.println("needed quantity: " + needed_quantity + " available quantity: " + available_quantity);
+        logger.debug("needed quantity: " + needed_quantity + " available quantity: " + available_quantity);
 
         // checking if product is available in other warehouses or not
 
@@ -417,8 +422,8 @@ public class OrderService implements IOrderService {
 
         WareHouse warehouse = wareHouseService.getWareHouseById(r_warehouse_id);
 
-        for (int j = 0; j < warehouse.getProduct_ids().size(); j++) {
-            if (warehouse.getProduct_ids().get(j).equals(product_id)) {
+        for (int j = 0; j < warehouse.getProductIds().size(); j++) {
+            if (warehouse.getProductIds().get(j).equals(product_id)) {
                 String q = warehouse.getQuantities().get(j);
                 int p_quantity = Integer.parseInt(q);
                 p_quantity -= available_quantity;
@@ -429,30 +434,30 @@ public class OrderService implements IOrderService {
         try {
             wareHouseService.updateWareHouse(warehouse);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
 
     public void createW2WOrder(String product_id, String quantity, String r_warehouse_id, String s_warehouse_id,
             String orderId) {
 
-        System.out.println("Inside create w2w order");
+        logger.debug("Inside create w2w order");
 
         W2WOrder w2wOrder = new W2WOrder();
         Random rand = new Random();
         String id = "w2w" + rand.nextInt(1000000);
         w2wOrder.setId(id);
-        w2wOrder.setProduct_id(product_id);
+        w2wOrder.setProductId(product_id);
         w2wOrder.setQuantity(quantity);
         w2wOrder.setWarehouseId(r_warehouse_id);
-        w2wOrder.setS_warehouse_id(s_warehouse_id);
+        w2wOrder.setSWarehouseId(s_warehouse_id);
         w2wOrder.setOrderId(orderId);
         w2wOrder.setStatus("shipped");
 
         try {
             w2wOrderService.addW2WOrder(w2wOrder);
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -467,7 +472,7 @@ public class OrderService implements IOrderService {
                 try {
                     deliveryManService.updateDeliveryMan(d);
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    logger.error(e.getMessage(), e);
                 }
 
                 break;
@@ -492,12 +497,12 @@ public class OrderService implements IOrderService {
         List<Map<String, Object>> statusCorder = new ArrayList<>();
 
         for (Order o : orders) {
-            if (o.getStatus().equals("delivered") && o.getDelivery_man_id().equals(id)) {
+            if (o.getStatus().equals("delivered") && o.getDeliveryManId().equals(id)) {
 
                 User user = userService.getUserByUserId(o.getCustomerId());
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
                 WareHouse wareHouse = wareHouseService.getWareHouseById(o.getWarehouseId());
-                Product product = productService.getProductById(o.getProduct_id());
+                Product product = productService.getProductById(o.getProductId());
                 // System.out.println(user);
                 if (user != null) {
 
@@ -527,14 +532,14 @@ public class OrderService implements IOrderService {
         DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
         if(deliveryMan == null)
         {
-            System.out.println("Delivery man not exists");
+            logger.debug("Delivery man not exists");
             return null;
         }
         WareHouse wareHouse = wareHouseService.getWareHouseById(deliveryMan.getWarehouseId());
-        System.out.println("Warehouse Orders pending : " + wareHouse.getId());
+        logger.debug("Warehouse Orders pending : " + wareHouse.getId());
         if(wareHouse == null)
         {
-            System.out.println("delivery man warehouse donot exists");
+            logger.debug("delivery man warehouse donot exists");
             return null;
         }
         List<Order> orders = orderRepo.findAll();
@@ -542,11 +547,11 @@ public class OrderService implements IOrderService {
 
         for (Order o : orders) {
             String warehouseId = o.getWarehouseId();
-            System.out.println(warehouseId);
+            logger.debug(warehouseId);
             if (o.getStatus().equals("pending") && o.getWarehouseId().equals(warehouseId)) {                
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
                 User user = userService.getUserByUserId(o.getCustomerId());
-                Product product = productService.getProductById(o.getProduct_id());
+                Product product = productService.getProductById(o.getProductId());
                     Map<String, Object> orderWithCustomer = new HashMap<>();
                     orderWithCustomer.put("order", o);                   
                     orderWithCustomer.put("customer", customer);
@@ -570,23 +575,23 @@ public class OrderService implements IOrderService {
         DeliveryMan deliveryMan =  deliveryManService.getDeliveryManById(id);
         if(deliveryMan == null)
         {
-            System.out.println("Delivery man not exists");
+            logger.debug("Delivery man not exists");
             return null;
         }
         WareHouse wareHouse = wareHouseService.getWareHouseById( deliveryMan.getWarehouseId());
         if(wareHouse == null)
         {
-            System.out.println("delivery man warehouse donot exists");
+            logger.debug("delivery man warehouse donot exists");
             return null;
         }
         List<Order> orders = orderRepo.findAll();
         Map<String, Object> Filterorders = new HashMap<>();
 
         for (Order o : orders) {
-            if (o.getStatus().equals("shipped") && o.getDelivery_man_id().equals(id)) {                
+            if (o.getStatus().equals("shipped") && o.getDeliveryManId().equals(id)) {                
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
                 User user = userService.getUserByUserId(o.getCustomerId());
-                Product product = productService.getProductById(o.getProduct_id());
+                Product product = productService.getProductById(o.getProductId());
                    
                 Filterorders.put("order", o);                   
                 Filterorders.put("customer", customer);
@@ -609,7 +614,7 @@ public class OrderService implements IOrderService {
         Map<String, CustomerUserPair> uniquePairsMap = new HashMap<>(); // Use customer ID as key
     
         for (Order order : orders) {
-            if ("delivered".equals(order.getStatus()) && id.equals(order.getDelivery_man_id())) {
+            if ("delivered".equals(order.getStatus()) && id.equals(order.getDeliveryManId())) {
                 Customer customer = customerService.getCustomerById(order.getCustomerId());
                 User user = userService.getUserByUserId(order.getCustomerId());
                 CustomerUserPair pair = new CustomerUserPair(customer, user);
@@ -634,12 +639,12 @@ public class OrderService implements IOrderService {
 
         DeliveryMan deliveryMan = deliveryManService.getDeliveryManById(id);
         if (deliveryMan == null) {
-            System.out.println("Delivery man not exists");
+            logger.debug("Delivery man not exists");
             return null;
         }
         WareHouse wareHouse = wareHouseService.getWareHouseById(deliveryMan.getWarehouseId());
         if (wareHouse == null) {
-            System.out.println("delivery man warehouse donot exists");
+            logger.debug("delivery man warehouse donot exists");
             return null;
         }
         List<Map<String, Object>> cancel = new ArrayList<>();
@@ -647,10 +652,10 @@ public class OrderService implements IOrderService {
 
         for (Order o : orders) {
             Map<String, Object> Filterorders = new HashMap<>();
-            if (o.getStatus().equals("cancel") && o.getDelivery_man_id().equals(id)) {
+            if (o.getStatus().equals("cancel") && o.getDeliveryManId().equals(id)) {
                 Customer customer = customerService.getCustomerById(o.getCustomerId());
                 User user = userService.getUserByUserId(o.getCustomerId());
-                Product product = productService.getProductById(o.getProduct_id());
+                Product product = productService.getProductById(o.getProductId());
 
                 Filterorders.put("order", o);
                 Filterorders.put("customer", customer);

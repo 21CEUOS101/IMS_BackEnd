@@ -1,8 +1,10 @@
 package com.project.ims.Controllers;
 
-// imports 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+// imports
 import java.util.List;
-import java.util.Random;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,11 +27,14 @@ import com.project.ims.Services.CustomerService;
 import com.project.ims.Services.OrderService;
 import com.project.ims.Services.ReturnOrderService;
 import com.project.ims.Services.UserService;
+import com.project.ims.Utils.IdGenerator;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 public class CustomerController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
     // necessary dependency injections
     @Autowired
@@ -64,7 +69,6 @@ public class CustomerController {
                 customerOutput.setId(customers.get(i).getId());
                 customerOutput.setName(user.getName());
                 customerOutput.setEmail(user.getEmail());
-                customerOutput.setPassword(user.getPassword());
                 customerOutput.setPhone(user.getPhone());
                 customerOutput.setAddress(customers.get(i).getAddress());
                 customerOutput.setPincode(customers.get(i).getPincode());
@@ -75,7 +79,7 @@ public class CustomerController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -92,14 +96,13 @@ public class CustomerController {
             customerOutput.setId(customer.getId());
             customerOutput.setName(user.getName());
             customerOutput.setEmail(user.getEmail());
-            customerOutput.setPassword(user.getPassword());
             customerOutput.setPhone(user.getPhone());
             customerOutput.setAddress(customer.getAddress());
             customerOutput.setPincode(customer.getPincode());
 
             return customerOutput;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -107,7 +110,7 @@ public class CustomerController {
     @PostMapping("/customer")
     public Customer addCustomer(@RequestBody CustomerAddRequest data) {
 
-        String id = generateId();
+        String id = IdGenerator.generate("c");
 
         Customer customer = new Customer();
         customer.setId(id);
@@ -120,7 +123,7 @@ public class CustomerController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -129,7 +132,7 @@ public class CustomerController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
 
         return customer;
@@ -148,7 +151,7 @@ public class CustomerController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
 
@@ -157,7 +160,7 @@ public class CustomerController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
         return customer;
     }
@@ -172,7 +175,7 @@ public class CustomerController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return;
         }
 
@@ -181,20 +184,9 @@ public class CustomerController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
-    
-
-    
-    public String generateId() {
-        // id generation
-        Random rand = new Random();
-        String id = 'c' + String.valueOf(rand.nextInt(1000000));
-
-        return id;
-    }
-
     public void createUser(String name, String email, String password, String role, String phone, String userId) {
         User user = new User();
         user.setName(name);
@@ -226,7 +218,7 @@ public class CustomerController {
         try {
             return orderService.getAllOrderByCustomerId(id);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -237,7 +229,7 @@ public class CustomerController {
         try {
             return returnOrderService.getAllReturnOrderByCustomerId(id);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }

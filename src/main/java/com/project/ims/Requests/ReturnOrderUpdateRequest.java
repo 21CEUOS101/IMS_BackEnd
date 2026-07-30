@@ -1,6 +1,7 @@
 package com.project.ims.Requests;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -8,17 +9,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReturnOrderUpdateRequest {
 
-    private String return_reason;
+    @JsonProperty("return_reason")
+    private String returnReason;
 
     private String status;
 
-    private String date_time;
+    @JsonProperty("date_time")
+    private String dateTime;
 
-    private String delivery_man_id;
+    @JsonProperty("delivery_man_id")
+    private String deliveryManId;
 
-    private String delivered_date_time;
+    @JsonProperty("delivered_date_time")
+    private String deliveredDateTime;
 
-    private String pickup_address;
+    @JsonProperty("pickup_address")
+    private String pickupAddress;
 
-    private String order_id;
+    @JsonProperty("order_id")
+    private String orderId;
 }

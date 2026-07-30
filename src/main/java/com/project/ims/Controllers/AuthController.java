@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.JwtRequest;
 import com.project.ims.Models.JwtResponse;
@@ -26,7 +25,7 @@ import com.project.ims.Services.CustomUserDetailService;
 
 import org.slf4j.Logger;
 
-@CrossOrigin(origins = {"https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173","https://ashish2901-ims.vercel.app/","http://localhost:3000","http://localhost:3001","https://ims-frontend-eight.vercel.app/"}, allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -47,12 +46,11 @@ public class AuthController {
     @Autowired
     private JwtHelper helper;
 
-    private Logger logger = LoggerFactory.getLogger(AuthController.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
-        System.out.println("Login Request : " + request);
+        logger.info("Login request for username: {}", request.getUsername());
         this.doAuthenticate(request.getUsername(), request.getPassword());
 
 
@@ -91,7 +89,7 @@ public class AuthController {
     @PostMapping("/register")
     public User createUser(@RequestBody User user) {
 
-        System.out.println(user);
+        logger.info("Register request for user: {}", user.getUserId());
 
         User newUser = new User();
         newUser.setUserId(user.getUserId());
@@ -106,11 +104,11 @@ public class AuthController {
 
             return newUser;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
-    
+
     @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePassword data) {
 
