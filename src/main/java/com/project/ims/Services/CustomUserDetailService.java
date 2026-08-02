@@ -22,6 +22,9 @@ public class CustomUserDetailService implements UserDetailsService {
 
         User user = userRepo.findByEmail(id);
 
+        if (user == null)
+            throw new UsernameNotFoundException("User not found");
+
         return user;
     }
     

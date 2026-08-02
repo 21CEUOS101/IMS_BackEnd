@@ -8,12 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import com.project.ims.Models.JwtRequest;
 import com.project.ims.Models.JwtResponse;
@@ -75,13 +77,17 @@ public class AuthController {
             manager.authenticate(authentication);
 
 
-        } catch (BadCredentialsException e) {
+        } catch (AuthenticationException e) {
+            // Unknown usernames surface as InternalAuthenticationServiceException rather
+            // than BadCredentialsException; normalize both to the same clean response
+            // instead of letting the unknown-username case leak an internal error message.
             throw new BadCredentialsException(" Invalid Username or Password  !!");
         }
 
     }
 
     @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String exceptionHandler() {
         return "Credentials Invalid !!";
     }
